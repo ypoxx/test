@@ -8,9 +8,66 @@ let gameSpeed = 5;
 let score = 0;
 let highScore = localStorage.getItem('highScore') || 0;
 let animationId;
+let particles = [];
+let stars = [];
 
 // Update high score display
 document.getElementById('highScore').textContent = highScore;
+
+// Generate stars for background
+for (let i = 0; i < 50; i++) {
+    stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * (canvas.height - 60),
+        size: Math.random() * 2,
+        speed: Math.random() * 0.5 + 0.1
+    });
+}
+
+// Particle System
+class Particle {
+    constructor(x, y, color, velocityX, velocityY) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.velocityX = velocityX;
+        this.velocityY = velocityY;
+        this.size = Math.random() * 4 + 2;
+        this.life = 1;
+        this.decay = Math.random() * 0.02 + 0.01;
+    }
+
+    update() {
+        this.x += this.velocityX;
+        this.y += this.velocityY;
+        this.velocityY += 0.2; // Gravity
+        this.life -= this.decay;
+    }
+
+    draw() {
+        ctx.save();
+        ctx.globalAlpha = this.life;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+
+    isDead() {
+        return this.life <= 0;
+    }
+}
+
+function createParticles(x, y, color, count) {
+    for (let i = 0; i < count; i++) {
+        const angle = (Math.PI * 2 * i) / count;
+        const speed = Math.random() * 3 + 2;
+        const velocityX = Math.cos(angle) * speed;
+        const velocityY = Math.sin(angle) * speed - 2;
+        particles.push(new Particle(x, y, color, velocityX, velocityY));
+    }
+}
 
 // Player Object
 const player = {
@@ -22,28 +79,78 @@ const player = {
     gravity: 0.6,
     jumpPower: -12,
     isJumping: false,
+    rotation: 0,
+    targetRotation: 0,
+    wasJumping: false,
 
     draw() {
-        // Body
-        ctx.fillStyle = '#667eea';
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.save();
+
+        // Shadow
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+        ctx.beginPath();
+        const shadowY = canvas.height - 60;
+        const shadowScale = 1 - (shadowY - this.y - this.height) / 200;
+        ctx.ellipse(this.x + this.width / 2, shadowY + 5,
+                   this.width / 2 * shadowScale, 5 * shadowScale, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Translate to player center for rotation
+        ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+        ctx.rotate(this.rotation);
+        ctx.translate(-this.width / 2, -this.height / 2);
+
+        // Body with gradient
+        const gradient = ctx.createLinearGradient(0, 0, 0, this.height);
+        gradient.addColorStop(0, '#667eea');
+        gradient.addColorStop(1, '#764ba2');
+        ctx.fillStyle = gradient;
+
+        // Rounded rectangle body
+        ctx.beginPath();
+        ctx.roundRect(0, 0, this.width, this.height, 10);
+        ctx.fill();
+
+        // Highlight
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.beginPath();
+        ctx.roundRect(3, 3, this.width - 6, this.height / 2, 8);
+        ctx.fill();
 
         // Eyes
         ctx.fillStyle = 'white';
-        ctx.fillRect(this.x + 8, this.y + 10, 8, 8);
-        ctx.fillRect(this.x + 24, this.y + 10, 8, 8);
+        ctx.beginPath();
+        ctx.arc(12, 15, 6, 0, Math.PI * 2);
+        ctx.arc(28, 15, 6, 0, Math.PI * 2);
+        ctx.fill();
 
-        // Pupils
+        // Pupils (follow movement)
+        const pupilOffsetX = this.velocityY < 0 ? -1 : 1;
         ctx.fillStyle = 'black';
-        ctx.fillRect(this.x + 11, this.y + 13, 4, 4);
-        ctx.fillRect(this.x + 27, this.y + 13, 4, 4);
+        ctx.beginPath();
+        ctx.arc(12 + pupilOffsetX, 15, 3, 0, Math.PI * 2);
+        ctx.arc(28 + pupilOffsetX, 15, 3, 0, Math.PI * 2);
+        ctx.fill();
 
-        // Mouth
-        ctx.fillStyle = 'black';
-        ctx.fillRect(this.x + 12, this.y + 28, 16, 3);
+        // Mouth (changes based on jumping)
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        if (this.isJumping) {
+            // Excited mouth
+            ctx.arc(20, 25, 8, 0.2, Math.PI - 0.2);
+        } else {
+            // Normal smile
+            ctx.arc(20, 22, 6, 0.1, Math.PI - 0.1);
+        }
+        ctx.stroke();
+
+        ctx.restore();
     },
 
     update() {
+        const wasOnGround = !this.isJumping && this.velocityY === 0;
+
         // Apply gravity
         this.velocityY += this.gravity;
         this.y += this.velocityY;
@@ -53,14 +160,37 @@ const player = {
         if (this.y >= groundLevel) {
             this.y = groundLevel;
             this.velocityY = 0;
+
+            // Landing particles
+            if (this.wasJumping) {
+                createParticles(this.x + this.width / 2, this.y + this.height,
+                              '#8bc34a', 8);
+            }
+
             this.isJumping = false;
+            this.targetRotation = 0;
         }
+
+        // Smooth rotation
+        this.rotation += (this.targetRotation - this.rotation) * 0.1;
+
+        // Update rotation while jumping
+        if (this.isJumping && this.velocityY < 0) {
+            this.targetRotation = -Math.PI / 8; // Tilt back when going up
+        } else if (this.isJumping && this.velocityY > 0) {
+            this.targetRotation = Math.PI / 12; // Tilt forward when falling
+        }
+
+        this.wasJumping = this.isJumping;
     },
 
     jump() {
         if (!this.isJumping) {
             this.velocityY = this.jumpPower;
             this.isJumping = true;
+            // Jump particles
+            createParticles(this.x + this.width / 2, this.y + this.height,
+                          '#667eea', 10);
         }
     },
 
@@ -68,6 +198,9 @@ const player = {
         this.y = 300;
         this.velocityY = 0;
         this.isJumping = false;
+        this.rotation = 0;
+        this.targetRotation = 0;
+        this.wasJumping = false;
     }
 };
 
@@ -79,19 +212,82 @@ const obstacleInterval = 120; // Frames between obstacles
 class Obstacle {
     constructor() {
         this.width = 30;
-        this.height = Math.random() * 40 + 40; // Random height between 40-80
+        this.height = Math.random() * 40 + 40;
         this.x = canvas.width;
         this.y = canvas.height - this.height - 60;
-        this.color = '#764ba2';
+        this.type = Math.random() > 0.5 ? 'spike' : 'block';
+        this.hue = Math.random() * 30 + 260; // Purple range
     }
 
     draw() {
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.save();
 
-        // Add some detail
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-        ctx.fillRect(this.x + 5, this.y + 5, this.width - 10, this.height - 10);
+        if (this.type === 'spike') {
+            // Spike obstacle
+            const gradient = ctx.createLinearGradient(
+                this.x, this.y,
+                this.x, this.y + this.height
+            );
+            gradient.addColorStop(0, `hsl(${this.hue}, 60%, 50%)`);
+            gradient.addColorStop(1, `hsl(${this.hue}, 60%, 35%)`);
+            ctx.fillStyle = gradient;
+
+            // Draw spike shape
+            ctx.beginPath();
+            ctx.moveTo(this.x + this.width / 2, this.y);
+            ctx.lineTo(this.x + this.width, this.y + this.height);
+            ctx.lineTo(this.x, this.y + this.height);
+            ctx.closePath();
+            ctx.fill();
+
+            // Highlight
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.beginPath();
+            ctx.moveTo(this.x + this.width / 2, this.y + 5);
+            ctx.lineTo(this.x + this.width / 2 + 5, this.y + this.height / 2);
+            ctx.lineTo(this.x + this.width / 2, this.y + this.height / 2);
+            ctx.closePath();
+            ctx.fill();
+
+            // Shadow
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.beginPath();
+            ctx.moveTo(this.x + this.width / 2, this.y + this.height - 10);
+            ctx.lineTo(this.x + this.width - 5, this.y + this.height);
+            ctx.lineTo(this.x + 5, this.y + this.height);
+            ctx.closePath();
+            ctx.fill();
+
+        } else {
+            // Block obstacle
+            const gradient = ctx.createLinearGradient(
+                this.x, this.y,
+                this.x, this.y + this.height
+            );
+            gradient.addColorStop(0, `hsl(${this.hue}, 60%, 50%)`);
+            gradient.addColorStop(1, `hsl(${this.hue}, 60%, 35%)`);
+            ctx.fillStyle = gradient;
+
+            // Rounded block
+            ctx.beginPath();
+            ctx.roundRect(this.x, this.y, this.width, this.height, 8);
+            ctx.fill();
+
+            // Highlight
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.beginPath();
+            ctx.roundRect(this.x + 3, this.y + 3, this.width - 6, this.height / 3, 5);
+            ctx.fill();
+
+            // Inner detail
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(this.x + 5, this.y + 5, this.width - 10, this.height - 10, 5);
+            ctx.stroke();
+        }
+
+        ctx.restore();
     }
 
     update() {
@@ -113,41 +309,108 @@ function checkCollision(player, obstacle) {
 
 // Draw Ground
 function drawGround() {
-    ctx.fillStyle = '#8bc34a';
+    // Grass gradient
+    const gradient = ctx.createLinearGradient(0, canvas.height - 60, 0, canvas.height);
+    gradient.addColorStop(0, '#8bc34a');
+    gradient.addColorStop(0.5, '#7cb342');
+    gradient.addColorStop(1, '#689f38');
+    ctx.fillStyle = gradient;
     ctx.fillRect(0, canvas.height - 60, canvas.width, 60);
 
-    // Ground detail
+    // Grass blades
     ctx.fillStyle = '#7cb342';
-    for (let i = 0; i < canvas.width; i += 40) {
-        ctx.fillRect(i, canvas.height - 60, 30, 5);
+    const offset = (score / 5) % 20;
+    for (let i = -20; i < canvas.width + 20; i += 20) {
+        const x = i - offset;
+        ctx.beginPath();
+        ctx.moveTo(x, canvas.height - 60);
+        ctx.lineTo(x + 5, canvas.height - 70);
+        ctx.lineTo(x + 3, canvas.height - 60);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(x + 10, canvas.height - 60);
+        ctx.lineTo(x + 13, canvas.height - 65);
+        ctx.lineTo(x + 12, canvas.height - 60);
+        ctx.fill();
+    }
+
+    // Ground line
+    ctx.strokeStyle = '#689f38';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(0, canvas.height - 60);
+    ctx.lineTo(canvas.width, canvas.height - 60);
+    ctx.stroke();
+
+    // Dirt
+    ctx.fillStyle = '#6d4c41';
+    for (let i = 0; i < canvas.width; i += 30) {
+        ctx.fillRect(i + 10, canvas.height - 40, 3, 3);
+        ctx.fillRect(i + 20, canvas.height - 25, 2, 2);
+        ctx.fillRect(i + 5, canvas.height - 15, 2, 2);
     }
 }
 
 // Draw Background
 function drawBackground() {
-    // Sky
-    ctx.fillStyle = '#e0f7ff';
+    // Sky gradient
+    const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height - 60);
+    skyGradient.addColorStop(0, '#87CEEB');
+    skyGradient.addColorStop(1, '#e0f7ff');
+    ctx.fillStyle = skyGradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height - 60);
 
-    // Clouds
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+    // Stars (subtle)
+    stars.forEach(star => {
+        star.x -= star.speed;
+        if (star.x < -10) star.x = canvas.width + 10;
+
+        ctx.fillStyle = `rgba(255, 255, 255, ${star.size / 4})`;
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        ctx.fill();
+    });
+
+    // Clouds with better rendering
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+
+    // Cloud 1
+    const cloud1X = 100 - (score % 800);
+    drawCloud(cloud1X, 60, 1.2);
+
+    // Cloud 2
+    const cloud2X = 400 - (score % 1000) * 0.5;
+    drawCloud(cloud2X, 100, 1);
+
+    // Cloud 3
+    const cloud3X = 600 - (score % 600);
+    drawCloud(cloud3X, 80, 0.8);
+
+    // Cloud 4
+    const cloud4X = 250 - (score % 700) * 0.7;
+    drawCloud(cloud4X, 140, 0.9);
+}
+
+function drawCloud(x, y, scale) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
     ctx.beginPath();
-    ctx.arc(100 - (score % 800), 60, 30, 0, Math.PI * 2);
-    ctx.arc(120 - (score % 800), 50, 40, 0, Math.PI * 2);
-    ctx.arc(140 - (score % 800), 60, 30, 0, Math.PI * 2);
+    ctx.arc(0, 0, 20, 0, Math.PI * 2);
+    ctx.arc(20, -5, 25, 0, Math.PI * 2);
+    ctx.arc(40, 0, 20, 0, Math.PI * 2);
     ctx.fill();
 
+    // Cloud shadow
+    ctx.fillStyle = 'rgba(200, 220, 255, 0.3)';
     ctx.beginPath();
-    ctx.arc(400 - (score % 1000) * 0.5, 100, 25, 0, Math.PI * 2);
-    ctx.arc(420 - (score % 1000) * 0.5, 95, 35, 0, Math.PI * 2);
-    ctx.arc(440 - (score % 1000) * 0.5, 100, 25, 0, Math.PI * 2);
+    ctx.ellipse(20, 15, 30, 5, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.beginPath();
-    ctx.arc(600 - (score % 600), 80, 20, 0, Math.PI * 2);
-    ctx.arc(615 - (score % 600), 75, 30, 0, Math.PI * 2);
-    ctx.arc(630 - (score % 600), 80, 20, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.restore();
 }
 
 // Update Score Display
@@ -168,6 +431,12 @@ function gameOver() {
     gameRunning = false;
     cancelAnimationFrame(animationId);
 
+    // Create explosion particles
+    createParticles(player.x + player.width / 2, player.y + player.height / 2,
+                   '#ff5252', 30);
+    createParticles(player.x + player.width / 2, player.y + player.height / 2,
+                   '#ffa726', 20);
+
     const finalScore = Math.floor(score / 10);
     document.getElementById('finalScore').textContent = finalScore;
 
@@ -178,7 +447,9 @@ function gameOver() {
         document.getElementById('highScore').textContent = highScore;
     }
 
-    document.getElementById('gameOver').classList.remove('hidden');
+    setTimeout(() => {
+        document.getElementById('gameOver').classList.remove('hidden');
+    }, 300);
 }
 
 // Game Loop
@@ -189,19 +460,15 @@ function gameLoop() {
     // Draw
     drawBackground();
     drawGround();
-    player.draw();
 
-    // Update player
-    player.update();
+    // Update and draw particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        particles[i].draw();
 
-    // Update score
-    updateScore();
-
-    // Spawn obstacles
-    obstacleTimer++;
-    if (obstacleTimer > obstacleInterval) {
-        obstacles.push(new Obstacle());
-        obstacleTimer = 0;
+        if (particles[i].isDead()) {
+            particles.splice(i, 1);
+        }
     }
 
     // Update and draw obstacles
@@ -210,9 +477,9 @@ function gameLoop() {
         obstacles[i].draw();
 
         // Check collision
-        if (checkCollision(player, obstacles[i])) {
+        if (gameRunning && checkCollision(player, obstacles[i])) {
             gameOver();
-            return;
+            // Don't return immediately, let particles render
         }
 
         // Remove off-screen obstacles
@@ -221,8 +488,22 @@ function gameLoop() {
         }
     }
 
-    // Continue loop
+    // Draw player
     if (gameRunning) {
+        player.draw();
+        player.update();
+        updateScore();
+
+        // Spawn obstacles
+        obstacleTimer++;
+        if (obstacleTimer > obstacleInterval) {
+            obstacles.push(new Obstacle());
+            obstacleTimer = 0;
+        }
+    }
+
+    // Continue loop (keep rendering particles even after game over)
+    if (gameRunning || particles.length > 0) {
         animationId = requestAnimationFrame(gameLoop);
     }
 }
@@ -233,6 +514,7 @@ function startGame() {
     score = 0;
     gameSpeed = 5;
     obstacles = [];
+    particles = [];
     obstacleTimer = 0;
     player.reset();
     document.getElementById('score').textContent = '0';
