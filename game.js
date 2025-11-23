@@ -17,7 +17,6 @@ const DIFFICULTY = {
 let currentDifficulty = 'easy';
 let tutorialMode = true;
 let tutorialStep = 0;
-let showingHowToPlay = false;
 
 // Philosophical Eras with Themes
 const ERAS = [
@@ -146,7 +145,7 @@ const QUOTES = [
 let gameRunning = false;
 let gamePaused = false;
 let score = 0;
-let wisdom = 0; // New: Wisdom points
+let wisdom = 0;
 let highScore = localStorage.getItem('philosophyHighScore') || 0;
 let currentEraIndex = 0;
 let selectedPhilosopherIndex = 0;
@@ -163,14 +162,11 @@ let tutorialMessages = [];
 // Tutorial Messages
 const TUTORIAL_STEPS = [
     { text: "Willkommen zur philosophischen Reise!", duration: 3000 },
-    { text: "Drücke LEERTASTE zum Springen! ⬆️", duration: 3000 },
+    { text: "Tap oder Klick zum Springen! ⬆️", duration: 3000 },
     { text: "Sammle philosophische Werke 📚", duration: 3000 },
     { text: "Weiche Dilemmata aus! ⚠️", duration: 3000 },
     { text: "Erreiche neue Epochen der Philosophie! 🎯", duration: 3000 }
 ];
-
-// Update displays
-document.getElementById('highScore').textContent = highScore;
 
 // Player Object
 const player = {
@@ -341,7 +337,7 @@ class Obstacle {
         ctx.textBaseline = 'middle';
         ctx.fillText(this.dilemma.icon, this.x + this.width / 2, this.y + this.height / 2);
 
-        // Name label (NEW!)
+        // Name label
         ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
         ctx.fillRect(this.x - 5, this.y - 25, this.width + 10, 22);
         ctx.fillStyle = era.color;
@@ -392,7 +388,7 @@ class Collectible {
 
         ctx.restore();
 
-        // Work title (NEW!)
+        // Work title
         ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
         const textWidth = ctx.measureText(this.work.name).width;
         ctx.fillRect(this.x + this.width / 2 - textWidth / 2 - 5, this.y - 25, textWidth + 10, 22);
@@ -537,40 +533,7 @@ function drawGround() {
     }
 }
 
-// Draw Progress Bar (NEW!)
-function drawProgressBar() {
-    const nextEra = ERAS[currentEraIndex + 1];
-    if (!nextEra) return;
-
-    const progress = (score - ERAS[currentEraIndex].scoreThreshold) /
-                     (nextEra.scoreThreshold - ERAS[currentEraIndex].scoreThreshold);
-    const barWidth = 300;
-    const barHeight = 25;
-    const barX = canvas.width - barWidth - 20;
-    const barY = 80;
-
-    // Background
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-    ctx.fillRect(barX, barY, barWidth, barHeight);
-
-    // Progress fill
-    const era = ERAS[currentEraIndex];
-    ctx.fillStyle = era.color;
-    ctx.fillRect(barX, barY, barWidth * Math.min(progress, 1), barHeight);
-
-    // Border
-    ctx.strokeStyle = era.color;
-    ctx.lineWidth = 2;
-    ctx.strokeRect(barX, barY, barWidth, barHeight);
-
-    // Text
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 12px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText(`Nächste Epoche: ${nextEra.name} ${nextEra.icon}`, barX + barWidth / 2, barY - 8);
-}
-
-// Draw Tutorial Messages (NEW!)
+// Draw Tutorial Messages
 function drawTutorialMessages() {
     if (!tutorialMode || tutorialMessages.length === 0) return;
 
@@ -621,8 +584,6 @@ function updateEra() {
             if (i !== currentEraIndex) {
                 currentEraIndex = i;
                 document.getElementById('currentEra').textContent = ERAS[i].name;
-                document.getElementById('eraIcon').textContent = ERAS[i].icon;
-                document.getElementById('eraTheme').textContent = ERAS[i].theme;
                 showQuote();
                 createParticles(canvas.width / 2, canvas.height / 2, ERAS[i].color, 50);
 
@@ -640,13 +601,18 @@ function updateEra() {
 // Show Random Quote
 function showQuote() {
     const quote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
-    const quoteEl = document.getElementById('quote');
-    document.getElementById('quoteText').textContent = `"${quote.text}"`;
+    const quoteEl = document.getElementById('quoteDisplay');
+    document.getElementById('quoteText').textContent = quote.text;
     document.getElementById('quoteAuthor').textContent = `- ${quote.author}`;
+
     quoteEl.classList.remove('hidden');
+    quoteEl.classList.add('show');
 
     setTimeout(() => {
-        quoteEl.classList.add('hidden');
+        quoteEl.classList.remove('show');
+        setTimeout(() => {
+            quoteEl.classList.add('hidden');
+        }, 300);
     }, 4000);
 }
 
@@ -662,20 +628,21 @@ function updateScore() {
     }
 }
 
-// Show Collected Work (NEW!)
+// Show Collected Work
 function showCollectedWork(work) {
-    const notification = document.createElement('div');
-    notification.className = 'work-notification';
-    notification.innerHTML = `
-        <div class="work-title">${work.icon} ${work.name}</div>
-        <div class="work-author">von ${work.author}</div>
-    `;
-    document.body.appendChild(notification);
+    const notification = document.getElementById('workNotification');
+    document.getElementById('notifTitle').textContent = work.name;
+    document.getElementById('notifAuthor').textContent = `von ${work.author} • +100`;
+
+    notification.classList.remove('hidden');
+    notification.classList.add('show');
 
     setTimeout(() => {
-        notification.classList.add('fade-out');
-        setTimeout(() => notification.remove(), 500);
-    }, 2000);
+        notification.classList.remove('show');
+        setTimeout(() => {
+            notification.classList.add('hidden');
+        }, 300);
+    }, 2500);
 }
 
 // Game Over
@@ -688,16 +655,16 @@ function gameOver() {
     const finalScore = Math.floor(score / 10);
     document.getElementById('finalScore').textContent = finalScore;
     document.getElementById('finalWisdom').textContent = wisdom;
-    document.getElementById('finalEra').textContent = ERAS[currentEraIndex].name;
+    document.getElementById('finalEraName').textContent = ERAS[currentEraIndex].name;
+    document.getElementById('finalEraIcon').textContent = ERAS[currentEraIndex].icon;
 
     if (finalScore > highScore) {
         highScore = finalScore;
         localStorage.setItem('philosophyHighScore', highScore);
-        document.getElementById('highScore').textContent = highScore;
     }
 
     setTimeout(() => {
-        document.getElementById('gameOver').classList.remove('hidden');
+        switchScreen('gameOverScreen');
     }, 300);
 }
 
@@ -714,7 +681,6 @@ function gameLoop() {
 
     drawBackground();
     drawGround();
-    drawProgressBar();
 
     // Update and draw particles
     for (let i = particles.length - 1; i >= 0; i--) {
@@ -837,11 +803,10 @@ function startGame() {
     document.getElementById('score').textContent = '0';
     document.getElementById('wisdom').textContent = '0';
     document.getElementById('currentEra').textContent = ERAS[0].name;
-    document.getElementById('eraIcon').textContent = ERAS[0].icon;
-    document.getElementById('eraTheme').textContent = ERAS[0].theme;
-    document.getElementById('currentPhilosopher').textContent = PHILOSOPHERS[selectedPhilosopherIndex].name;
-    document.getElementById('gameOver').classList.add('hidden');
-    document.getElementById('startScreen').classList.add('hidden');
+    document.getElementById('philName').textContent = PHILOSOPHERS[selectedPhilosopherIndex].name;
+    document.getElementById('philIcon').textContent = PHILOSOPHERS[selectedPhilosopherIndex].icon;
+
+    switchScreen('gameScreen');
 
     // Start tutorial
     showTutorialMessage(0);
@@ -853,6 +818,28 @@ function startGame() {
     gameLoop();
 }
 
+// Screen Management
+function switchScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+}
+
+// Panel Management
+function openPanel(panelId) {
+    document.getElementById(panelId).classList.add('open');
+    if (gameRunning) {
+        gamePaused = true;
+    }
+}
+
+function closePanel(panelId) {
+    document.getElementById(panelId).classList.remove('open');
+    if (gameRunning) {
+        gamePaused = false;
+        gameLoop();
+    }
+}
+
 // Utility function
 function adjustColor(color, amount) {
     const num = parseInt(color.replace('#', ''), 16);
@@ -862,7 +849,20 @@ function adjustColor(color, amount) {
     return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
 }
 
+// Update Character Selection
+function updateCharacterSelection() {
+    document.querySelectorAll('.phil-card').forEach((card, index) => {
+        if (index === selectedPhilosopherIndex) {
+            card.classList.add('active');
+        } else {
+            card.classList.remove('active');
+        }
+    });
+}
+
 // Event Listeners
+
+// Keyboard controls
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Space' || e.key === ' ') {
         e.preventDefault();
@@ -870,22 +870,9 @@ document.addEventListener('keydown', (e) => {
             player.jump();
         }
     }
-    if (e.key === 'p' || e.key === 'P') {
-        if (gameRunning) {
-            gamePaused = !gamePaused;
-            if (!gamePaused) gameLoop();
-        }
-    }
-    if (e.key === 'ArrowUp' && !gameRunning) {
-        selectedPhilosopherIndex = (selectedPhilosopherIndex - 1 + PHILOSOPHERS.length) % PHILOSOPHERS.length;
-        updateCharacterSelection();
-    }
-    if (e.key === 'ArrowDown' && !gameRunning) {
-        selectedPhilosopherIndex = (selectedPhilosopherIndex + 1) % PHILOSOPHERS.length;
-        updateCharacterSelection();
-    }
 });
 
+// Canvas click/touch
 canvas.addEventListener('click', () => {
     if (gameRunning) {
         player.jump();
@@ -899,72 +886,74 @@ canvas.addEventListener('touchstart', (e) => {
     }
 }, { passive: false });
 
-document.getElementById('restartBtn').addEventListener('click', () => {
-    document.getElementById('gameOver').classList.add('hidden');
-    document.getElementById('startScreen').classList.remove('hidden');
+// Start Screen
+document.getElementById('startGameBtn').addEventListener('click', startGame);
+
+document.getElementById('helpBtn').addEventListener('click', () => {
+    openPanel('helpPanel');
 });
 
-document.getElementById('startBtn').addEventListener('click', startGame);
-
-// Difficulty selection
-document.querySelectorAll('.difficulty-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        currentDifficulty = btn.dataset.difficulty;
-        document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-    });
-});
-
-// How to Play
-const howToPlayBtn = document.getElementById('howToPlayBtn');
-const howToPlayOverlay = document.getElementById('howToPlay');
-const closeHowToPlayBtn = document.getElementById('closeHowToPlay');
-
-if (howToPlayBtn && howToPlayOverlay) {
-    howToPlayBtn.addEventListener('click', () => {
-        howToPlayOverlay.classList.remove('hidden');
-    });
-}
-
-if (closeHowToPlayBtn && howToPlayOverlay) {
-    closeHowToPlayBtn.addEventListener('click', () => {
-        howToPlayOverlay.classList.add('hidden');
-    });
-}
-
-// Close on background click
-if (howToPlayOverlay) {
-    howToPlayOverlay.addEventListener('click', (e) => {
-        if (e.target === howToPlayOverlay) {
-            howToPlayOverlay.classList.add('hidden');
-        }
-    });
-}
-
-// Character selection
-document.querySelectorAll('.character-card').forEach((card, index) => {
+// Philosopher Selection
+document.querySelectorAll('.phil-card').forEach((card, index) => {
     card.addEventListener('click', () => {
         selectedPhilosopherIndex = index;
         updateCharacterSelection();
     });
 });
 
-function updateCharacterSelection() {
-    document.querySelectorAll('.character-card').forEach((card, index) => {
-        if (index === selectedPhilosopherIndex) {
-            card.classList.add('selected');
-            const phil = PHILOSOPHERS[index];
-            document.getElementById('philInfo').innerHTML = `
-                <strong>${phil.name}</strong> (${phil.lived})<br>
-                <em>"${phil.idea}"</em>
-            `;
-        } else {
-            card.classList.remove('selected');
-        }
+// Difficulty Selection
+document.querySelectorAll('.diff-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        currentDifficulty = btn.dataset.diff;
+        document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
     });
-}
+});
+
+// Help Panel
+document.getElementById('closeHelpBtn').addEventListener('click', () => {
+    closePanel('helpPanel');
+});
+
+document.getElementById('closeHelp2Btn').addEventListener('click', () => {
+    closePanel('helpPanel');
+});
+
+// Menu Panel
+document.getElementById('menuBtn').addEventListener('click', () => {
+    openPanel('menuPanel');
+});
+
+document.getElementById('closeMenuBtn').addEventListener('click', () => {
+    closePanel('menuPanel');
+});
+
+document.getElementById('resumeBtn').addEventListener('click', () => {
+    closePanel('menuPanel');
+});
+
+document.getElementById('menuHelpBtn').addEventListener('click', () => {
+    closePanel('menuPanel');
+    openPanel('helpPanel');
+});
+
+document.getElementById('quitBtn').addEventListener('click', () => {
+    gameRunning = false;
+    gamePaused = false;
+    cancelAnimationFrame(animationId);
+    closePanel('menuPanel');
+    switchScreen('startScreen');
+});
+
+// Game Over Screen
+document.getElementById('restartBtn').addEventListener('click', () => {
+    startGame();
+});
+
+document.getElementById('backToMenuBtn').addEventListener('click', () => {
+    switchScreen('startScreen');
+});
 
 // Initial setup
 updateCharacterSelection();
-drawBackground();
-drawGround();
+switchScreen('startScreen');
