@@ -562,9 +562,11 @@ function adjustColor(color, amount) {
 
 // Event Listeners
 document.addEventListener('keydown', (e) => {
-    if (e.code === 'Space') {
+    if (e.code === 'Space' || e.key === ' ') {
         e.preventDefault();
-        player.jump();
+        if (gameRunning) {
+            player.jump();
+        }
     }
     if (e.key === 'p' || e.key === 'P') {
         if (gameRunning) {
@@ -583,8 +585,17 @@ document.addEventListener('keydown', (e) => {
 });
 
 canvas.addEventListener('click', () => {
-    player.jump();
+    if (gameRunning) {
+        player.jump();
+    }
 });
+
+canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (gameRunning) {
+        player.jump();
+    }
+}, { passive: false });
 
 document.getElementById('restartBtn').addEventListener('click', () => {
     document.getElementById('gameOver').classList.add('hidden');

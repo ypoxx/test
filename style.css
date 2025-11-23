@@ -4,6 +4,26 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(196, 158, 100, 0.1);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(196, 158, 100, 0.5);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(196, 158, 100, 0.7);
 }
 
 body {
@@ -241,7 +261,7 @@ h1 {
     transform: translate(-50%, -50%) scale(0.8);
     background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(25px);
-    padding: 60px 80px;
+    padding: 40px 50px;
     border-radius: 35px;
     box-shadow: 0 30px 120px rgba(0, 0, 0, 0.5),
                 0 0 0 3px rgba(196, 158, 100, 0.5) inset;
@@ -249,8 +269,12 @@ h1 {
     z-index: 1000;
     opacity: 0;
     transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    max-width: 700px;
+    max-width: 650px;
+    max-height: 90vh;
     width: 90%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
 }
 
 .start-screen {
@@ -273,8 +297,8 @@ h1 {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: 25px;
-    font-size: 3em;
+    margin-bottom: 20px;
+    font-size: 2.2em;
     font-weight: 800;
     animation: shake 0.6s ease-in-out;
 }
@@ -375,8 +399,8 @@ h1 {
 
 /* Character Selection */
 .character-select {
-    margin: 30px 0;
-    padding: 25px;
+    margin: 20px 0;
+    padding: 20px;
     background: linear-gradient(135deg, rgba(196, 158, 100, 0.1) 0%, rgba(74, 44, 94, 0.1) 100%);
     border-radius: 20px;
     border: 2px solid rgba(196, 158, 100, 0.3);
@@ -385,8 +409,8 @@ h1 {
 .character-select h3 {
     font-family: 'Cinzel', serif;
     color: #4a2c5e;
-    margin-bottom: 20px;
-    font-size: 1.5em;
+    margin-bottom: 15px;
+    font-size: 1.3em;
 }
 
 .characters {
@@ -400,8 +424,8 @@ h1 {
     background: white;
     border: 3px solid rgba(196, 158, 100, 0.3);
     border-radius: 15px;
-    padding: 20px;
-    min-width: 150px;
+    padding: 15px;
+    min-width: 130px;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
@@ -421,15 +445,15 @@ h1 {
 }
 
 .char-icon {
-    font-size: 3em;
-    margin-bottom: 10px;
+    font-size: 2.5em;
+    margin-bottom: 8px;
 }
 
 .char-name {
     font-family: 'Cinzel', serif;
     font-weight: 700;
     color: #4a2c5e;
-    font-size: 1.2em;
+    font-size: 1.1em;
     margin-bottom: 5px;
 }
 
@@ -446,34 +470,94 @@ h1 {
 /* Responsive Design */
 @media (max-width: 768px) {
     h1 {
-        font-size: 2.5em;
+        font-size: 2.2em;
     }
 
     .subtitle {
-        font-size: 1em;
+        font-size: 0.95em;
     }
 
     .info-panel {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
         gap: 15px;
         padding: 20px;
     }
 
     .game-container {
-        padding: 25px;
+        padding: 20px;
     }
 
     .game-over, .start-screen {
-        padding: 40px 30px;
+        padding: 30px 25px;
         width: 95%;
+        max-height: 95vh;
+    }
+
+    .game-over h2, .start-screen h2 {
+        font-size: 1.8em;
+        margin-bottom: 15px;
+    }
+
+    .character-select {
+        margin: 15px 0;
+        padding: 15px;
+    }
+
+    .character-select h3 {
+        font-size: 1.1em;
+        margin-bottom: 12px;
     }
 
     .characters {
-        flex-direction: column;
-        align-items: stretch;
+        gap: 12px;
     }
 
     .character-card {
         min-width: auto;
+        padding: 12px;
+    }
+
+    .char-icon {
+        font-size: 2em;
+    }
+
+    .char-name {
+        font-size: 1em;
+    }
+
+    .instructions {
+        font-size: 0.95em !important;
+        margin-bottom: 20px !important;
+    }
+
+    #startBtn, #restartBtn {
+        padding: 15px 40px;
+        font-size: 1.05em;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.8em;
+    }
+
+    .game-over, .start-screen {
+        padding: 25px 20px;
+    }
+
+    .game-over h2, .start-screen h2 {
+        font-size: 1.5em;
+    }
+
+    .characters {
+        gap: 10px;
+    }
+
+    .character-card {
+        padding: 10px;
+    }
+
+    .char-icon {
+        font-size: 1.8em;
     }
 }
