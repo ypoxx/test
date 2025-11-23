@@ -916,13 +916,30 @@ document.querySelectorAll('.difficulty-btn').forEach(btn => {
 });
 
 // How to Play
-document.getElementById('howToPlayBtn')?.addEventListener('click', () => {
-    document.getElementById('howToPlay').classList.remove('hidden');
-});
+const howToPlayBtn = document.getElementById('howToPlayBtn');
+const howToPlayOverlay = document.getElementById('howToPlay');
+const closeHowToPlayBtn = document.getElementById('closeHowToPlay');
 
-document.getElementById('closeHowToPlay')?.addEventListener('click', () => {
-    document.getElementById('howToPlay').classList.add('hidden');
-});
+if (howToPlayBtn && howToPlayOverlay) {
+    howToPlayBtn.addEventListener('click', () => {
+        howToPlayOverlay.classList.remove('hidden');
+    });
+}
+
+if (closeHowToPlayBtn && howToPlayOverlay) {
+    closeHowToPlayBtn.addEventListener('click', () => {
+        howToPlayOverlay.classList.add('hidden');
+    });
+}
+
+// Close on background click
+if (howToPlayOverlay) {
+    howToPlayOverlay.addEventListener('click', (e) => {
+        if (e.target === howToPlayOverlay) {
+            howToPlayOverlay.classList.add('hidden');
+        }
+    });
+}
 
 // Character selection
 document.querySelectorAll('.character-card').forEach((card, index) => {
