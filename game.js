@@ -1,14 +1,45 @@
-// Canvas Setup
+// Canvas Setup with HiDPI/Retina Support
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+
+// HiDPI Support - Automatically scale for retina displays
+const dpr = window.devicePixelRatio || 1;
+const baseWidth = 900;
+const baseHeight = 450;
+
+// Set display size (CSS pixels)
+canvas.style.width = baseWidth + 'px';
+canvas.style.height = baseHeight + 'px';
+
+// Set actual size in memory (scaled by DPR for retina)
+canvas.width = baseWidth * dpr;
+canvas.height = baseHeight * dpr;
+
+// Scale all drawing operations
+ctx.scale(dpr, dpr);
+
+// Enable better anti-aliasing and image smoothing
+ctx.imageSmoothingEnabled = true;
+ctx.imageSmoothingQuality = 'high';
 
 // Game Constants
 const GRAVITY = 0.45;
 const JUMP_POWER = -11;
 const MAX_JUMP_POWER = -14;
 const JUMP_HOLD_BOOST = 0.3;
-const GROUND_LEVEL = canvas.height - 80;
-const GAME_DURATION = 90; // 90 seconds per run
+const GROUND_LEVEL = baseHeight - 80;
+const LEVEL_DURATION = 180; // 3 minutes per level
+const TOTAL_LEVELS = 6;
+
+// Level Requirements (books to collect per level)
+const LEVEL_REQUIREMENTS = [
+    { level: 1, name: 'Antike', books: 50, era: 0 },
+    { level: 2, name: 'Mittelalter', books: 55, era: 1 },
+    { level: 3, name: 'Renaissance', books: 60, era: 2 },
+    { level: 4, name: 'Aufklärung', books: 65, era: 3 },
+    { level: 5, name: 'Moderne', books: 70, era: 4 },
+    { level: 6, name: 'Gegenwart', books: 75, era: 5 }
+];
 
 // Physics constants
 const AIR_CONTROL = 0.3;
@@ -29,7 +60,9 @@ let tutorialStep = 0;
 let lastTime = 0;
 let deltaTime = 0;
 let gameTime = 0;
-let timeRemaining = GAME_DURATION;
+let timeRemaining = LEVEL_DURATION;
+let currentLevel = 1;
+let booksCollected = 0;
 
 // Sound System
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -216,8 +249,9 @@ const PHILOSOPHICAL_DILEMMAS = [
     { name: 'KI-Ethik', icon: '🤖', era: 5, effect: 'slow' }
 ];
 
-// Power-Ups
+// Power-Ups - 9 total (3 old + 6 new)
 const POWERUP_TYPES = [
+    // Original Power-Ups
     {
         name: 'Zeitlupe',
         icon: '⏱️',
@@ -238,6 +272,49 @@ const POWERUP_TYPES = [
         duration: 10000,
         color: '#FFD700',
         effect: 'doublejump'
+    },
+    // New Power-Ups
+    {
+        name: 'Time Freeze',
+        icon: '⏸️',
+        duration: 4000,
+        color: '#4169E1',
+        effect: 'timefreeze'
+    },
+    {
+        name: 'Invincibility',
+        icon: '⭐',
+        duration: 6000,
+        color: '#FFD700',
+        effect: 'invincibility'
+    },
+    {
+        name: 'Score Multiplier',
+        icon: '💎',
+        duration: 8000,
+        color: '#9370DB',
+        effect: 'scoremultiplier'
+    },
+    {
+        name: 'Speed Boost',
+        icon: '⚡',
+        duration: 5000,
+        color: '#FF6347',
+        effect: 'speedboost'
+    },
+    {
+        name: 'Ghost Mode',
+        icon: '👻',
+        duration: 5000,
+        color: '#E0E0E0',
+        effect: 'ghostmode'
+    },
+    {
+        name: 'Extra Time',
+        icon: '⏰',
+        duration: 0,
+        color: '#00CED1',
+        effect: 'extratime'
     }
 ];
 
@@ -281,7 +358,12 @@ let slowMotionTimer = 0;
 let activePowerups = {
     slowmo: 0,
     magnet: 0,
-    doublejump: 0
+    doublejump: 0,
+    timefreeze: 0,
+    invincibility: 0,
+    scoremultiplier: 0,
+    speedboost: 0,
+    ghostmode: 0
 };
 
 // Tutorial
@@ -332,7 +414,7 @@ const player = {
             ctx.fillStyle = gradient;
 
             const size = (i / this.trail.length) * this.width * 0.9;
-            ctx.font = `${size}px Arial`;
+            ctx.font = `${size}px Philosopher, Arial`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(PHILOSOPHERS[selectedPhilosopherIndex].icon, point.x, point.y);
@@ -378,10 +460,28 @@ const player = {
             ctx.fill();
         }
 
+        // Invincibility star aura
+        if (activePowerups.invincibility > 0) {
+            const starPulse = 50 + Math.sin(Date.now() / 100) * 8;
+            const starGradient = ctx.createRadialGradient(0, 0, 10, 0, 0, starPulse);
+            starGradient.addColorStop(0, 'transparent');
+            starGradient.addColorStop(0.6, '#FFD700' + '80');
+            starGradient.addColorStop(1, 'transparent');
+            ctx.fillStyle = starGradient;
+            ctx.beginPath();
+            ctx.arc(0, 0, starPulse, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Ghost mode transparency
+        if (activePowerups.ghostmode > 0) {
+            ctx.globalAlpha = 0.5;
+        }
+
         // Glow effect
         ctx.shadowColor = philosopher.color;
         ctx.shadowBlur = 20;
-        ctx.font = 'bold 50px Arial';
+        ctx.font = 'bold 50px Philosopher, Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(philosopher.icon, 0, 0);
@@ -390,7 +490,7 @@ const player = {
         if (this.slowTimer > 0) {
             ctx.globalAlpha = 0.5;
             ctx.fillStyle = '#0000FF';
-            ctx.font = 'bold 30px Arial';
+            ctx.font = 'bold 30px Philosopher, Arial';
             ctx.fillText('💤', 15, -15);
         }
 
@@ -654,7 +754,7 @@ class FloatingText {
     draw() {
         ctx.save();
         ctx.globalAlpha = this.life;
-        ctx.font = `bold ${this.size}px Arial`;
+        ctx.font = `bold ${this.size}px Philosopher, Arial`;
         ctx.fillStyle = this.color;
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 4;
@@ -716,7 +816,7 @@ class Collectible {
         // Icon with shadow
         ctx.shadowColor = '#FFD700';
         ctx.shadowBlur = 25;
-        ctx.font = 'bold 36px Arial';
+        ctx.font = 'bold 36px Philosopher, Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(this.work.icon, 0, 0);
@@ -725,7 +825,7 @@ class Collectible {
 
         // Label
         ctx.save();
-        ctx.font = 'bold 11px Arial';
+        ctx.font = 'bold 11px Philosopher, Arial';
         const textWidth = ctx.measureText(this.work.name).width + 10;
 
         const labelGradient = ctx.createLinearGradient(
@@ -745,7 +845,7 @@ class Collectible {
 
         // Lane bonus indicator
         if (this.lane.multiplier > 1) {
-            ctx.font = 'bold 10px Arial';
+            ctx.font = 'bold 10px Philosopher, Arial';
             ctx.fillStyle = '#FF6347';
             ctx.fillText(`x${this.lane.multiplier}`, this.x + this.width / 2, this.y - 34);
         }
@@ -753,7 +853,9 @@ class Collectible {
     }
 
     update(dt) {
-        const speedMult = activePowerups.slowmo > 0 ? 0.5 : 1;
+        let speedMult = activePowerups.slowmo > 0 ? 0.5 : 1;
+        // Speed boost increases obstacle speed (making game harder/faster)
+        speedMult *= activePowerups.speedboost > 0 ? 1.5 : 1;
         this.x -= this.speed * speedMult * dt;
         this.rotation += 0.03 * dt;
 
@@ -835,7 +937,7 @@ class Obstacle {
 
         // Icon
         ctx.shadowBlur = 8;
-        ctx.font = 'bold 35px Arial';
+        ctx.font = 'bold 35px Philosopher, Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillStyle = '#FFFFFF';
@@ -844,7 +946,7 @@ class Obstacle {
         ctx.restore();
 
         // Label
-        ctx.font = 'bold 10px Arial';
+        ctx.font = 'bold 10px Philosopher, Arial';
         const textWidth = ctx.measureText(this.dilemma.name).width + 10;
         ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
         ctx.fillRect(this.x + this.width / 2 - textWidth / 2, this.y - 24, textWidth, 18);
@@ -854,7 +956,8 @@ class Obstacle {
     }
 
     update(dt) {
-        const speedMult = activePowerups.slowmo > 0 ? 0.5 : 1;
+        let speedMult = activePowerups.slowmo > 0 ? 0.5 : 1;
+        speedMult *= activePowerups.speedboost > 0 ? 1.5 : 1;
         this.x -= this.speed * speedMult * dt;
     }
 
@@ -903,7 +1006,7 @@ class PowerUp {
         // Icon
         ctx.shadowColor = this.type.color;
         ctx.shadowBlur = 20;
-        ctx.font = 'bold 32px Arial';
+        ctx.font = 'bold 32px Philosopher, Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillStyle = '#FFFFFF';
@@ -913,7 +1016,8 @@ class PowerUp {
     }
 
     update(dt) {
-        const speedMult = activePowerups.slowmo > 0 ? 0.5 : 1;
+        let speedMult = activePowerups.slowmo > 0 ? 0.5 : 1;
+        speedMult *= activePowerups.speedboost > 0 ? 1.5 : 1;
         this.x -= this.speed * speedMult * dt;
         this.rotation += 0.025 * dt;
     }
@@ -992,7 +1096,7 @@ function drawBackground() {
 
     // Era theme
     ctx.save();
-    ctx.font = 'bold 16px Arial';
+    ctx.font = 'bold 16px Philosopher, Arial';
     ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
     ctx.textAlign = 'left';
     ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
@@ -1043,7 +1147,7 @@ function drawTutorialMessages() {
         ctx.globalAlpha = alpha;
 
         const y = 160 + index * 55;
-        ctx.font = 'bold 19px Arial';
+        ctx.font = 'bold 19px Philosopher, Arial';
         const textWidth = ctx.measureText(msg.text).width;
 
         const gradient = ctx.createLinearGradient(
@@ -1163,7 +1267,10 @@ function updateScore(dt) {
         score += dt * 0.5;
         document.getElementById('score').textContent = Math.floor(score / 10);
         updateEra();
-        document.getElementById('wisdom').textContent = wisdom;
+
+        // Update books display (show as "Books: X / Target")
+        const levelReq = LEVEL_REQUIREMENTS[currentLevel - 1];
+        document.getElementById('wisdom').textContent = `${booksCollected}/${levelReq.books}`;
 
         // Combo visual
         if (comboMultiplier > 1) {
@@ -1204,13 +1311,47 @@ function applyScreenShake() {
     }
 }
 
-// Game Over (now just time's up!)
-function gameOver() {
+// Check Level Complete
+function checkLevelComplete() {
+    const levelReq = LEVEL_REQUIREMENTS[currentLevel - 1];
+
+    if (booksCollected >= levelReq.books) {
+        // Level complete! Go to next level
+        if (currentLevel >= TOTAL_LEVELS) {
+            // All levels complete - Victory!
+            gameOver(true);
+        } else {
+            // Next level
+            currentLevel++;
+            booksCollected = 0;
+            gameTime = 0;
+            timeRemaining = LEVEL_DURATION;
+
+            // Update era to match level
+            currentEraIndex = LEVEL_REQUIREMENTS[currentLevel - 1].era;
+            document.getElementById('currentEra').textContent = ERAS[currentEraIndex].name;
+            document.getElementById('currentLevel').textContent = currentLevel;
+            initSkyElements();
+
+            // Show level up message
+            screenShake = 15;
+            createParticles(baseWidth / 2, baseHeight / 2, ERAS[currentEraIndex].primaryColor, 60);
+            playEraChangeSound();
+            showQuote();
+        }
+    } else {
+        // Failed to collect enough books - Game Over
+        gameOver(false);
+    }
+}
+
+// Game Over
+function gameOver(victory = false) {
     gameRunning = false;
     cancelAnimationFrame(animationId);
 
     screenShake = 20;
-    createParticles(canvas.width / 2, canvas.height / 2, '#FFD700', 50);
+    createParticles(baseWidth / 2, baseHeight / 2, victory ? '#FFD700' : '#FF6347', 50);
 
     const finalScore = Math.floor(score / 10);
     document.getElementById('finalScore').textContent = finalScore;
@@ -1241,13 +1382,15 @@ function gameLoop(currentTime = 0) {
         return;
     }
 
-    // Update timer
-    gameTime += deltaTime * 16.67 / 1000;
-    timeRemaining = Math.max(0, GAME_DURATION - gameTime);
+    // Update timer (freeze time power-up stops the timer)
+    if (activePowerups.timefreeze <= 0) {
+        gameTime += deltaTime * 16.67 / 1000;
+    }
+    timeRemaining = Math.max(0, LEVEL_DURATION - gameTime);
 
-    // Time's up!
+    // Time's up for this level!
     if (timeRemaining <= 0) {
-        gameOver();
+        checkLevelComplete();
         return;
     }
 
@@ -1271,7 +1414,8 @@ function gameLoop(currentTime = 0) {
 
     drawGround();
 
-    const speedMult = activePowerups.slowmo > 0 ? 0.5 : 1;
+    let speedMult = activePowerups.slowmo > 0 ? 0.5 : 1;
+    speedMult *= activePowerups.speedboost > 0 ? 1.5 : 1;
     backgroundOffset += (2.5 + score / 1200) * speedMult * deltaTime;
 
     // Particles
@@ -1295,10 +1439,18 @@ function gameLoop(currentTime = 0) {
 
         if (checkCollision(player, powerups[i])) {
             const powerup = powerups[i];
-            activePowerups[powerup.type.effect] = Date.now() + powerup.type.duration;
 
-            if (powerup.type.effect === 'doublejump') {
-                player.canDoubleJump = true;
+            // Handle different power-up effects
+            if (powerup.type.effect === 'extratime') {
+                // Extra time - instant effect
+                timeRemaining += 15;
+                gameTime -= 15;
+            } else {
+                activePowerups[powerup.type.effect] = Date.now() + powerup.type.duration;
+
+                if (powerup.type.effect === 'doublejump') {
+                    player.canDoubleJump = true;
+                }
             }
 
             floatingTexts.push(new FloatingText(powerup.x, powerup.y, powerup.type.name, powerup.type.color, 28));
@@ -1319,10 +1471,14 @@ function gameLoop(currentTime = 0) {
             const work = collectibles[i].work;
             const laneMultiplier = collectibles[i].lane.multiplier;
             const basePoints = work.basePoints * laneMultiplier;
-            const points = Math.floor(basePoints * comboMultiplier);
+
+            // Apply score multiplier power-up
+            const scoreMultBonus = activePowerups.scoremultiplier > 0 ? 2 : 1;
+            const points = Math.floor(basePoints * comboMultiplier * scoreMultBonus);
 
             score += points;
             wisdom += Math.floor(15 * comboMultiplier * laneMultiplier);
+            booksCollected++; // Track books for level system
 
             // Combo
             const now = Date.now();
@@ -1363,7 +1519,10 @@ function gameLoop(currentTime = 0) {
         obstacles[i].draw();
 
         if (checkCollision(player, obstacles[i]) && player.bounceTimer === 0) {
-            if (obstacles[i].dilemma.effect === 'bounce') {
+            // Ghost mode and invincibility ignore obstacles
+            if (activePowerups.ghostmode > 0 || activePowerups.invincibility > 0) {
+                // Do nothing - pass through
+            } else if (obstacles[i].dilemma.effect === 'bounce') {
                 player.bounce();
                 floatingTexts.push(new FloatingText(player.x, player.y, obstacles[i].dilemma.name, '#FF6347', 20));
             } else {
@@ -1397,9 +1556,9 @@ function gameLoop(currentTime = 0) {
         obstacleTimer = 0;
     }
 
-    // Spawn collectibles
+    // Spawn collectibles - INCREASED SPAWN RATE (was 85, now 50)
     collectibleTimer += deltaTime;
-    if (collectibleTimer > 85) {
+    if (collectibleTimer > 50) {
         const lane = Math.floor(Math.random() * 3);
         collectibles.push(new Collectible(lane));
         collectibleTimer = 0;
@@ -1473,14 +1632,14 @@ function drawPowerUpIndicators() {
             ctx.strokeRect(x, y, width, height);
 
             // Text
-            ctx.font = 'bold 16px Arial';
+            ctx.font = 'bold 16px Philosopher, Arial';
             ctx.fillStyle = '#FFFFFF';
             ctx.textAlign = 'left';
             ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
             ctx.shadowBlur = 4;
             ctx.fillText(powerupType.icon, x + 6, y + 21);
 
-            ctx.font = 'bold 13px Arial';
+            ctx.font = 'bold 13px Philosopher, Arial';
             ctx.fillText(`${Math.ceil(timeLeft)}s`, x + 40, y + 21);
             ctx.shadowBlur = 0;
 
@@ -1496,7 +1655,9 @@ function startGame() {
     score = 0;
     wisdom = 0;
     gameTime = 0;
-    timeRemaining = GAME_DURATION;
+    timeRemaining = LEVEL_DURATION;
+    currentLevel = 1;
+    booksCollected = 0;
     currentEraIndex = 0;
     obstacles = [];
     collectibles = [];
@@ -1515,14 +1676,24 @@ function startGame() {
     screenShake = 0;
     backgroundOffset = 0;
     lastTime = 0;
-    activePowerups = { slowmo: 0, magnet: 0, doublejump: 0 };
+    activePowerups = {
+        slowmo: 0,
+        magnet: 0,
+        doublejump: 0,
+        timefreeze: 0,
+        invincibility: 0,
+        scoremultiplier: 0,
+        speedboost: 0,
+        ghostmode: 0
+    };
 
     player.reset();
     initSkyElements();
 
     document.getElementById('score').textContent = '0';
-    document.getElementById('wisdom').textContent = '0';
+    document.getElementById('wisdom').textContent = '0/50';
     document.getElementById('currentEra').textContent = ERAS[0].name;
+    document.getElementById('currentLevel').textContent = '1';
     document.getElementById('philIcon').textContent = PHILOSOPHERS[selectedPhilosopherIndex].icon;
 
     switchScreen('gameScreen');
