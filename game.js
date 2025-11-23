@@ -31,14 +31,14 @@ const GROUND_LEVEL = baseHeight - 80;
 const LEVEL_DURATION = 180; // 3 minutes per level
 const TOTAL_LEVELS = 6;
 
-// Level Requirements (books to collect per level)
+// Level Requirements (books to collect per level) - BALANCED!
 const LEVEL_REQUIREMENTS = [
-    { level: 1, name: 'Antike', books: 50, era: 0 },
-    { level: 2, name: 'Mittelalter', books: 55, era: 1 },
-    { level: 3, name: 'Renaissance', books: 60, era: 2 },
-    { level: 4, name: 'Aufklärung', books: 65, era: 3 },
-    { level: 5, name: 'Moderne', books: 70, era: 4 },
-    { level: 6, name: 'Gegenwart', books: 75, era: 5 }
+    { level: 1, name: 'Antike', books: 20, era: 0, color: '#FFD700' },
+    { level: 2, name: 'Mittelalter', books: 24, era: 1, color: '#8B4513' },
+    { level: 3, name: 'Renaissance', books: 28, era: 2, color: '#FF6347' },
+    { level: 4, name: 'Aufklärung', books: 32, era: 3, color: '#4169E1' },
+    { level: 5, name: 'Moderne', books: 36, era: 4, color: '#9370DB' },
+    { level: 6, name: 'Gegenwart', books: 40, era: 5, color: '#00CED1' }
 ];
 
 // Physics constants
@@ -63,6 +63,15 @@ let gameTime = 0;
 let timeRemaining = LEVEL_DURATION;
 let currentLevel = 1;
 let booksCollected = 0;
+let totalBooksCollected = 0;
+let achievements = {
+    speedDemon: false,
+    comboMaster: false,
+    powerUpCollector: false,
+    allLevelsComplete: false
+};
+let maxCombo = 0;
+let powerupsCollected = 0;
 
 // Sound System
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -273,39 +282,39 @@ const POWERUP_TYPES = [
         color: '#FFD700',
         effect: 'doublejump'
     },
-    // New Power-Ups
+    // New Power-Ups - EXTENDED DURATIONS!
     {
         name: 'Time Freeze',
         icon: '⏸️',
-        duration: 4000,
+        duration: 6000,
         color: '#4169E1',
         effect: 'timefreeze'
     },
     {
         name: 'Invincibility',
         icon: '⭐',
-        duration: 6000,
+        duration: 8000,
         color: '#FFD700',
         effect: 'invincibility'
     },
     {
         name: 'Score Multiplier',
         icon: '💎',
-        duration: 8000,
+        duration: 12000,
         color: '#9370DB',
         effect: 'scoremultiplier'
     },
     {
         name: 'Speed Boost',
         icon: '⚡',
-        duration: 5000,
+        duration: 7000,
         color: '#FF6347',
         effect: 'speedboost'
     },
     {
         name: 'Ghost Mode',
         icon: '👻',
-        duration: 5000,
+        duration: 7000,
         color: '#E0E0E0',
         effect: 'ghostmode'
     },
@@ -353,6 +362,10 @@ let tutorialMessages = [];
 let screenShake = 0;
 let backgroundOffset = 0;
 let slowMotionTimer = 0;
+let chromaticAberration = 0;
+let vignette = 0;
+let fireworksTimer = 0;
+let backgroundLayers = [];
 
 // Active power-ups
 let activePowerups = {
@@ -401,23 +414,33 @@ const player = {
     slowTimer: 0,
 
     draw() {
-        // Enhanced trail
+        // MEGA Enhanced trail with MORE layers!
         ctx.save();
         this.trail.forEach((point, i) => {
-            const alpha = (i / this.trail.length) * 0.4;
+            const alpha = (i / this.trail.length) * 0.5;
             const era = ERAS[currentEraIndex];
             ctx.globalAlpha = alpha;
 
-            const gradient = ctx.createRadialGradient(point.x, point.y, 0, point.x, point.y, 30);
-            gradient.addColorStop(0, era.primaryColor);
-            gradient.addColorStop(1, 'transparent');
-            ctx.fillStyle = gradient;
+            // Triple-layer trail for THICKNESS
+            for (let layer = 0; layer < 3; layer++) {
+                const offset = layer * 3;
+                const gradient = ctx.createRadialGradient(
+                    point.x, point.y, 0,
+                    point.x, point.y, 35 + offset
+                );
+                gradient.addColorStop(0, era.primaryColor);
+                gradient.addColorStop(0.5, era.secondaryColor);
+                gradient.addColorStop(1, 'transparent');
+                ctx.fillStyle = gradient;
 
-            const size = (i / this.trail.length) * this.width * 0.9;
-            ctx.font = `${size}px Philosopher, Arial`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(PHILOSOPHERS[selectedPhilosopherIndex].icon, point.x, point.y);
+                const size = (i / this.trail.length) * this.width * 1.1;
+                ctx.font = `${size}px Philosopher, Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.shadowColor = era.primaryColor;
+                ctx.shadowBlur = 20;
+                ctx.fillText(PHILOSOPHERS[selectedPhilosopherIndex].icon, point.x, point.y);
+            }
         });
         ctx.restore();
 
@@ -546,13 +569,13 @@ const player = {
         this.squashStretch.x += (1 - this.squashStretch.x) * 0.15;
         this.squashStretch.y += (1 - this.squashStretch.y) * 0.15;
 
-        // Trail
-        if (gameRunning && Date.now() % 2 === 0) {
+        // Trail - EVERY FRAME for MAXIMUM smoothness!
+        if (gameRunning) {
             this.trail.push({
                 x: this.x + this.width / 2,
                 y: this.y + this.height / 2
             });
-            if (this.trail.length > 10) this.trail.shift();
+            if (this.trail.length > 15) this.trail.shift(); // Longer trail!
         }
     },
 
@@ -624,18 +647,22 @@ const player = {
     }
 };
 
-// Enhanced Particle
+// Enhanced Particle with types
 class Particle {
-    constructor(x, y, color, velocityX = null, velocityY = null) {
+    constructor(x, y, color, velocityX = null, velocityY = null, type = 'normal') {
         this.x = x;
         this.y = y;
         this.color = color;
+        this.type = type;
         this.velocityX = velocityX !== null ? velocityX : (Math.random() - 0.5) * 6;
         this.velocityY = velocityY !== null ? velocityY : (Math.random() - 0.5) * 6 - 3;
-        this.size = Math.random() * 6 + 2;
+        this.size = type === 'star' ? Math.random() * 8 + 4 : Math.random() * 6 + 2;
         this.life = 1;
-        this.decay = 0.012;
-        this.gravity = 0.12;
+        this.decay = type === 'star' ? 0.008 : 0.012;
+        this.gravity = type === 'confetti' ? 0.2 : 0.12;
+        this.rotation = Math.random() * Math.PI * 2;
+        this.rotationSpeed = (Math.random() - 0.5) * 0.2;
+        this.initialLife = 1;
     }
 
     update(dt) {
@@ -643,20 +670,56 @@ class Particle {
         this.y += this.velocityY * dt;
         this.velocityY += this.gravity * dt;
         this.life -= this.decay * dt;
+        this.rotation += this.rotationSpeed * dt;
+
+        // Add drag
+        this.velocityX *= 0.98;
+        this.velocityY *= 0.98;
     }
 
     draw() {
         ctx.save();
         ctx.globalAlpha = this.life;
 
-        const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
-        gradient.addColorStop(0, this.color);
-        gradient.addColorStop(1, 'transparent');
+        if (this.type === 'star') {
+            // Animated star
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.rotation);
+            ctx.fillStyle = this.color;
+            ctx.shadowColor = this.color;
+            ctx.shadowBlur = 15;
 
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
+            // Draw star shape
+            ctx.beginPath();
+            for (let i = 0; i < 5; i++) {
+                const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+                const radius = i % 2 === 0 ? this.size : this.size * 0.4;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.fill();
+        } else if (this.type === 'confetti') {
+            // Rectangle confetti
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.rotation);
+            ctx.fillStyle = this.color;
+            ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size * 1.5);
+        } else {
+            // Normal particle with glow
+            const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+            gradient.addColorStop(0, this.color);
+            gradient.addColorStop(1, 'transparent');
+
+            ctx.fillStyle = gradient;
+            ctx.shadowColor = this.color;
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
         ctx.restore();
     }
 
@@ -665,10 +728,91 @@ class Particle {
     }
 }
 
-function createParticles(x, y, color, count) {
+function createParticles(x, y, color, count, type = 'normal') {
     for (let i = 0; i < count; i++) {
-        particles.push(new Particle(x, y, color));
+        particles.push(new Particle(x, y, color, null, null, type));
     }
+}
+
+// Create explosion effect
+function createExplosion(x, y, color, intensity = 1) {
+    const count = Math.floor(50 * intensity);
+    for (let i = 0; i < count; i++) {
+        const angle = (Math.PI * 2 * i) / count;
+        const speed = (Math.random() * 8 + 4) * intensity;
+        const vx = Math.cos(angle) * speed;
+        const vy = Math.sin(angle) * speed;
+        particles.push(new Particle(x, y, color, vx, vy, 'normal'));
+    }
+}
+
+// Create firework burst
+function createFirework(x, y) {
+    const colors = ['#FFD700', '#FF6347', '#4169E1', '#9370DB', '#00CED1', '#FF69B4'];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+
+    // Main burst
+    for (let i = 0; i < 40; i++) {
+        const angle = (Math.PI * 2 * i) / 40;
+        const speed = Math.random() * 6 + 3;
+        const vx = Math.cos(angle) * speed;
+        const vy = Math.sin(angle) * speed;
+        particles.push(new Particle(x, y, color, vx, vy, 'star'));
+    }
+
+    // Confetti
+    for (let i = 0; i < 20; i++) {
+        const vx = (Math.random() - 0.5) * 8;
+        const vy = (Math.random() - 0.5) * 8 - 5;
+        particles.push(new Particle(x, y, colors[Math.floor(Math.random() * colors.length)], vx, vy, 'confetti'));
+    }
+}
+
+// Light Beam Effect - MAGICAL!
+function createLightBeam(x1, y1, x2, y2, color) {
+    floatingTexts.push({
+        x: x1,
+        y: y1,
+        targetX: x2,
+        targetY: y2,
+        color: color,
+        life: 1,
+        isBeam: true,
+        update(dt) {
+            this.life -= 0.05 * dt;
+        },
+        draw() {
+            if (this.life <= 0) return;
+            ctx.save();
+            ctx.globalAlpha = this.life * 0.6;
+
+            // Thicker beam with gradient
+            const gradient = ctx.createLinearGradient(this.x, this.y, this.targetX, this.targetY);
+            gradient.addColorStop(0, this.color);
+            gradient.addColorStop(0.5, adjustColor(this.color, 60));
+            gradient.addColorStop(1, 'transparent');
+
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 8;
+            ctx.shadowColor = this.color;
+            ctx.shadowBlur = 20;
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.targetX, this.targetY);
+            ctx.stroke();
+
+            // Inner bright line
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.shadowBlur = 10;
+            ctx.stroke();
+
+            ctx.restore();
+        },
+        isDead() {
+            return this.life <= 0;
+        }
+    });
 }
 
 // Sky Elements (clouds, stars, etc.)
@@ -1261,6 +1405,32 @@ function showQuote() {
     }, 4500);
 }
 
+// Show Achievement
+function showAchievement(title, subtitle) {
+    const notification = document.getElementById('workNotification');
+    document.getElementById('notifTitle').textContent = title;
+    document.getElementById('notifAuthor').textContent = subtitle;
+
+    notification.classList.remove('hidden');
+    notification.classList.add('show');
+
+    // BIG ACHIEVEMENT celebration!
+    screenShake = 20;
+    chromaticAberration = 8;
+    createExplosion(baseWidth / 2, baseHeight / 2, '#FFD700', 1.5);
+    createFirework(baseWidth / 2 - 100, baseHeight / 2 - 50);
+    createFirework(baseWidth / 2 + 100, baseHeight / 2 - 50);
+    playEraChangeSound();
+    setTimeout(() => playEraChangeSound(), 100);
+
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            notification.classList.add('hidden');
+        }, 300);
+    }, 3500);
+}
+
 // Update Score
 function updateScore(dt) {
     if (gameRunning && !gamePaused) {
@@ -1272,13 +1442,18 @@ function updateScore(dt) {
         const levelReq = LEVEL_REQUIREMENTS[currentLevel - 1];
         document.getElementById('wisdom').textContent = `${booksCollected}/${levelReq.books}`;
 
-        // Combo visual
+        // Combo visual - BIG EFFECT!
         if (comboMultiplier > 1) {
+            const scale = 1 + (comboMultiplier - 1) * 0.15;
             document.getElementById('wisdom').style.color = '#FFD700';
-            document.getElementById('wisdom').style.transform = `scale(${1 + (comboMultiplier - 1) * 0.12})`;
+            document.getElementById('wisdom').style.transform = `scale(${scale})`;
+            document.getElementById('wisdom').style.textShadow = '0 0 10px #FFD700, 0 0 20px #FFD700';
+            document.getElementById('wisdom').style.fontWeight = '900';
         } else {
             document.getElementById('wisdom').style.color = '';
             document.getElementById('wisdom').style.transform = '';
+            document.getElementById('wisdom').style.textShadow = '';
+            document.getElementById('wisdom').style.fontWeight = '';
         }
     }
 }
@@ -1298,6 +1473,33 @@ function showCollectedWork(work, points) {
             notification.classList.add('hidden');
         }, 300);
     }, 2800);
+}
+
+// Screen Effects
+function applyScreenEffects() {
+    // Chromatic aberration decay
+    if (chromaticAberration > 0) {
+        chromaticAberration *= 0.9;
+        if (chromaticAberration < 0.1) chromaticAberration = 0;
+    }
+
+    // Vignette decay
+    if (vignette > 0) {
+        vignette *= 0.95;
+        if (vignette < 0.01) vignette = 0;
+    }
+
+    // Draw vignette
+    if (vignette > 0) {
+        const gradient = ctx.createRadialGradient(
+            baseWidth / 2, baseHeight / 2, baseHeight * 0.3,
+            baseWidth / 2, baseHeight / 2, baseHeight * 0.8
+        );
+        gradient.addColorStop(0, 'transparent');
+        gradient.addColorStop(1, `rgba(0, 0, 0, ${vignette * 0.6})`);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, baseWidth, baseHeight);
+    }
 }
 
 // Screen Shake
@@ -1333,11 +1535,50 @@ function checkLevelComplete() {
             document.getElementById('currentLevel').textContent = currentLevel;
             initSkyElements();
 
-            // Show level up message
-            screenShake = 15;
-            createParticles(baseWidth / 2, baseHeight / 2, ERAS[currentEraIndex].primaryColor, 60);
+            // MASSIVE LEVEL UP CELEBRATION! 🎉🎆
+            screenShake = 35;
+            chromaticAberration = 15;
+            vignette = 0.6;
+
+            // EXPLOSION of particles!
+            createExplosion(baseWidth / 2, baseHeight / 2, ERAS[currentEraIndex].primaryColor, 2);
+            createParticles(baseWidth / 2, baseHeight / 2, ERAS[currentEraIndex].primaryColor, 150, 'star');
+            createParticles(baseWidth / 2, baseHeight / 2, '#FFD700', 80, 'confetti');
+
+            // Start fireworks sequence
+            fireworksTimer = 120; // 2 seconds of fireworks
+
+            // Flash screen with pulse
+            const flash = document.createElement('div');
+            flash.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle, ${LEVEL_REQUIREMENTS[currentLevel - 1].color}, transparent);
+                opacity: 0.8;
+                z-index: 9999;
+                pointer-events: none;
+                animation: flashFade 1s ease-out;
+            `;
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), 1000);
+
+            // Triple sound burst
             playEraChangeSound();
+            setTimeout(() => playEraChangeSound(), 150);
+            setTimeout(() => playEraChangeSound(), 300);
             showQuote();
+
+            // Show level complete message
+            floatingTexts.push(new FloatingText(
+                baseWidth / 2,
+                baseHeight / 2 - 50,
+                `LEVEL ${currentLevel - 1} ABGESCHLOSSEN! 🎉`,
+                '#FFD700',
+                40
+            ));
         }
     } else {
         // Failed to collect enough books - Game Over
@@ -1345,19 +1586,64 @@ function checkLevelComplete() {
     }
 }
 
-// Game Over
+// Game Over - MUCH MORE INFORMATIVE!
 function gameOver(victory = false) {
     gameRunning = false;
     cancelAnimationFrame(animationId);
 
-    screenShake = 20;
-    createParticles(baseWidth / 2, baseHeight / 2, victory ? '#FFD700' : '#FF6347', 50);
+    if (victory) {
+        // ULTIMATE VICTORY CELEBRATION! 🎆🎉
+        screenShake = 40;
+        chromaticAberration = 20;
+        vignette = 0.8;
+
+        // MASSIVE fireworks show!
+        fireworksTimer = 300; // 5 seconds!
+
+        // Create mega explosions
+        createExplosion(baseWidth / 2, baseHeight / 2, '#FFD700', 3);
+        createParticles(baseWidth / 2, baseHeight / 2, '#FFD700', 200, 'star');
+        createParticles(baseWidth / 2, baseHeight / 2, '#FF6347', 100, 'confetti');
+        createParticles(baseWidth / 2, baseHeight / 2, '#4169E1', 100, 'confetti');
+
+        // Create fireworks in corners
+        setTimeout(() => createFirework(100, 100), 200);
+        setTimeout(() => createFirework(baseWidth - 100, 100), 400);
+        setTimeout(() => createFirework(100, baseHeight - 100), 600);
+        setTimeout(() => createFirework(baseWidth - 100, baseHeight - 100), 800);
+    } else {
+        screenShake = 20;
+        createParticles(baseWidth / 2, baseHeight / 2, '#FF6347', 50);
+    }
 
     const finalScore = Math.floor(score / 10);
     document.getElementById('finalScore').textContent = finalScore;
-    document.getElementById('finalWisdom').textContent = wisdom;
-    document.getElementById('finalEraName').textContent = ERAS[currentEraIndex].name;
-    document.getElementById('finalEraIcon').textContent = ERAS[currentEraIndex].theme.split(' ')[0];
+    document.getElementById('finalWisdom').textContent = `${totalBooksCollected} Bücher`;
+    document.getElementById('finalEraName').textContent = victory ? '🏆 ALLE LEVELS!' : ERAS[currentEraIndex].name;
+    document.getElementById('finalEraIcon').textContent = victory ? '🎉' : ERAS[currentEraIndex].theme.split(' ')[0];
+
+    // Show stats in Game Over screen title
+    const titleEl = document.querySelector('#gameOverScreen .screen-title');
+    if (titleEl) {
+        if (victory) {
+            titleEl.textContent = '🎉 VICTORY! 🎉';
+            titleEl.style.color = '#FFD700';
+        } else {
+            titleEl.textContent = `Level ${currentLevel} - Zeit abgelaufen`;
+            titleEl.style.color = '#FF6347';
+        }
+    }
+
+    // Check for all levels complete achievement
+    if (victory && !achievements.allLevelsComplete) {
+        achievements.allLevelsComplete = true;
+    }
+
+    // Speed demon achievement - complete in under 15 min
+    const totalTime = (currentLevel - 1) * LEVEL_DURATION + (LEVEL_DURATION - timeRemaining);
+    if (victory && totalTime < 900 && !achievements.speedDemon) {
+        achievements.speedDemon = true;
+    }
 
     if (finalScore > highScore) {
         highScore = finalScore;
@@ -1400,8 +1686,10 @@ function gameLoop(currentTime = 0) {
     document.getElementById('philName').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
     ctx.save();
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, baseWidth, baseHeight);
 
+    // Apply screen effects
+    applyScreenEffects();
     applyScreenShake();
 
     drawBackground();
@@ -1453,8 +1741,23 @@ function gameLoop(currentTime = 0) {
                 }
             }
 
-            floatingTexts.push(new FloatingText(powerup.x, powerup.y, powerup.type.name, powerup.type.color, 28));
-            createParticles(powerup.x, powerup.y, powerup.type.color, 25);
+            // Track power-ups collected
+            powerupsCollected++;
+            if (powerupsCollected >= 20 && !achievements.powerUpCollector) {
+                achievements.powerUpCollector = true;
+                showAchievement('🎁 Power-Up Sammler!', 'Sammle 20 Power-Ups!');
+            }
+
+            // MEGA power-up collection effect!
+            floatingTexts.push(new FloatingText(powerup.x, powerup.y, powerup.type.name, powerup.type.color, 36));
+            createExplosion(powerup.x, powerup.y, powerup.type.color, 0.8);
+            createParticles(powerup.x, powerup.y, powerup.type.color, 30, 'star');
+            screenShake = 10;
+            chromaticAberration = 5;
+
+            // Screen flash for power-up
+            vignette = 0.3;
+
             playPowerUpSound();
             powerups.splice(i, 1);
         } else if (powerups[i].isOffScreen()) {
@@ -1479,12 +1782,22 @@ function gameLoop(currentTime = 0) {
             score += points;
             wisdom += Math.floor(15 * comboMultiplier * laneMultiplier);
             booksCollected++; // Track books for level system
+            totalBooksCollected++;
 
             // Combo
             const now = Date.now();
             if (now - lastCollectTime < 2500) {
                 comboCount++;
                 comboMultiplier = Math.min(1 + comboCount * 0.5, 5);
+
+                // Track max combo
+                if (comboCount > maxCombo) {
+                    maxCombo = comboCount;
+                    if (maxCombo >= 15 && !achievements.comboMaster) {
+                        achievements.comboMaster = true;
+                        showAchievement('🔥 Combo Master!', '15er Combo erreicht!');
+                    }
+                }
             } else {
                 comboCount = 0;
                 comboMultiplier = 1;
@@ -1492,15 +1805,24 @@ function gameLoop(currentTime = 0) {
             lastCollectTime = now;
 
             showCollectedWork(work, points);
+
+            // MEGA Collection Effect with LIGHT BEAMS! ✨
+            const comboColor = comboMultiplier > 2 ? '#FFD700' : '#4CAF50';
+
+            // Light beam from collect to player
+            createLightBeam(collectibles[i].x, collectibles[i].y, player.x + player.width/2, player.y + player.height/2, comboColor);
+
             floatingTexts.push(new FloatingText(
                 collectibles[i].x,
                 collectibles[i].y,
                 `+${points}${comboMultiplier > 1 ? ' x' + comboMultiplier.toFixed(1) : ''}`,
-                comboMultiplier > 1 ? '#FFD700' : '#4CAF50',
-                28
+                comboColor,
+                32 + comboCount * 2
             ));
 
-            createParticles(collectibles[i].x, collectibles[i].y, '#4CAF50', 20);
+            createExplosion(collectibles[i].x, collectibles[i].y, comboColor, 0.5);
+            createParticles(collectibles[i].x, collectibles[i].y, comboColor, 15, 'star');
+            createParticles(collectibles[i].x, collectibles[i].y, '#FFFFFF', 10, 'confetti');
             playCollectSound();
             collectibles.splice(i, 1);
 
@@ -1556,18 +1878,19 @@ function gameLoop(currentTime = 0) {
         obstacleTimer = 0;
     }
 
-    // Spawn collectibles - INCREASED SPAWN RATE (was 85, now 50)
+    // Spawn collectibles - MUCH MORE FREQUENT! (was 85, then 50, now 35)
     collectibleTimer += deltaTime;
-    if (collectibleTimer > 50) {
+    const collectibleSpawnRate = tutorialMode ? 50 : 35;
+    if (collectibleTimer > collectibleSpawnRate) {
         const lane = Math.floor(Math.random() * 3);
         collectibles.push(new Collectible(lane));
         collectibleTimer = 0;
     }
 
-    // Spawn power-ups
-    if (score > 300 && !tutorialMode) {
+    // Spawn power-ups - MORE FREQUENT! (was 450, now 280)
+    if (score > 200 && !tutorialMode) {
         powerupTimer += deltaTime;
-        if (powerupTimer > 450) {
+        if (powerupTimer > 280) {
             powerups.push(new PowerUp());
             powerupTimer = 0;
         }
@@ -1587,6 +1910,29 @@ function gameLoop(currentTime = 0) {
 
     // Power-up indicators (top right)
     drawPowerUpIndicators();
+
+    // Level progress bar (bottom of screen)
+    drawLevelProgressBar();
+
+    // Combo counter (top center)
+    if (comboMultiplier > 1) {
+        drawComboCounter();
+    }
+
+    // Combo Meter (left side)
+    if (comboCount > 0) {
+        drawComboMeter();
+    }
+
+    // Fireworks (during celebrations)
+    if (fireworksTimer > 0) {
+        fireworksTimer--;
+        if (fireworksTimer % 15 === 0) {
+            const x = Math.random() * baseWidth;
+            const y = Math.random() * baseHeight * 0.6;
+            createFirework(x, y);
+        }
+    }
 
     // Combo decay
     if (Date.now() - lastCollectTime > 2500 && comboMultiplier > 1) {
@@ -1611,7 +1957,7 @@ function drawPowerUpIndicators() {
             const timeLeft = (activePowerups[key] - now) / 1000;
             const width = 130;
             const height = 32;
-            const x = canvas.width - width - 12;
+            const x = baseWidth - width - 12;
             const y = yOffset;
 
             // Background gradient
@@ -1648,6 +1994,209 @@ function drawPowerUpIndicators() {
     });
 }
 
+// Combo Meter (left side) - VISUAL PROGRESSION!
+function drawComboMeter() {
+    const maxComboHeight = 300;
+    const progress = Math.min(comboCount / 30, 1); // Max at 30 combo
+    const height = maxComboHeight * progress;
+
+    const x = 15;
+    const y = baseHeight / 2 - maxComboHeight / 2;
+    const width = 12;
+
+    ctx.save();
+
+    // Background bar
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+    ctx.fillRect(x, y, width, maxComboHeight);
+
+    // Combo fill with gradient
+    const gradient = ctx.createLinearGradient(x, y + maxComboHeight, x, y);
+    gradient.addColorStop(0, '#4CAF50');
+    gradient.addColorStop(0.5, '#FFD700');
+    gradient.addColorStop(1, '#FF6347');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(x, y + maxComboHeight - height, width, height);
+
+    // Pulsing glow
+    const pulse = Math.sin(Date.now() / 150) * 0.3 + 0.7;
+    ctx.shadowColor = comboMultiplier > 2 ? '#FFD700' : '#4CAF50';
+    ctx.shadowBlur = 15 * pulse;
+    ctx.fillRect(x, y + maxComboHeight - height, width, height);
+
+    // Border
+    ctx.strokeStyle = '#FFFFFF';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x, y, width, maxComboHeight);
+
+    // Markers every 5 combo
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+        const markerY = y + (maxComboHeight / 6) * i;
+        ctx.beginPath();
+        ctx.moveTo(x, markerY);
+        ctx.lineTo(x + width, markerY);
+        ctx.stroke();
+    }
+
+    // Text
+    ctx.font = 'bold 10px Philosopher, Arial';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textAlign = 'center';
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+    ctx.shadowBlur = 4;
+    ctx.fillText(`${comboCount}`, x + width / 2, y - 5);
+
+    ctx.restore();
+}
+
+// Combo Counter - ULTRA MASSIVE VISUAL!
+function drawComboCounter() {
+    const scale = 1 + (comboMultiplier - 1) * 0.12;
+    const pulse = Math.sin(Date.now() / 120) * 0.15 + 0.85;
+    const rotation = Math.sin(Date.now() / 500) * 0.05;
+
+    ctx.save();
+    ctx.translate(baseWidth / 2, 70);
+    ctx.rotate(rotation);
+    ctx.scale(scale * pulse, scale * pulse);
+
+    // Multiple glow layers
+    for (let i = 3; i >= 0; i--) {
+        const glowSize = (100 + comboCount * 6) * (1 + i * 0.3);
+        const alpha = (0.4 - i * 0.08) * (comboMultiplier / 5);
+        const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, glowSize);
+        gradient.addColorStop(0, `rgba(255, 215, 0, ${alpha})`);
+        gradient.addColorStop(0.5, `rgba(255, 165, 0, ${alpha * 0.6})`);
+        gradient.addColorStop(1, 'transparent');
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(0, 0, glowSize, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // Rotating stars for high combos
+    if (comboCount >= 10) {
+        ctx.save();
+        const starRotation = Date.now() / 1000;
+        ctx.rotate(starRotation);
+        for (let i = 0; i < 8; i++) {
+            const angle = (i / 8) * Math.PI * 2;
+            const dist = 80 + Math.sin(Date.now() / 300 + i) * 10;
+            const x = Math.cos(angle) * dist;
+            const y = Math.sin(angle) * dist;
+
+            ctx.fillStyle = '#FFD700';
+            ctx.shadowColor = '#FFD700';
+            ctx.shadowBlur = 15;
+            ctx.font = 'bold 20px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('✨', x, y);
+        }
+        ctx.restore();
+    }
+
+    // Main text with outline
+    const fontSize = 40 + comboCount * 2;
+    ctx.font = `bold ${fontSize}px Philosopher, Arial`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // Outline
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 6;
+    ctx.strokeText(`${comboCount}x COMBO!`, 0, 0);
+
+    // Fill
+    const textGradient = ctx.createLinearGradient(0, -fontSize/2, 0, fontSize/2);
+    textGradient.addColorStop(0, '#FFD700');
+    textGradient.addColorStop(0.5, '#FFA500');
+    textGradient.addColorStop(1, '#FF8C00');
+    ctx.fillStyle = textGradient;
+    ctx.shadowColor = '#FFD700';
+    ctx.shadowBlur = 25;
+    ctx.fillText(`${comboCount}x COMBO!`, 0, 0);
+
+    // Multiplier with glow
+    ctx.font = 'bold 20px Philosopher, Arial';
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 4;
+    ctx.strokeText(`${comboMultiplier.toFixed(1)}x Multiplikator`, 0, 35);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.shadowBlur = 15;
+    ctx.fillText(`${comboMultiplier.toFixed(1)}x Multiplikator`, 0, 35);
+
+    ctx.restore();
+
+    // Screen-wide effect for mega combos
+    if (comboCount >= 20) {
+        ctx.save();
+        const megaPulse = Math.sin(Date.now() / 100) * 0.2 + 0.8;
+        ctx.globalAlpha = 0.1 * megaPulse;
+        const bgGradient = ctx.createRadialGradient(
+            baseWidth / 2, baseHeight / 2, 0,
+            baseWidth / 2, baseHeight / 2, baseWidth / 2
+        );
+        bgGradient.addColorStop(0, '#FFD700');
+        bgGradient.addColorStop(1, 'transparent');
+        ctx.fillStyle = bgGradient;
+        ctx.fillRect(0, 0, baseWidth, baseHeight);
+        ctx.restore();
+    }
+}
+
+// Level Progress Bar - BEAUTIFUL!
+function drawLevelProgressBar() {
+    const levelReq = LEVEL_REQUIREMENTS[currentLevel - 1];
+    const progress = Math.min(booksCollected / levelReq.books, 1);
+
+    const barWidth = baseWidth - 40;
+    const barHeight = 8;
+    const x = 20;
+    const y = baseHeight - 20;
+
+    // Shadow
+    ctx.save();
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.fillRect(x, y + 2, barWidth, barHeight);
+
+    // Background
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+    ctx.fillRect(x, y, barWidth, barHeight);
+
+    // Progress gradient
+    const gradient = ctx.createLinearGradient(x, y, x + barWidth, y);
+    gradient.addColorStop(0, levelReq.color);
+    gradient.addColorStop(1, adjustColor(levelReq.color, 40));
+    ctx.fillStyle = gradient;
+    ctx.fillRect(x, y, barWidth * progress, barHeight);
+
+    // Pulsing glow when near completion
+    if (progress > 0.8) {
+        const pulse = Math.sin(Date.now() / 200) * 0.3 + 0.7;
+        ctx.shadowColor = levelReq.color;
+        ctx.shadowBlur = 15 * pulse;
+        ctx.fillRect(x, y, barWidth * progress, barHeight);
+        ctx.shadowBlur = 0;
+    }
+
+    // Border
+    ctx.strokeStyle = levelReq.color;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x, y, barWidth, barHeight);
+
+    // Text overlay
+    ctx.font = 'bold 11px Philosopher, Arial';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textAlign = 'center';
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+    ctx.shadowBlur = 4;
+    ctx.fillText(`${booksCollected} / ${levelReq.books} Bücher`, baseWidth / 2, y + 6);
+
+    ctx.restore();
+}
+
 // Start Game
 function startGame() {
     gameRunning = true;
@@ -1658,6 +2207,9 @@ function startGame() {
     timeRemaining = LEVEL_DURATION;
     currentLevel = 1;
     booksCollected = 0;
+    totalBooksCollected = 0;
+    maxCombo = 0;
+    powerupsCollected = 0;
     currentEraIndex = 0;
     obstacles = [];
     collectibles = [];
@@ -1691,7 +2243,7 @@ function startGame() {
     initSkyElements();
 
     document.getElementById('score').textContent = '0';
-    document.getElementById('wisdom').textContent = '0/50';
+    document.getElementById('wisdom').textContent = '0/20';
     document.getElementById('currentEra').textContent = ERAS[0].name;
     document.getElementById('currentLevel').textContent = '1';
     document.getElementById('philIcon').textContent = PHILOSOPHERS[selectedPhilosopherIndex].icon;
