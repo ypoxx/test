@@ -2,169 +2,196 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Philosophen-Odyssee: Die Reise durch die Weisheit</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Philosophen-Odyssee</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="game-container">
-        <h1>🧠 Philosophen-Odyssee</h1>
-        <div class="subtitle">Eine Reise durch die Geschichte der Weisheit</div>
-
-        <div class="info-panel">
-            <div class="era">
-                <span class="era-label">Epoche:</span>
-                <div class="era-info">
-                    <span id="eraIcon">🏛️</span>
-                    <span id="currentEra">Antike</span>
-                </div>
-                <span id="eraTheme" class="era-theme">Erkenne dich selbst</span>
-            </div>
-
-            <div class="scores">
-                <div class="score">
-                    <span class="score-label">📖 Weisheit</span>
-                    <span id="score">0</span>
-                </div>
-                <div class="wisdom">
-                    <span class="score-label">💎 Erkenntnis</span>
-                    <span id="wisdom">0</span>
+    <!-- Game Screen -->
+    <div id="gameScreen" class="screen active">
+        <!-- Top HUD -->
+        <div class="hud-top">
+            <div class="hud-left">
+                <div class="stat">
+                    <span class="stat-icon">🏛️</span>
+                    <div class="stat-info">
+                        <div class="stat-label">Epoche</div>
+                        <div class="stat-value" id="currentEra">Antike</div>
+                    </div>
                 </div>
             </div>
-
-            <div class="high-score">
-                <span class="score-label">👑 Rekord</span>
-                <span id="highScore">0</span>
+            <div class="hud-center">
+                <div class="score-display">
+                    <div id="score" class="score-big">0</div>
+                    <div class="score-label">Weisheit</div>
+                </div>
             </div>
-
-            <div class="philosopher">
-                <span class="philosopher-label">Philosoph:</span>
-                <span id="currentPhilosopher">Sokrates</span>
+            <div class="hud-right">
+                <button id="menuBtn" class="icon-btn">☰</button>
             </div>
         </div>
 
+        <!-- Canvas -->
         <canvas id="gameCanvas" width="900" height="450"></canvas>
 
-        <div class="controls">
-            <p>🎮 <strong>LEERTASTE</strong> = Springen | <strong>↑↓</strong> = Charakter wechseln | <strong>P</strong> = Pause</p>
-            <button id="howToPlayBtn" class="help-btn">❓ Spielanleitung</button>
-        </div>
-
-        <!-- Quote Display -->
-        <div id="quote" class="quote hidden">
-            <p id="quoteText"></p>
-            <span id="quoteAuthor"></span>
-        </div>
-
-        <!-- Game Over Screen -->
-        <div id="gameOver" class="game-over hidden">
-            <h2>Das Spiel ist vorbei!</h2>
-            <p class="philosophy-message">Die Reise durch die Philosophie endet hier...</p>
-            <div class="final-stats">
-                <p>Dein Weisheits-Score: <span id="finalScore" class="highlight">0</span></p>
-                <p>Gesammelte Erkenntnis: <span id="finalWisdom" class="highlight">0</span> 💎</p>
-                <p class="era-reached">Erreichte Epoche: <span id="finalEra">Antike</span></p>
+        <!-- Bottom HUD -->
+        <div class="hud-bottom">
+            <div class="philosopher-display">
+                <span class="phil-icon" id="philIcon">🧔</span>
+                <span class="phil-name" id="philName">Sokrates</span>
             </div>
-            <button id="restartBtn">🔄 Neue philosophische Reise</button>
+            <div class="wisdom-display">
+                <span class="wisdom-icon">💎</span>
+                <span class="wisdom-value" id="wisdom">0</span>
+            </div>
         </div>
+    </div>
 
-        <!-- Start Screen -->
-        <div id="startScreen" class="start-screen">
-            <h2>Willkommen zur Philosophen-Odyssee!</h2>
-            <p class="instructions">
-                🎯 <strong>Dein Ziel:</strong> Reise durch 6 Epochen der Philosophie-Geschichte!<br>
-                📚 <strong>Sammle:</strong> Philosophische Werke von Platon bis Rawls<br>
-                ⚠️ <strong>Weiche aus:</strong> Philosophischen Dilemmata und Paradoxa<br>
-                💎 <strong>Erhalte:</strong> Weisheit und Erkenntnis für jedes gesammelte Werk
-            </p>
+    <!-- Start Screen -->
+    <div id="startScreen" class="screen">
+        <div class="screen-content">
+            <h1 class="game-title">🧠<br>Philosophen-<br>Odyssee</h1>
+            <p class="game-subtitle">Reise durch die Epochen</p>
 
-            <div class="difficulty-select">
-                <h3>Schwierigkeitsgrad:</h3>
-                <div class="difficulty-buttons">
-                    <button class="difficulty-btn selected" data-difficulty="easy">
-                        🌱 Nachdenklich<br>
-                        <span class="diff-desc">Langsam & entspannt</span>
-                    </button>
-                    <button class="difficulty-btn" data-difficulty="normal">
-                        🧠 Philosophisch<br>
-                        <span class="diff-desc">Standard-Herausforderung</span>
-                    </button>
-                    <button class="difficulty-btn" data-difficulty="hard">
-                        ⚡ Erleuchtung<br>
-                        <span class="diff-desc">Für Meisterdenker</span>
-                    </button>
+            <!-- Philosopher Selection -->
+            <div class="selection-section">
+                <h3>Wähle deinen Philosophen</h3>
+                <div class="phil-cards">
+                    <div class="phil-card active" data-phil="0">
+                        <div class="phil-card-icon">🧔</div>
+                        <div class="phil-card-name">Sokrates</div>
+                    </div>
+                    <div class="phil-card" data-phil="1">
+                        <div class="phil-card-icon">📿</div>
+                        <div class="phil-card-name">Augustinus</div>
+                    </div>
+                    <div class="phil-card" data-phil="2">
+                        <div class="phil-card-icon">🎩</div>
+                        <div class="phil-card-name">Kant</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="character-select">
-                <h3>Wähle deinen Philosophen:</h3>
-                <div class="characters">
-                    <div class="character-card selected" data-philosopher="0">
-                        <div class="char-icon">🧔</div>
-                        <div class="char-name">Sokrates</div>
-                        <div class="char-era">Antike</div>
-                    </div>
-                    <div class="character-card" data-philosopher="1">
-                        <div class="char-icon">📿</div>
-                        <div class="char-name">Augustinus</div>
-                        <div class="char-era">Mittelalter</div>
-                    </div>
-                    <div class="character-card" data-philosopher="2">
-                        <div class="char-icon">🎩</div>
-                        <div class="char-name">Kant</div>
-                        <div class="char-era">Aufklärung</div>
-                    </div>
-                </div>
-                <div id="philInfo" class="phil-info">
-                    <strong>Sokrates</strong> (469-399 v.Chr.)<br>
-                    <em>"Ich weiß, dass ich nichts weiß"</em>
+            <!-- Difficulty Selection -->
+            <div class="selection-section">
+                <h3>Schwierigkeit</h3>
+                <div class="diff-buttons">
+                    <button class="diff-btn active" data-diff="easy">🌱 Nachdenklich</button>
+                    <button class="diff-btn" data-diff="normal">🧠 Philosophisch</button>
+                    <button class="diff-btn" data-diff="hard">⚡ Erleuchtung</button>
                 </div>
             </div>
 
-            <button id="startBtn">🚀 Reise beginnen!</button>
+            <!-- Start Button -->
+            <button id="startGameBtn" class="btn-primary">Spiel Starten</button>
+            <button id="helpBtn" class="btn-secondary">❓ Spielanleitung</button>
         </div>
+    </div>
 
-        <!-- How to Play Overlay -->
-        <div id="howToPlay" class="how-to-play hidden">
-            <div class="how-to-play-content">
-                <h2>📖 Spielanleitung</h2>
-
-                <div class="how-section">
-                    <h3>🎮 Steuerung</h3>
-                    <p><strong>LEERTASTE</strong> oder <strong>Klick/Touch</strong> zum Springen</p>
+    <!-- Game Over Screen -->
+    <div id="gameOverScreen" class="screen">
+        <div class="screen-content">
+            <h2 class="screen-title">Spiel Vorbei</h2>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-box-value" id="finalScore">0</div>
+                    <div class="stat-box-label">Weisheit</div>
                 </div>
-
-                <div class="how-section">
-                    <h3>🎯 Ziel</h3>
-                    <p>Reise durch 6 Epochen und sammle philosophische Werke!</p>
+                <div class="stat-box">
+                    <div class="stat-box-value" id="finalWisdom">0</div>
+                    <div class="stat-box-label">Erkenntnis</div>
                 </div>
+            </div>
+            <div class="era-badge">
+                <span id="finalEraIcon">🏛️</span>
+                <span id="finalEraName">Antike</span>
+            </div>
+            <button id="restartBtn" class="btn-primary">Nochmal Spielen</button>
+            <button id="backToMenuBtn" class="btn-secondary">Zum Menü</button>
+        </div>
+    </div>
 
-                <div class="how-section">
-                    <h3>📚 Elemente</h3>
-                    <div class="game-elements">
-                        <div class="element">
-                            <span class="element-icon">📚</span>
-                            <div>
-                                <strong>Werke sammeln</strong>
-                                <p>+100 Punkte, +10 Erkenntnis</p>
-                            </div>
-                        </div>
-                        <div class="element">
-                            <span class="element-icon">❓</span>
-                            <div>
-                                <strong>Dilemmata ausweichen</strong>
-                                <p>Berührung = Game Over</p>
-                            </div>
-                        </div>
-                    </div>
+    <!-- Help Panel (Slide-in) -->
+    <div id="helpPanel" class="side-panel">
+        <div class="panel-header">
+            <h2>Spielanleitung</h2>
+            <button id="closeHelpBtn" class="close-btn">✕</button>
+        </div>
+        <div class="panel-content">
+            <div class="help-item">
+                <div class="help-icon">🎮</div>
+                <div class="help-text">
+                    <strong>Steuerung</strong>
+                    <p>Tap/Klick zum Springen</p>
                 </div>
-
-                <div class="how-section">
-                    <h3>💡 Tipp</h3>
-                    <p>Folge dem Tutorial am Anfang und starte im "Nachdenklich"-Modus!</p>
+            </div>
+            <div class="help-item">
+                <div class="help-icon">📚</div>
+                <div class="help-text">
+                    <strong>Werke sammeln</strong>
+                    <p>Philosophische Bücher für Punkte</p>
                 </div>
+            </div>
+            <div class="help-item">
+                <div class="help-icon">⚠️</div>
+                <div class="help-text">
+                    <strong>Dilemmata meiden</strong>
+                    <p>Berührung = Game Over</p>
+                </div>
+            </div>
+            <div class="help-item">
+                <div class="help-icon">🏛️</div>
+                <div class="help-text">
+                    <strong>Epochen erreichen</strong>
+                    <p>6 Epochen von Antike bis Gegenwart</p>
+                </div>
+            </div>
+        </div>
+        <button id="closeHelp2Btn" class="btn-primary">Los geht's!</button>
+    </div>
 
-                <button id="closeHowToPlay" class="close-btn">Verstanden! 🎯</button>
+    <!-- Menu Panel (Slide-in) -->
+    <div id="menuPanel" class="side-panel">
+        <div class="panel-header">
+            <h2>Menü</h2>
+            <button id="closeMenuBtn" class="close-btn">✕</button>
+        </div>
+        <div class="panel-content">
+            <div class="menu-item" id="resumeBtn">
+                <span class="menu-icon">▶️</span>
+                <span class="menu-text">Weiterspielen</span>
+            </div>
+            <div class="menu-item" id="menuHelpBtn">
+                <span class="menu-icon">❓</span>
+                <span class="menu-text">Spielanleitung</span>
+            </div>
+            <div class="menu-item" id="quitBtn">
+                <span class="menu-icon">🏠</span>
+                <span class="menu-text">Zum Startbildschirm</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Work Notification -->
+    <div id="workNotification" class="notification hidden">
+        <div class="notif-content">
+            <div class="notif-icon">📚</div>
+            <div class="notif-text">
+                <div class="notif-title" id="notifTitle">Werk gesammelt</div>
+                <div class="notif-subtitle" id="notifAuthor">+100 Punkte</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quote Display -->
+    <div id="quoteDisplay" class="notification hidden">
+        <div class="notif-content">
+            <div class="notif-icon">💭</div>
+            <div class="notif-text">
+                <div class="notif-quote" id="quoteText"></div>
+                <div class="notif-author" id="quoteAuthor"></div>
             </div>
         </div>
     </div>
