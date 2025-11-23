@@ -10,43 +10,96 @@
     <div class="game-container">
         <h1>🧠 Philosophen-Odyssee</h1>
         <div class="subtitle">Eine Reise durch die Geschichte der Weisheit</div>
+
         <div class="info-panel">
             <div class="era">
                 <span class="era-label">Epoche:</span>
-                <span id="currentEra">Antike</span>
+                <div class="era-info">
+                    <span id="eraIcon">🏛️</span>
+                    <span id="currentEra">Antike</span>
+                </div>
+                <span id="eraTheme" class="era-theme">Erkenne dich selbst</span>
             </div>
-            <div class="score"><span id="score">0</span></div>
-            <div class="high-score"><span id="highScore">0</span></div>
+
+            <div class="scores">
+                <div class="score">
+                    <span class="score-label">📖 Weisheit</span>
+                    <span id="score">0</span>
+                </div>
+                <div class="wisdom">
+                    <span class="score-label">💎 Erkenntnis</span>
+                    <span id="wisdom">0</span>
+                </div>
+            </div>
+
+            <div class="high-score">
+                <span class="score-label">👑 Rekord</span>
+                <span id="highScore">0</span>
+            </div>
+
             <div class="philosopher">
-                <span class="philosopher-label">Spieler:</span>
+                <span class="philosopher-label">Philosoph:</span>
                 <span id="currentPhilosopher">Sokrates</span>
             </div>
         </div>
+
         <canvas id="gameCanvas" width="900" height="450"></canvas>
+
         <div class="controls">
-            <p>🎮 LEERTASTE = Springen | ↑↓ = Charakter wechseln | P = Pause</p>
+            <p>🎮 <strong>LEERTASTE</strong> = Springen | <strong>↑↓</strong> = Charakter wechseln | <strong>P</strong> = Pause</p>
+            <button id="howToPlayBtn" class="help-btn">❓ Spielanleitung</button>
         </div>
+
+        <!-- Quote Display -->
         <div id="quote" class="quote hidden">
             <p id="quoteText"></p>
             <span id="quoteAuthor"></span>
         </div>
+
+        <!-- Game Over Screen -->
         <div id="gameOver" class="game-over hidden">
             <h2>Das Spiel ist vorbei!</h2>
-            <p class="philosophy-message">Die Weisheit wurde nicht erreicht...</p>
-            <p>Dein Weisheits-Score: <span id="finalScore">0</span></p>
-            <p class="era-reached">Erreichte Epoche: <span id="finalEra">Antike</span></p>
+            <p class="philosophy-message">Die Reise durch die Philosophie endet hier...</p>
+            <div class="final-stats">
+                <p>Dein Weisheits-Score: <span id="finalScore" class="highlight">0</span></p>
+                <p>Gesammelte Erkenntnis: <span id="finalWisdom" class="highlight">0</span> 💎</p>
+                <p class="era-reached">Erreichte Epoche: <span id="finalEra">Antike</span></p>
+            </div>
             <button id="restartBtn">🔄 Neue philosophische Reise</button>
         </div>
+
+        <!-- Start Screen -->
         <div id="startScreen" class="start-screen">
             <h2>Willkommen zur Philosophen-Odyssee!</h2>
             <p class="instructions">
-                Reise durch die Epochen der Philosophie-Geschichte!<br>
-                Sammle Bücher 📚 und weiche philosophischen Dilemmata aus!
+                🎯 <strong>Dein Ziel:</strong> Reise durch 6 Epochen der Philosophie-Geschichte!<br>
+                📚 <strong>Sammle:</strong> Philosophische Werke von Platon bis Rawls<br>
+                ⚠️ <strong>Weiche aus:</strong> Philosophischen Dilemmata und Paradoxa<br>
+                💎 <strong>Erhalte:</strong> Weisheit und Erkenntnis für jedes gesammelte Werk
             </p>
+
+            <div class="difficulty-select">
+                <h3>Schwierigkeitsgrad:</h3>
+                <div class="difficulty-buttons">
+                    <button class="difficulty-btn selected" data-difficulty="easy">
+                        🌱 Nachdenklich<br>
+                        <span class="diff-desc">Langsam & entspannt</span>
+                    </button>
+                    <button class="difficulty-btn" data-difficulty="normal">
+                        🧠 Philosophisch<br>
+                        <span class="diff-desc">Standard-Herausforderung</span>
+                    </button>
+                    <button class="difficulty-btn" data-difficulty="hard">
+                        ⚡ Erleuchtung<br>
+                        <span class="diff-desc">Für Meisterdenker</span>
+                    </button>
+                </div>
+            </div>
+
             <div class="character-select">
                 <h3>Wähle deinen Philosophen:</h3>
                 <div class="characters">
-                    <div class="character-card" data-philosopher="0">
+                    <div class="character-card selected" data-philosopher="0">
                         <div class="char-icon">🧔</div>
                         <div class="char-name">Sokrates</div>
                         <div class="char-era">Antike</div>
@@ -62,10 +115,77 @@
                         <div class="char-era">Aufklärung</div>
                     </div>
                 </div>
+                <div id="philInfo" class="phil-info">
+                    <strong>Sokrates</strong> (469-399 v.Chr.)<br>
+                    <em>"Ich weiß, dass ich nichts weiß"</em>
+                </div>
             </div>
+
             <button id="startBtn">🚀 Reise beginnen!</button>
         </div>
+
+        <!-- How to Play Overlay -->
+        <div id="howToPlay" class="how-to-play hidden">
+            <div class="how-to-play-content">
+                <h2>📖 Spielanleitung</h2>
+
+                <div class="how-section">
+                    <h3>🎮 Steuerung</h3>
+                    <ul>
+                        <li><strong>LEERTASTE</strong> oder <strong>Klick/Touch</strong> - Springen</li>
+                        <li><strong>P</strong> - Pause</li>
+                        <li><strong>↑ ↓</strong> - Charakter wechseln (im Menü)</li>
+                    </ul>
+                </div>
+
+                <div class="how-section">
+                    <h3>🎯 Spielziel</h3>
+                    <p>Reise durch 6 Epochen der Philosophie (Antike → Gegenwart). Sammle philosophische Werke und erreiche neue Epochen durch Punkte!</p>
+                </div>
+
+                <div class="how-section">
+                    <h3>📚 Elemente im Spiel</h3>
+                    <div class="game-elements">
+                        <div class="element">
+                            <span class="element-icon">📕📗📘</span>
+                            <div>
+                                <strong>Philosophische Werke</strong>
+                                <p>Sammle Bücher wie "Politeia", "Kritik der reinen Vernunft" etc. für +100 Punkte und +10 Erkenntnis!</p>
+                            </div>
+                        </div>
+                        <div class="element">
+                            <span class="element-icon">❓⚡🕳️</span>
+                            <div>
+                                <strong>Philosophische Dilemmata</strong>
+                                <p>Weiche aus: Höhlengleichnis, Theodizee, Trolley-Problem, etc. Berührung = Game Over!</p>
+                            </div>
+                        </div>
+                        <div class="element">
+                            <span class="element-icon">🏛️⛪💡</span>
+                            <div>
+                                <strong>Epochen</strong>
+                                <p>6 Epochen mit einzigartigen Themen, Farben und philosophischen Konzepten!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="how-section">
+                    <h3>💡 Tipps</h3>
+                    <ul>
+                        <li>🎯 Folge dem Tutorial zu Beginn - es zeigt dir alle Grundlagen!</li>
+                        <li>💎 Sammle mehrere Werke hintereinander für Combo-Bonus!</li>
+                        <li>📊 Beobachte die Fortschrittsleiste oben rechts - sie zeigt die nächste Epoche!</li>
+                        <li>🌱 Starte im "Nachdenklich"-Modus, um das Spiel kennenzulernen!</li>
+                        <li>📖 Lese die Namen der Werke und Dilemmata - lerne Philosophie kennen!</li>
+                    </ul>
+                </div>
+
+                <button id="closeHowToPlay" class="close-btn">Verstanden! 🎯</button>
+            </div>
+        </div>
     </div>
+
     <script src="game.js"></script>
 </body>
 </html>
