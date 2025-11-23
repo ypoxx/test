@@ -3,16 +3,21 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
 // Game Constants
-const GRAVITY = 0.5;
-const JUMP_POWER = -12;
+const GRAVITY = 0.45;
+const JUMP_POWER = -11;
+const MAX_JUMP_POWER = -14;
+const JUMP_HOLD_BOOST = 0.3;
 const GROUND_LEVEL = canvas.height - 80;
-const COYOTE_TIME = 6; // Frames after leaving ground where you can still jump
-const JUMP_BUFFER = 8; // Frames to remember jump input
+const GAME_DURATION = 90; // 90 seconds per run
 
-// Difficulty Settings (25% slower progression)
+// Physics constants
+const AIR_CONTROL = 0.3;
+const GROUND_FRICTION = 0.85;
+
+// Difficulty Settings
 const DIFFICULTY = {
-    easy: { speed: 2.5, obstacleInterval: 160, name: 'Nachdenklich' },
-    normal: { speed: 4, obstacleInterval: 130, name: 'Philosophisch' },
+    easy: { speed: 3, obstacleInterval: 180, name: 'Nachdenklich' },
+    normal: { speed: 4.5, obstacleInterval: 140, name: 'Philosophisch' },
     hard: { speed: 6, obstacleInterval: 100, name: 'Erleuchtung' }
 };
 
@@ -23,72 +28,132 @@ let tutorialStep = 0;
 // Game timing
 let lastTime = 0;
 let deltaTime = 0;
+let gameTime = 0;
+let timeRemaining = GAME_DURATION;
 
-// Philosophical Eras with Enhanced Themes
+// Sound System
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+let soundEnabled = true;
+
+function playSound(frequency, duration, type = 'sine', volume = 0.3) {
+    if (!soundEnabled || !audioContext) return;
+
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    oscillator.frequency.value = frequency;
+    oscillator.type = type;
+    gainNode.gain.value = volume;
+
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + duration);
+}
+
+function playJumpSound() {
+    playSound(440, 0.1, 'square', 0.2);
+}
+
+function playCollectSound() {
+    playSound(880, 0.15, 'sine', 0.25);
+    setTimeout(() => playSound(1320, 0.1, 'sine', 0.15), 50);
+}
+
+function playBounceSound() {
+    playSound(220, 0.15, 'sawtooth', 0.2);
+}
+
+function playPowerUpSound() {
+    playSound(660, 0.1, 'sine', 0.2);
+    setTimeout(() => playSound(880, 0.1, 'sine', 0.2), 80);
+    setTimeout(() => playSound(1100, 0.15, 'sine', 0.2), 160);
+}
+
+function playEraChangeSound() {
+    playSound(523, 0.2, 'triangle', 0.25);
+    setTimeout(() => playSound(659, 0.2, 'triangle', 0.25), 100);
+    setTimeout(() => playSound(784, 0.3, 'triangle', 0.25), 200);
+}
+
+// Enhanced Eras with beautiful colors
 const ERAS = [
     {
         name: 'Antike',
-        primaryColor: '#d4af37',
-        secondaryColor: '#8b7355',
-        bgColor: '#fef5e7',
-        skyGradient: ['#87ceeb', '#f0e68c'],
+        primaryColor: '#FFD700',
+        secondaryColor: '#FFA500',
+        accentColor: '#FF8C00',
+        bgGradient: ['#87CEEB', '#FDB813', '#FF6B35'],
+        groundColor: '#D4AF37',
         scoreThreshold: 0,
-        theme: 'Erkenne dich selbst',
-        icon: '🏛️'
+        theme: '🏛️ Erkenne dich selbst',
+        decorationType: 'columns',
+        skyElements: { type: 'clouds', color: 'rgba(255, 255, 255, 0.6)' }
     },
     {
         name: 'Mittelalter',
-        primaryColor: '#8b4513',
-        secondaryColor: '#654321',
-        bgColor: '#deb887',
-        skyGradient: ['#696969', '#a0826d'],
-        scoreThreshold: 500,
-        theme: 'Glaube und Vernunft',
-        icon: '⛪'
+        primaryColor: '#8B4513',
+        secondaryColor: '#A0522D',
+        accentColor: '#CD853F',
+        bgGradient: ['#4A5568', '#8B7355', '#DEB887'],
+        groundColor: '#654321',
+        scoreThreshold: 800,
+        theme: '⛪ Glaube und Vernunft',
+        decorationType: 'castles',
+        skyElements: { type: 'stars', color: 'rgba(255, 255, 200, 0.8)' }
     },
     {
         name: 'Renaissance',
-        primaryColor: '#cd853f',
-        secondaryColor: '#daa520',
-        bgColor: '#faebd7',
-        skyGradient: ['#ffa07a', '#f4a460'],
-        scoreThreshold: 1000,
-        theme: 'Humanismus',
-        icon: '🎨'
+        primaryColor: '#FF6347',
+        secondaryColor: '#FF7F50',
+        accentColor: '#FFD700',
+        bgGradient: ['#FFA07A', '#FA8072', '#F4A460'],
+        groundColor: '#CD853F',
+        scoreThreshold: 1800,
+        theme: '🎨 Humanismus',
+        decorationType: 'art',
+        skyElements: { type: 'birds', color: 'rgba(139, 69, 19, 0.5)' }
     },
     {
         name: 'Aufklärung',
-        primaryColor: '#4169e1',
-        secondaryColor: '#1e90ff',
-        bgColor: '#e6f2ff',
-        skyGradient: ['#87ceeb', '#b0e0e6'],
-        scoreThreshold: 1500,
-        theme: 'Sapere Aude!',
-        icon: '💡'
+        primaryColor: '#4169E1',
+        secondaryColor: '#1E90FF',
+        accentColor: '#00BFFF',
+        bgGradient: ['#87CEEB', '#6495ED', '#4682B4'],
+        groundColor: '#4169E1',
+        scoreThreshold: 3000,
+        theme: '💡 Sapere Aude!',
+        decorationType: 'books',
+        skyElements: { type: 'rays', color: 'rgba(255, 255, 100, 0.3)' }
     },
     {
         name: 'Moderne',
-        primaryColor: '#8a2be2',
-        secondaryColor: '#9370db',
-        bgColor: '#e6e6fa',
-        skyGradient: ['#9370db', '#dda0dd'],
-        scoreThreshold: 2500,
-        theme: 'Existenz & Sein',
-        icon: '🏭'
+        primaryColor: '#9370DB',
+        secondaryColor: '#8A2BE2',
+        accentColor: '#BA55D3',
+        bgGradient: ['#9370DB', '#8A2BE2', '#4B0082'],
+        groundColor: '#663399',
+        scoreThreshold: 5000,
+        theme: '🏭 Existenz & Sein',
+        decorationType: 'cities',
+        skyElements: { type: 'smoke', color: 'rgba(100, 100, 100, 0.4)' }
     },
     {
         name: 'Gegenwart',
-        primaryColor: '#00ced1',
-        secondaryColor: '#40e0d0',
-        bgColor: '#e0ffff',
-        skyGradient: ['#00bfff', '#87ceeb'],
-        scoreThreshold: 4000,
-        theme: 'Digitale Ethik',
-        icon: '💻'
+        primaryColor: '#00CED1',
+        secondaryColor: '#00BFFF',
+        accentColor: '#1E90FF',
+        bgGradient: ['#00CED1', '#48D1CC', '#20B2AA'],
+        groundColor: '#008B8B',
+        scoreThreshold: 7500,
+        theme: '💻 Digitale Ethik',
+        decorationType: 'digital',
+        skyElements: { type: 'pixels', color: 'rgba(0, 255, 255, 0.6)' }
     }
 ];
 
-// Philosophers with detailed info
+// Philosophers
 const PHILOSOPHERS = [
     {
         name: 'Sokrates',
@@ -97,7 +162,8 @@ const PHILOSOPHERS = [
         lived: '469-399 v.Chr.',
         idea: 'Ich weiß, dass ich nichts weiß',
         jumpPower: 1.0,
-        color: '#d4af37'
+        airControl: 1.0,
+        color: '#FFD700'
     },
     {
         name: 'Augustinus',
@@ -105,8 +171,9 @@ const PHILOSOPHERS = [
         era: 'Mittelalter',
         lived: '354-430 n.Chr.',
         idea: 'Glaube sucht Verständnis',
-        jumpPower: 1.1,
-        color: '#8b4513'
+        jumpPower: 1.15,
+        airControl: 0.9,
+        color: '#8B4513'
     },
     {
         name: 'Kant',
@@ -115,61 +182,62 @@ const PHILOSOPHERS = [
         lived: '1724-1804',
         idea: 'Handle nach dem kategorischen Imperativ',
         jumpPower: 0.95,
-        color: '#4169e1'
+        airControl: 1.2,
+        color: '#4169E1'
     }
 ];
 
-// Philosophical Works as Collectibles
+// Collectibles with lane bonuses
 const PHILOSOPHICAL_WORKS = [
-    { name: 'Politeia', author: 'Platon', icon: '📕', era: 0, points: 100 },
-    { name: 'Nikomachische Ethik', author: 'Aristoteles', icon: '📗', era: 0, points: 100 },
-    { name: 'Confessiones', author: 'Augustinus', icon: '📘', era: 1, points: 120 },
-    { name: 'Summa Theologica', author: 'Thomas von Aquin', icon: '📙', era: 1, points: 120 },
-    { name: 'Der Fürst', author: 'Machiavelli', icon: '📕', era: 2, points: 150 },
-    { name: 'Kritik der reinen Vernunft', author: 'Kant', icon: '📗', era: 3, points: 150 },
-    { name: 'Leviathan', author: 'Hobbes', icon: '📘', era: 3, points: 150 },
-    { name: 'Also sprach Zarathustra', author: 'Nietzsche', icon: '📙', era: 4, points: 200 },
-    { name: 'Sein und Zeit', author: 'Heidegger', icon: '📕', era: 4, points: 200 },
-    { name: 'Eine Theorie der Gerechtigkeit', author: 'Rawls', icon: '📗', era: 5, points: 250 }
+    { name: 'Politeia', author: 'Platon', icon: '📕', era: 0, basePoints: 100 },
+    { name: 'Nikomachische Ethik', author: 'Aristoteles', icon: '📗', era: 0, basePoints: 100 },
+    { name: 'Confessiones', author: 'Augustinus', icon: '📘', era: 1, basePoints: 120 },
+    { name: 'Summa Theologica', author: 'Thomas', icon: '📙', era: 1, basePoints: 120 },
+    { name: 'Der Fürst', author: 'Machiavelli', icon: '📕', era: 2, basePoints: 150 },
+    { name: 'Kritik d. r. Vernunft', author: 'Kant', icon: '📗', era: 3, basePoints: 150 },
+    { name: 'Leviathan', author: 'Hobbes', icon: '📘', era: 3, basePoints: 150 },
+    { name: 'Zarathustra', author: 'Nietzsche', icon: '📙', era: 4, basePoints: 200 },
+    { name: 'Sein und Zeit', author: 'Heidegger', icon: '📕', era: 4, basePoints: 200 },
+    { name: 'Theorie d. Gerechtigkeit', author: 'Rawls', icon: '📗', era: 5, basePoints: 250 }
 ];
 
-// Philosophical Dilemmas as Obstacles
+// Dilemmas - now just slow you down or bounce you back!
 const PHILOSOPHICAL_DILEMMAS = [
-    { name: 'Höhlengleichnis', icon: '🕳️', era: 0 },
-    { name: 'Sokratisches Paradox', icon: '❓', era: 0 },
-    { name: 'Theodizee', icon: '⚖️', era: 1 },
-    { name: 'Gottesbeweis', icon: '✝️', era: 1 },
-    { name: 'Gedankenexperiment', icon: '🧪', era: 2 },
-    { name: 'Antinomien', icon: '⚡', era: 3 },
-    { name: 'Kategorischer Imperativ', icon: '📜', era: 3 },
-    { name: 'Wille zur Macht', icon: '💪', era: 4 },
-    { name: 'Existenzkrise', icon: '😰', era: 4 },
-    { name: 'Trolley-Problem', icon: '🚃', era: 5 },
-    { name: 'KI-Ethik', icon: '🤖', era: 5 }
+    { name: 'Höhlengleichnis', icon: '🕳️', era: 0, effect: 'slow' },
+    { name: 'Sokratisches Paradox', icon: '❓', era: 0, effect: 'bounce' },
+    { name: 'Theodizee', icon: '⚖️', era: 1, effect: 'slow' },
+    { name: 'Gottesbeweis', icon: '✝️', era: 1, effect: 'bounce' },
+    { name: 'Gedankenexperiment', icon: '🧪', era: 2, effect: 'slow' },
+    { name: 'Antinomien', icon: '⚡', era: 3, effect: 'bounce' },
+    { name: 'Kategorischer Imperativ', icon: '📜', era: 3, effect: 'slow' },
+    { name: 'Wille zur Macht', icon: '💪', era: 4, effect: 'bounce' },
+    { name: 'Existenzkrise', icon: '😰', era: 4, effect: 'slow' },
+    { name: 'Trolley-Problem', icon: '🚃', era: 5, effect: 'bounce' },
+    { name: 'KI-Ethik', icon: '🤖', era: 5, effect: 'slow' }
 ];
 
-// Power-Up Types
+// Power-Ups
 const POWERUP_TYPES = [
     {
-        name: 'Slow Motion',
+        name: 'Zeitlupe',
         icon: '⏱️',
         duration: 5000,
-        color: '#00ffff',
+        color: '#00FFFF',
         effect: 'slowmo'
-    },
-    {
-        name: 'Schutzschild',
-        icon: '🛡️',
-        duration: 8000,
-        color: '#ffd700',
-        effect: 'shield'
     },
     {
         name: 'Magnet',
         icon: '🧲',
         duration: 7000,
-        color: '#ff69b4',
+        color: '#FF69B4',
         effect: 'magnet'
+    },
+    {
+        name: 'Doppelsprung',
+        icon: '⏫',
+        duration: 10000,
+        color: '#FFD700',
+        effect: 'doublejump'
     }
 ];
 
@@ -177,12 +245,10 @@ const POWERUP_TYPES = [
 const QUOTES = [
     { text: "Ich weiß, dass ich nichts weiß", author: "Sokrates" },
     { text: "Cogito, ergo sum", author: "Descartes" },
-    { text: "Der Mensch ist dem Menschen ein Wolf", author: "Hobbes" },
     { text: "Sapere aude!", author: "Kant" },
     { text: "Die Hölle, das sind die anderen", author: "Sartre" },
     { text: "Gott ist tot", author: "Nietzsche" },
-    { text: "Das Sein bestimmt das Bewusstsein", author: "Marx" },
-    { text: "Was mich nicht umbringt, macht mich stärker", author: "Nietzsche" }
+    { text: "Das Sein bestimmt das Bewusstsein", author: "Marx" }
 ];
 
 // Game State
@@ -195,6 +261,7 @@ let currentEraIndex = 0;
 let selectedPhilosopherIndex = 0;
 let animationId;
 let particles = [];
+let skyElements = [];
 let collectibles = [];
 let obstacles = [];
 let powerups = [];
@@ -208,55 +275,63 @@ let lastCollectTime = 0;
 let tutorialMessages = [];
 let screenShake = 0;
 let backgroundOffset = 0;
+let slowMotionTimer = 0;
 
 // Active power-ups
 let activePowerups = {
     slowmo: 0,
-    shield: 0,
-    magnet: 0
+    magnet: 0,
+    doublejump: 0
 };
 
-// Obstacle patterns
-const OBSTACLE_PATTERNS = [
-    [1], // Single
-    [1, 0, 1], // Double with gap
-    [1, 1], // Double close
-    [1, 0, 0, 1], // Wide spread
-];
-
-// Tutorial Messages
+// Tutorial
 const TUTORIAL_STEPS = [
-    { text: "Willkommen zur philosophischen Reise!", duration: 3000 },
-    { text: "Tap oder Klick zum Springen! ⬆️", duration: 3000 },
-    { text: "Sammle philosophische Werke 📚", duration: 3000 },
-    { text: "Weiche Dilemmata aus! ⚠️", duration: 3000 },
-    { text: "Power-Ups helfen dir! 🌟", duration: 3000 }
+    { text: "Willkommen! Sammle philosophische Werke! 📚", duration: 3000 },
+    { text: "Tap/Klick zum Springen! Halten = höher! ⬆️", duration: 3500 },
+    { text: "Höhere Lanes = Mehr Punkte! 🎯", duration: 3000 },
+    { text: "Dilemmata verlangsamen dich nur! 💨", duration: 3000 },
+    { text: "Sammle so viel wie möglich in 90s! ⏱️", duration: 3500 }
 ];
 
-// Player Object with improved physics
+// Lane system
+const LANES = [
+    { y: GROUND_LEVEL - 180, multiplier: 3, name: 'Hoch' },    // Top lane
+    { y: GROUND_LEVEL - 110, multiplier: 2, name: 'Mittel' },  // Mid lane
+    { y: GROUND_LEVEL - 50, multiplier: 1, name: 'Tief' }      // Low lane
+];
+
+// Player with enhanced physics
 const player = {
     x: 100,
     y: GROUND_LEVEL,
-    width: 50,
-    height: 50,
+    width: 55,
+    height: 55,
     velocityY: 0,
     velocityX: 0,
     isJumping: false,
-    coyoteTimer: 0,
-    jumpBufferTimer: 0,
+    jumpHeld: false,
+    canDoubleJump: false,
+    hasDoubleJumped: false,
     rotation: 0,
     squashStretch: { x: 1, y: 1 },
     trail: [],
+    bounceTimer: 0,
+    slowTimer: 0,
 
     draw() {
-        // Draw trail
+        // Enhanced trail
         ctx.save();
         this.trail.forEach((point, i) => {
-            const alpha = (i / this.trail.length) * 0.3;
+            const alpha = (i / this.trail.length) * 0.4;
             const era = ERAS[currentEraIndex];
             ctx.globalAlpha = alpha;
-            ctx.fillStyle = era.primaryColor;
-            const size = this.width * 0.8 * (i / this.trail.length);
+
+            const gradient = ctx.createRadialGradient(point.x, point.y, 0, point.x, point.y, 30);
+            gradient.addColorStop(0, era.primaryColor);
+            gradient.addColorStop(1, 'transparent');
+            ctx.fillStyle = gradient;
+
+            const size = (i / this.trail.length) * this.width * 0.9;
             ctx.font = `${size}px Arial`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
@@ -266,60 +341,82 @@ const player = {
 
         ctx.save();
 
-        // Enhanced shadow with blur
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-        ctx.shadowBlur = 10;
-        ctx.shadowOffsetY = 5;
-
-        const shadowScale = Math.max(0.3, 1 - (GROUND_LEVEL - this.y) / 300);
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+        // Beautiful shadow
+        const shadowScale = Math.max(0.4, 1 - (GROUND_LEVEL - this.y) / 300);
+        const gradient = ctx.createRadialGradient(
+            this.x + this.width / 2, GROUND_LEVEL + this.height + 5,
+            0,
+            this.x + this.width / 2, GROUND_LEVEL + this.height + 5,
+            this.width * shadowScale
+        );
+        gradient.addColorStop(0, 'rgba(0, 0, 0, 0.4)');
+        gradient.addColorStop(1, 'transparent');
+        ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.ellipse(this.x + this.width / 2, GROUND_LEVEL + this.height + 5,
-                   this.width / 2 * shadowScale, 8 * shadowScale, 0, 0, Math.PI * 2);
+        ctx.ellipse(this.x + this.width / 2, GROUND_LEVEL + this.height + 8,
+                   this.width / 2 * shadowScale, 10 * shadowScale, 0, 0, Math.PI * 2);
         ctx.fill();
-
-        ctx.shadowColor = 'transparent';
 
         // Character with squash & stretch
         ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
         ctx.rotate(this.rotation);
         ctx.scale(this.squashStretch.x, this.squashStretch.y);
 
-        // Aura effect with pulse
         const era = ERAS[currentEraIndex];
         const philosopher = PHILOSOPHERS[selectedPhilosopherIndex];
 
-        if (this.isJumping || activePowerups.shield > 0) {
-            const pulseSize = 35 + Math.sin(Date.now() / 200) * 5;
-            ctx.strokeStyle = activePowerups.shield > 0 ? '#ffd700' : era.primaryColor;
-            ctx.lineWidth = 3;
-            ctx.globalAlpha = 0.6;
+        // Pulsing aura
+        if (this.isJumping || activePowerups.doublejump > 0) {
+            const pulseSize = 40 + Math.sin(Date.now() / 150) * 6;
+            const auraGradient = ctx.createRadialGradient(0, 0, 10, 0, 0, pulseSize);
+            auraGradient.addColorStop(0, 'transparent');
+            auraGradient.addColorStop(0.7, era.primaryColor + '60');
+            auraGradient.addColorStop(1, 'transparent');
+            ctx.fillStyle = auraGradient;
             ctx.beginPath();
             ctx.arc(0, 0, pulseSize, 0, Math.PI * 2);
-            ctx.stroke();
-
-            // Inner glow
-            ctx.globalAlpha = 0.3;
-            ctx.beginPath();
-            ctx.arc(0, 0, pulseSize - 8, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.globalAlpha = 1;
+            ctx.fill();
         }
 
-        // Draw philosopher icon with glow
+        // Glow effect
         ctx.shadowColor = philosopher.color;
-        ctx.shadowBlur = 15;
-        ctx.font = 'bold 45px Arial';
+        ctx.shadowBlur = 20;
+        ctx.font = 'bold 50px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(philosopher.icon, 0, 0);
+
+        // Slow effect
+        if (this.slowTimer > 0) {
+            ctx.globalAlpha = 0.5;
+            ctx.fillStyle = '#0000FF';
+            ctx.font = 'bold 30px Arial';
+            ctx.fillText('💤', 15, -15);
+        }
 
         ctx.restore();
     },
 
     update(dt) {
+        // Slow effect
+        if (this.slowTimer > 0) {
+            this.slowTimer--;
+            dt *= 0.5;
+        }
+
+        // Bounce effect
+        if (this.bounceTimer > 0) {
+            this.bounceTimer--;
+        }
+
         // Apply gravity
         this.velocityY += GRAVITY * dt;
+
+        // Variable jump height - hold for higher jump!
+        if (this.jumpHeld && this.velocityY < 0) {
+            this.velocityY -= JUMP_HOLD_BOOST * dt;
+        }
+
         this.y += this.velocityY * dt;
 
         // Ground collision
@@ -327,77 +424,88 @@ const player = {
             this.y = GROUND_LEVEL;
             this.velocityY = 0;
             this.isJumping = false;
-            this.coyoteTimer = COYOTE_TIME;
+            this.hasDoubleJumped = false;
+            this.canDoubleJump = activePowerups.doublejump > 0;
 
             // Landing squash
-            this.squashStretch = { x: 1.2, y: 0.8 };
-            createParticles(this.x + this.width / 2, this.y + this.height,
-                          ERAS[currentEraIndex].primaryColor, 4);
-        } else {
-            // In air
-            if (this.coyoteTimer > 0) this.coyoteTimer--;
-        }
-
-        // Update rotation
-        if (this.isJumping) {
-            this.rotation += 0.06 * dt;
-        } else {
-            this.rotation *= 0.9;
-        }
-
-        // Squash & stretch recovery
-        this.squashStretch.x += (1 - this.squashStretch.x) * 0.1;
-        this.squashStretch.y += (1 - this.squashStretch.y) * 0.1;
-
-        // Jump buffer countdown
-        if (this.jumpBufferTimer > 0) {
-            this.jumpBufferTimer--;
-            // Try to jump if we're grounded
-            if (this.coyoteTimer > 0) {
-                this.performJump();
-                this.jumpBufferTimer = 0;
+            if (this.squashStretch.y > 1.1) {
+                this.squashStretch = { x: 1.3, y: 0.7 };
+                createParticles(this.x + this.width / 2, this.y + this.height,
+                              ERAS[currentEraIndex].primaryColor, 6);
             }
         }
 
-        // Trail effect
-        if (gameRunning && Date.now() % 3 === 0) {
+        // Rotation
+        if (this.isJumping) {
+            this.rotation += 0.05 * dt;
+        } else {
+            this.rotation *= 0.92;
+        }
+
+        // Squash & stretch recovery
+        this.squashStretch.x += (1 - this.squashStretch.x) * 0.15;
+        this.squashStretch.y += (1 - this.squashStretch.y) * 0.15;
+
+        // Trail
+        if (gameRunning && Date.now() % 2 === 0) {
             this.trail.push({
                 x: this.x + this.width / 2,
                 y: this.y + this.height / 2
             });
-            if (this.trail.length > 8) this.trail.shift();
+            if (this.trail.length > 10) this.trail.shift();
         }
     },
 
-    jump() {
-        // Coyote time: can jump shortly after leaving ground
-        if (this.coyoteTimer > 0) {
+    jump(isHolding = true) {
+        if (!gameRunning || gamePaused) return;
+
+        this.jumpHeld = isHolding;
+
+        // Ground jump
+        if (!this.isJumping) {
             this.performJump();
-        } else {
-            // Buffer the jump input
-            this.jumpBufferTimer = JUMP_BUFFER;
         }
+        // Double jump
+        else if (this.canDoubleJump && !this.hasDoubleJumped) {
+            this.hasDoubleJumped = true;
+            this.canDoubleJump = false;
+            this.velocityY = JUMP_POWER * 0.9;
+            this.squashStretch = { x: 0.7, y: 1.4 };
+            createParticles(this.x + this.width / 2, this.y + this.height,
+                          '#FFD700', 15);
+            playJumpSound();
+        }
+    },
+
+    releaseJump() {
+        this.jumpHeld = false;
     },
 
     performJump() {
-        if (!gameRunning || gamePaused) return;
-
         const philosopher = PHILOSOPHERS[selectedPhilosopherIndex];
         this.velocityY = JUMP_POWER * philosopher.jumpPower;
         this.isJumping = true;
-        this.coyoteTimer = 0;
-
-        // Jump stretch
-        this.squashStretch = { x: 0.8, y: 1.3 };
-
+        this.squashStretch = { x: 0.8, y: 1.4 };
         createParticles(this.x + this.width / 2, this.y + this.height,
                       ERAS[currentEraIndex].primaryColor, 12);
+        playJumpSound();
 
-        // Tutorial progress
         if (tutorialMode && tutorialStep === 1) {
             tutorialStep = 2;
             showTutorialMessage(2);
         }
+    },
+
+    bounce() {
+        this.velocityY = -8;
+        this.bounceTimer = 30;
+        screenShake = 8;
+        createParticles(this.x + this.width / 2, this.y + this.height / 2, '#FF6347', 20);
+        playBounceSound();
+    },
+
+    slow() {
+        this.slowTimer = 60;
     },
 
     reset() {
@@ -405,26 +513,29 @@ const player = {
         this.velocityY = 0;
         this.velocityX = 0;
         this.isJumping = false;
+        this.jumpHeld = false;
+        this.canDoubleJump = false;
+        this.hasDoubleJumped = false;
         this.rotation = 0;
-        this.coyoteTimer = 0;
-        this.jumpBufferTimer = 0;
         this.squashStretch = { x: 1, y: 1 };
         this.trail = [];
+        this.bounceTimer = 0;
+        this.slowTimer = 0;
     }
 };
 
-// Enhanced Particle System
+// Enhanced Particle
 class Particle {
     constructor(x, y, color, velocityX = null, velocityY = null) {
         this.x = x;
         this.y = y;
         this.color = color;
-        this.velocityX = velocityX !== null ? velocityX : (Math.random() - 0.5) * 5;
-        this.velocityY = velocityY !== null ? velocityY : (Math.random() - 0.5) * 5 - 3;
-        this.size = Math.random() * 5 + 2;
+        this.velocityX = velocityX !== null ? velocityX : (Math.random() - 0.5) * 6;
+        this.velocityY = velocityY !== null ? velocityY : (Math.random() - 0.5) * 6 - 3;
+        this.size = Math.random() * 6 + 2;
         this.life = 1;
-        this.decay = 0.015;
-        this.gravity = 0.15;
+        this.decay = 0.012;
+        this.gravity = 0.12;
     }
 
     update(dt) {
@@ -437,9 +548,12 @@ class Particle {
     draw() {
         ctx.save();
         ctx.globalAlpha = this.life;
-        ctx.fillStyle = this.color;
-        ctx.shadowColor = this.color;
-        ctx.shadowBlur = 8;
+
+        const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+        gradient.addColorStop(0, this.color);
+        gradient.addColorStop(1, 'transparent');
+
+        ctx.fillStyle = gradient;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
@@ -457,16 +571,79 @@ function createParticles(x, y, color, count) {
     }
 }
 
-// Floating Text Class
+// Sky Elements (clouds, stars, etc.)
+class SkyElement {
+    constructor(type) {
+        this.type = type;
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * (canvas.height - 200);
+        this.size = Math.random() * 40 + 20;
+        this.speed = Math.random() * 0.3 + 0.1;
+        this.opacity = Math.random() * 0.4 + 0.2;
+        this.phase = Math.random() * Math.PI * 2;
+    }
+
+    update(dt) {
+        this.x -= this.speed * dt;
+        if (this.x + this.size < 0) {
+            this.x = canvas.width + this.size;
+            this.y = Math.random() * (canvas.height - 200);
+        }
+    }
+
+    draw() {
+        ctx.save();
+        ctx.globalAlpha = this.opacity;
+
+        if (this.type === 'clouds') {
+            // Fluffy cloud
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size * 0.6, 0, Math.PI * 2);
+            ctx.arc(this.x + this.size * 0.5, this.y, this.size * 0.5, 0, Math.PI * 2);
+            ctx.arc(this.x + this.size, this.y, this.size * 0.6, 0, Math.PI * 2);
+            ctx.fill();
+        } else if (this.type === 'stars') {
+            // Twinkling star
+            const twinkle = Math.sin(Date.now() / 500 + this.phase) * 0.3 + 0.7;
+            ctx.globalAlpha = this.opacity * twinkle;
+            ctx.fillStyle = '#FFFFCC';
+            ctx.beginPath();
+            for (let i = 0; i < 5; i++) {
+                const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+                const radius = i % 2 === 0 ? this.size * 0.4 : this.size * 0.15;
+                const x = this.x + Math.cos(angle) * radius;
+                const y = this.y + Math.sin(angle) * radius;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.fill();
+        } else if (this.type === 'birds') {
+            // Simple bird
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(this.x - this.size * 0.3, this.y);
+            ctx.quadraticCurveTo(this.x, this.y - this.size * 0.2, this.x + this.size * 0.3, this.y);
+            ctx.stroke();
+        }
+
+        ctx.restore();
+    }
+}
+
+// Floating Text
 class FloatingText {
-    constructor(x, y, text, color = '#ffffff') {
+    constructor(x, y, text, color = '#FFFFFF', size = 24) {
         this.x = x;
         this.y = y;
         this.text = text;
         this.color = color;
-        this.velocityY = -2;
+        this.size = size;
+        this.velocityY = -1.5;
         this.life = 1;
-        this.decay = 0.02;
+        this.decay = 0.015;
     }
 
     update(dt) {
@@ -477,10 +654,10 @@ class FloatingText {
     draw() {
         ctx.save();
         ctx.globalAlpha = this.life;
-        ctx.font = 'bold 24px Arial';
+        ctx.font = `bold ${this.size}px Arial`;
         ctx.fillStyle = this.color;
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 4;
         ctx.textAlign = 'center';
         ctx.strokeText(this.text, this.x, this.y);
         ctx.fillText(this.text, this.x, this.y);
@@ -492,101 +669,20 @@ class FloatingText {
     }
 }
 
-// Enhanced Obstacle Class
-class Obstacle {
-    constructor(heightVariation = 0) {
-        this.width = 50;
-        this.baseHeight = 60 + Math.random() * 20;
-        this.height = this.baseHeight;
-        this.x = canvas.width + 100;
-        this.y = GROUND_LEVEL + player.height - this.height + heightVariation;
-
-        const diffSettings = DIFFICULTY[currentDifficulty];
-        const speedMult = activePowerups.slowmo > 0 ? 0.5 : 1;
-        this.speed = (tutorialMode ? 2 : diffSettings.speed + Math.min(score / 3000, 3)) * speedMult;
-
-        const eraProblems = PHILOSOPHICAL_DILEMMAS.filter(d => d.era === currentEraIndex);
-        const allProblems = eraProblems.length > 0 ? eraProblems : PHILOSOPHICAL_DILEMMAS;
-        this.dilemma = allProblems[Math.floor(Math.random() * allProblems.length)];
-
-        this.pulsePhase = Math.random() * Math.PI * 2;
-    }
-
-    draw() {
-        const era = ERAS[currentEraIndex];
-
-        // Pulsing effect
-        const pulse = Math.sin(Date.now() / 300 + this.pulsePhase) * 3;
-        this.height = this.baseHeight + pulse;
-        this.y = GROUND_LEVEL + player.height - this.height;
-
-        // Enhanced gradient
-        const gradient = ctx.createLinearGradient(this.x, this.y, this.x, this.y + this.height);
-        gradient.addColorStop(0, era.primaryColor);
-        gradient.addColorStop(0.5, era.secondaryColor);
-        gradient.addColorStop(1, adjustColor(era.secondaryColor, -30));
-
-        ctx.save();
-        ctx.shadowColor = era.primaryColor;
-        ctx.shadowBlur = 10;
-        ctx.fillStyle = gradient;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
-
-        // Border with glow
-        ctx.strokeStyle = era.primaryColor;
-        ctx.lineWidth = 3;
-        ctx.strokeRect(this.x, this.y, this.width, this.height);
-
-        // Icon
-        ctx.shadowBlur = 5;
-        ctx.font = 'bold 32px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = '#fff';
-        ctx.fillText(this.dilemma.icon, this.x + this.width / 2, this.y + this.height / 2);
-
-        ctx.restore();
-
-        // Name label
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        const labelWidth = ctx.measureText(this.dilemma.name).width + 10;
-        ctx.fillRect(this.x + this.width / 2 - labelWidth / 2, this.y - 22, labelWidth, 18);
-
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 10px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(this.dilemma.name, this.x + this.width / 2, this.y - 13);
-    }
-
-    update(dt) {
-        const speedMult = activePowerups.slowmo > 0 ? 0.5 : 1;
-        this.x -= this.speed * speedMult * dt;
-    }
-
-    isOffScreen() {
-        return this.x + this.width < 0;
-    }
-}
-
-// Enhanced Collectible Class
+// Collectible with beautiful design
 class Collectible {
     constructor(lane = 0) {
-        this.width = 35;
-        this.height = 35;
+        this.width = 40;
+        this.height = 40;
         this.x = canvas.width + 100;
 
-        // Three lanes: high, medium, low
-        const lanes = [
-            GROUND_LEVEL - 150,  // High
-            GROUND_LEVEL - 100,  // Medium
-            GROUND_LEVEL - 50    // Low
-        ];
-        this.baseY = lanes[lane] || (GROUND_LEVEL - 80 - Math.random() * 100);
+        this.lane = LANES[lane] || LANES[1];
+        this.baseY = this.lane.y;
         this.y = this.baseY;
 
         const diffSettings = DIFFICULTY[currentDifficulty];
         const speedMult = activePowerups.slowmo > 0 ? 0.5 : 1;
-        this.speed = (tutorialMode ? 2 : diffSettings.speed + Math.min(score / 3000, 3)) * speedMult;
+        this.speed = (diffSettings.speed + Math.min(score / 4000, 2)) * speedMult;
         this.rotation = 0;
         this.bouncePhase = Math.random() * Math.PI * 2;
 
@@ -596,60 +692,80 @@ class Collectible {
     }
 
     draw() {
-        // Bouncing animation
-        const bounce = Math.sin(Date.now() / 200 + this.bouncePhase) * 8;
+        // Smooth bouncing
+        const bounce = Math.sin(Date.now() / 180 + this.bouncePhase) * 10;
         this.y = this.baseY + bounce;
 
         ctx.save();
         ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
         ctx.rotate(this.rotation);
 
-        // Enhanced glow
-        ctx.shadowColor = '#ffd700';
-        ctx.shadowBlur = 20;
+        // Beautiful glow rings
+        for (let i = 0; i < 3; i++) {
+            const pulseSize = 25 + i * 8 + Math.sin(Date.now() / 120 + i) * 4;
+            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, pulseSize);
+            gradient.addColorStop(0, 'transparent');
+            gradient.addColorStop(0.7, '#FFD700' + Math.floor((0.3 - i * 0.1) * 255).toString(16).padStart(2, '0'));
+            gradient.addColorStop(1, 'transparent');
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(0, 0, pulseSize, 0, Math.PI * 2);
+            ctx.fill();
+        }
 
-        // Pulsing outer ring
-        const pulseSize = 20 + Math.sin(Date.now() / 150) * 3;
-        ctx.strokeStyle = '#ffd700';
-        ctx.lineWidth = 2;
-        ctx.globalAlpha = 0.4;
-        ctx.beginPath();
-        ctx.arc(0, 0, pulseSize, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.globalAlpha = 1;
-
-        // Icon
-        ctx.font = 'bold 32px Arial';
+        // Icon with shadow
+        ctx.shadowColor = '#FFD700';
+        ctx.shadowBlur = 25;
+        ctx.font = 'bold 36px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(this.work.icon, 0, 0);
 
         ctx.restore();
 
-        // Work title with better background
-        const textWidth = ctx.measureText(this.work.name).width + 8;
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        ctx.fillRect(this.x + this.width / 2 - textWidth / 2, this.y - 22, textWidth, 18);
+        // Label
+        ctx.save();
+        ctx.font = 'bold 11px Arial';
+        const textWidth = ctx.measureText(this.work.name).width + 10;
 
-        ctx.fillStyle = '#ffd700';
-        ctx.font = 'bold 10px Arial';
+        const labelGradient = ctx.createLinearGradient(
+            this.x + this.width / 2 - textWidth / 2, this.y - 24,
+            this.x + this.width / 2 + textWidth / 2, this.y - 24
+        );
+        labelGradient.addColorStop(0, 'rgba(0, 0, 0, 0.7)');
+        labelGradient.addColorStop(0.5, 'rgba(0, 0, 0, 0.9)');
+        labelGradient.addColorStop(1, 'rgba(0, 0, 0, 0.7)');
+
+        ctx.fillStyle = labelGradient;
+        ctx.fillRect(this.x + this.width / 2 - textWidth / 2, this.y - 26, textWidth, 20);
+
+        ctx.fillStyle = '#FFD700';
         ctx.textAlign = 'center';
-        ctx.fillText(this.work.name, this.x + this.width / 2, this.y - 13);
+        ctx.fillText(this.work.name, this.x + this.width / 2, this.y - 16);
+
+        // Lane bonus indicator
+        if (this.lane.multiplier > 1) {
+            ctx.font = 'bold 10px Arial';
+            ctx.fillStyle = '#FF6347';
+            ctx.fillText(`x${this.lane.multiplier}`, this.x + this.width / 2, this.y - 34);
+        }
+        ctx.restore();
     }
 
     update(dt) {
         const speedMult = activePowerups.slowmo > 0 ? 0.5 : 1;
         this.x -= this.speed * speedMult * dt;
-        this.rotation += 0.04 * dt;
+        this.rotation += 0.03 * dt;
 
-        // Magnet effect
+        // Magnet
         if (activePowerups.magnet > 0) {
             const dx = player.x - this.x;
             const dy = player.y - this.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < 200) {
-                this.x += dx * 0.05 * dt;
-                this.y += dy * 0.05 * dt;
+            if (dist < 250) {
+                this.x += dx * 0.06 * dt;
+                this.y += dy * 0.06 * dt;
+                this.baseY = this.y;
             }
         }
     }
@@ -659,17 +775,105 @@ class Collectible {
     }
 }
 
-// Power-Up Class
-class PowerUp {
+// Obstacle - now just bounces/slows!
+class Obstacle {
     constructor() {
-        this.width = 40;
-        this.height = 40;
+        this.width = 55;
+        this.baseHeight = 65 + Math.random() * 25;
+        this.height = this.baseHeight;
         this.x = canvas.width + 100;
-        this.y = GROUND_LEVEL - 120 - Math.random() * 80;
+        this.y = GROUND_LEVEL + player.height - this.height;
 
         const diffSettings = DIFFICULTY[currentDifficulty];
         const speedMult = activePowerups.slowmo > 0 ? 0.5 : 1;
-        this.speed = (diffSettings.speed + Math.min(score / 3000, 3)) * speedMult;
+        this.speed = (diffSettings.speed + Math.min(score / 4000, 2)) * speedMult;
+
+        const eraProblems = PHILOSOPHICAL_DILEMMAS.filter(d => d.era === currentEraIndex);
+        const allProblems = eraProblems.length > 0 ? eraProblems : PHILOSOPHICAL_DILEMMAS;
+        this.dilemma = allProblems[Math.floor(Math.random() * allProblems.length)];
+        this.pulsePhase = Math.random() * Math.PI * 2;
+    }
+
+    draw() {
+        const era = ERAS[currentEraIndex];
+        const pulse = Math.sin(Date.now() / 250 + this.pulsePhase) * 4;
+        this.height = this.baseHeight + pulse;
+        this.y = GROUND_LEVEL + player.height - this.height;
+
+        ctx.save();
+
+        // Beautiful gradient
+        const gradient = ctx.createLinearGradient(this.x, this.y, this.x, this.y + this.height);
+        gradient.addColorStop(0, era.primaryColor + 'CC');
+        gradient.addColorStop(0.5, era.secondaryColor);
+        gradient.addColorStop(1, era.accentColor + '88');
+
+        // Outer glow
+        ctx.shadowColor = era.primaryColor;
+        ctx.shadowBlur = 15;
+        ctx.fillStyle = gradient;
+
+        // Rounded rectangle
+        const radius = 8;
+        ctx.beginPath();
+        ctx.moveTo(this.x + radius, this.y);
+        ctx.lineTo(this.x + this.width - radius, this.y);
+        ctx.arcTo(this.x + this.width, this.y, this.x + this.width, this.y + radius, radius);
+        ctx.lineTo(this.x + this.width, this.y + this.height - radius);
+        ctx.arcTo(this.x + this.width, this.y + this.height, this.x + this.width - radius, this.y + this.height, radius);
+        ctx.lineTo(this.x + radius, this.y + this.height);
+        ctx.arcTo(this.x, this.y + this.height, this.x, this.y + this.height - radius, radius);
+        ctx.lineTo(this.x, this.y + radius);
+        ctx.arcTo(this.x, this.y, this.x + radius, this.y, radius);
+        ctx.closePath();
+        ctx.fill();
+
+        // Border
+        ctx.strokeStyle = era.accentColor;
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Icon
+        ctx.shadowBlur = 8;
+        ctx.font = 'bold 35px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillText(this.dilemma.icon, this.x + this.width / 2, this.y + this.height / 2);
+
+        ctx.restore();
+
+        // Label
+        ctx.font = 'bold 10px Arial';
+        const textWidth = ctx.measureText(this.dilemma.name).width + 10;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        ctx.fillRect(this.x + this.width / 2 - textWidth / 2, this.y - 24, textWidth, 18);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.textAlign = 'center';
+        ctx.fillText(this.dilemma.name, this.x + this.width / 2, this.y - 15);
+    }
+
+    update(dt) {
+        const speedMult = activePowerups.slowmo > 0 ? 0.5 : 1;
+        this.x -= this.speed * speedMult * dt;
+    }
+
+    isOffScreen() {
+        return this.x + this.width < 0;
+    }
+}
+
+// Power-Up
+class PowerUp {
+    constructor() {
+        this.width = 45;
+        this.height = 45;
+        this.x = canvas.width + 100;
+        this.y = GROUND_LEVEL - 130 - Math.random() * 70;
+
+        const diffSettings = DIFFICULTY[currentDifficulty];
+        const speedMult = activePowerups.slowmo > 0 ? 0.5 : 1;
+        this.speed = (diffSettings.speed + Math.min(score / 4000, 2)) * speedMult;
 
         this.type = POWERUP_TYPES[Math.floor(Math.random() * POWERUP_TYPES.length)];
         this.rotation = 0;
@@ -677,31 +881,32 @@ class PowerUp {
     }
 
     draw() {
-        const pulse = Math.sin(Date.now() / 150 + this.pulsePhase) * 5;
+        const pulse = Math.sin(Date.now() / 130 + this.pulsePhase) * 6;
 
         ctx.save();
         ctx.translate(this.x + this.width / 2, this.y + this.height / 2 + pulse);
         ctx.rotate(this.rotation);
 
-        // Glow effect
-        ctx.shadowColor = this.type.color;
-        ctx.shadowBlur = 25;
-
-        // Star background
-        ctx.fillStyle = this.type.color;
-        ctx.globalAlpha = 0.3;
-        for (let i = 0; i < 5; i++) {
+        // Star-burst effect
+        for (let i = 0; i < 6; i++) {
+            const size = 30 + i * 5 + Math.sin(Date.now() / 100 + i) * 3;
+            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, size);
+            gradient.addColorStop(0, this.type.color + '80');
+            gradient.addColorStop(0.6, this.type.color + '30');
+            gradient.addColorStop(1, 'transparent');
+            ctx.fillStyle = gradient;
             ctx.beginPath();
-            ctx.arc(0, 0, 25 + i * 3, 0, Math.PI * 2);
+            ctx.arc(0, 0, size, 0, Math.PI * 2);
             ctx.fill();
         }
-        ctx.globalAlpha = 1;
 
         // Icon
-        ctx.font = 'bold 28px Arial';
+        ctx.shadowColor = this.type.color;
+        ctx.shadowBlur = 20;
+        ctx.font = 'bold 32px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillStyle = '#fff';
+        ctx.fillStyle = '#FFFFFF';
         ctx.fillText(this.type.icon, 0, 0);
 
         ctx.restore();
@@ -710,7 +915,7 @@ class PowerUp {
     update(dt) {
         const speedMult = activePowerups.slowmo > 0 ? 0.5 : 1;
         this.x -= this.speed * speedMult * dt;
-        this.rotation += 0.03 * dt;
+        this.rotation += 0.025 * dt;
     }
 
     isOffScreen() {
@@ -718,7 +923,7 @@ class PowerUp {
     }
 }
 
-// Collision Detection
+// Collision
 function checkCollision(obj1, obj2) {
     return obj1.x < obj2.x + obj2.width &&
            obj1.x + obj1.width > obj2.x &&
@@ -726,156 +931,109 @@ function checkCollision(obj1, obj2) {
            obj1.y + obj1.height > obj2.y;
 }
 
-// Enhanced Background with Parallax
+// Beautiful Background
 function drawBackground() {
     const era = ERAS[currentEraIndex];
 
-    // Sky gradient
+    // Sky gradient with multiple colors
     const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, era.skyGradient[0]);
-    gradient.addColorStop(1, era.skyGradient[1]);
+    era.bgGradient.forEach((color, i) => {
+        gradient.addColorStop(i / (era.bgGradient.length - 1), color);
+    });
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Far background layer (slow parallax)
-    ctx.globalAlpha = 0.2;
-    const farOffset = (backgroundOffset * 0.3) % canvas.width;
-    drawEraDecoration(farOffset, 0.8);
+    // Sun/Moon
+    const celestialY = 80 + Math.sin(Date.now() / 10000) * 10;
+    const celestialGradient = ctx.createRadialGradient(
+        canvas.width - 100, celestialY, 0,
+        canvas.width - 100, celestialY, 50
+    );
 
-    // Mid background layer
-    ctx.globalAlpha = 0.4;
-    const midOffset = (backgroundOffset * 0.6) % canvas.width;
-    drawEraDecoration(midOffset, 1);
-
-    ctx.globalAlpha = 1;
-
-    // Era info overlay
-    ctx.font = 'bold 35px Arial';
-    ctx.textAlign = 'left';
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-    ctx.fillText(era.icon, 20, 55);
-
-    ctx.font = 'bold 13px Arial';
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-    ctx.fillText(era.theme, 65, 48);
-}
-
-function drawEraDecoration(offset, scale = 1) {
-    ctx.save();
-
-    switch(currentEraIndex) {
-        case 0: drawColumns(offset, scale); break;
-        case 1: drawCastles(offset, scale); break;
-        case 2: drawArt(offset, scale); break;
-        case 3: drawBooks(offset, scale); break;
-        case 4: drawCities(offset, scale); break;
-        case 5: drawTech(offset, scale); break;
+    if (currentEraIndex === 1) {
+        // Moon for medieval
+        celestialGradient.addColorStop(0, '#FFFFCC');
+        celestialGradient.addColorStop(0.7, '#FFFF99');
+        celestialGradient.addColorStop(1, 'transparent');
+    } else {
+        // Sun for others
+        celestialGradient.addColorStop(0, '#FFFACD');
+        celestialGradient.addColorStop(0.5, '#FFD700');
+        celestialGradient.addColorStop(1, 'transparent');
     }
 
+    ctx.fillStyle = celestialGradient;
+    ctx.beginPath();
+    ctx.arc(canvas.width - 100, celestialY, 50, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Light rays (for enlightenment era)
+    if (currentEraIndex === 3) {
+        ctx.save();
+        ctx.globalAlpha = 0.15;
+        for (let i = 0; i < 8; i++) {
+            const angle = (i * Math.PI / 4) + (Date.now() / 5000);
+            ctx.fillStyle = '#FFFF00';
+            ctx.beginPath();
+            ctx.moveTo(canvas.width - 100, celestialY);
+            ctx.lineTo(
+                canvas.width - 100 + Math.cos(angle) * 300,
+                celestialY + Math.sin(angle) * 300
+            );
+            ctx.lineTo(
+                canvas.width - 100 + Math.cos(angle + 0.2) * 300,
+                celestialY + Math.sin(angle + 0.2) * 300
+            );
+            ctx.closePath();
+            ctx.fill();
+        }
+        ctx.restore();
+    }
+
+    // Era theme
+    ctx.save();
+    ctx.font = 'bold 16px Arial';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.textAlign = 'left';
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+    ctx.shadowBlur = 4;
+    ctx.fillText(era.theme, 20, 45);
     ctx.restore();
 }
 
-function drawColumns(offset, scale) {
-    ctx.fillStyle = 'rgba(196, 158, 100, 0.4)';
-    for (let i = 0; i < 4; i++) {
-        const x = i * 250 - offset;
-        const h = 70 * scale;
-        ctx.fillRect(x, canvas.height - 150, 25, h);
-        ctx.fillRect(x + 7, canvas.height - 160, 10, 10);
-    }
-}
-
-function drawCastles(offset, scale) {
-    ctx.fillStyle = 'rgba(139, 69, 19, 0.4)';
-    for (let i = 0; i < 3; i++) {
-        const x = i * 350 - offset;
-        const w = 50 * scale;
-        const h = 50 * scale;
-        ctx.fillRect(x, canvas.height - 130, w, h);
-        ctx.fillRect(x + 10, canvas.height - 150, 10, 20);
-        ctx.fillRect(x + 30, canvas.height - 150, 10, 20);
-    }
-}
-
-function drawArt(offset, scale) {
-    ctx.strokeStyle = 'rgba(205, 127, 50, 0.5)';
-    ctx.lineWidth = 3;
-    for (let i = 0; i < 3; i++) {
-        const x = i * 300 - offset;
-        ctx.strokeRect(x, canvas.height - 140, 60 * scale, 50 * scale);
-        ctx.strokeRect(x + 10, canvas.height - 130, 20, 20);
-    }
-}
-
-function drawBooks(offset, scale) {
-    ctx.fillStyle = 'rgba(74, 134, 232, 0.4)';
-    for (let i = 0; i < 5; i++) {
-        const x = i * 200 - offset;
-        ctx.fillRect(x, canvas.height - 100, 12, 25 * scale);
-        ctx.fillRect(x + 15, canvas.height - 110, 12, 35 * scale);
-        ctx.fillRect(x + 30, canvas.height - 95, 12, 20 * scale);
-    }
-}
-
-function drawCities(offset, scale) {
-    ctx.fillStyle = 'rgba(156, 39, 176, 0.4)';
-    for (let i = 0; i < 6; i++) {
-        const x = i * 180 - offset;
-        const height = (40 + (i % 3) * 25) * scale;
-        ctx.fillRect(x, canvas.height - height, 25, height - 20);
-        ctx.fillRect(x + 5, canvas.height - height - 10, 5, 10);
-    }
-}
-
-function drawTech(offset, scale) {
-    ctx.strokeStyle = 'rgba(0, 188, 212, 0.5)';
-    ctx.lineWidth = 2;
-    for (let i = 0; i < 5; i++) {
-        const x = i * 220 - offset;
-        ctx.strokeRect(x, canvas.height - 110, 35, 35);
-        ctx.beginPath();
-        ctx.arc(x + 17, canvas.height - 92, 12, 0, Math.PI * 2);
-        ctx.stroke();
-
-        // Circuit lines
-        ctx.beginPath();
-        ctx.moveTo(x, canvas.height - 95);
-        ctx.lineTo(x + 35, canvas.height - 95);
-        ctx.stroke();
-    }
-}
-
-// Enhanced Ground
+// Ground
 function drawGround() {
     const era = ERAS[currentEraIndex];
 
+    // Gradient ground
     const gradient = ctx.createLinearGradient(0, GROUND_LEVEL + player.height, 0, canvas.height);
-    gradient.addColorStop(0, era.primaryColor);
-    gradient.addColorStop(0.6, era.secondaryColor);
-    gradient.addColorStop(1, adjustColor(era.secondaryColor, -30));
+    gradient.addColorStop(0, era.groundColor);
+    gradient.addColorStop(0.5, era.secondaryColor);
+    gradient.addColorStop(1, era.accentColor + 'CC');
     ctx.fillStyle = gradient;
     ctx.fillRect(0, GROUND_LEVEL + player.height, canvas.width, canvas.height);
 
     // Glowing top line
+    ctx.save();
     ctx.strokeStyle = era.primaryColor;
-    ctx.lineWidth = 5;
+    ctx.lineWidth = 6;
     ctx.shadowColor = era.primaryColor;
-    ctx.shadowBlur = 10;
+    ctx.shadowBlur = 15;
     ctx.beginPath();
     ctx.moveTo(0, GROUND_LEVEL + player.height);
     ctx.lineTo(canvas.width, GROUND_LEVEL + player.height);
     ctx.stroke();
-    ctx.shadowBlur = 0;
+    ctx.restore();
 
-    // Animated pattern
-    ctx.fillStyle = adjustColor(era.secondaryColor, -40);
-    const offset = (backgroundOffset * 0.2) % 40;
-    for (let i = 0; i < canvas.width; i += 40) {
-        ctx.fillRect(i - offset, GROUND_LEVEL + player.height + 12, 18, 4);
+    // Pattern
+    ctx.fillStyle = era.accentColor + '40';
+    const offset = (backgroundOffset * 0.15) % 50;
+    for (let i = 0; i < canvas.width; i += 50) {
+        ctx.fillRect(i - offset, GROUND_LEVEL + player.height + 15, 22, 5);
     }
 }
 
-// Draw Tutorial Messages
+// Tutorial
 function drawTutorialMessages() {
     if (!tutorialMode || tutorialMessages.length === 0) return;
 
@@ -884,24 +1042,47 @@ function drawTutorialMessages() {
         ctx.save();
         ctx.globalAlpha = alpha;
 
-        const y = 150 + index * 50;
-        ctx.font = 'bold 18px Arial';
+        const y = 160 + index * 55;
+        ctx.font = 'bold 19px Arial';
         const textWidth = ctx.measureText(msg.text).width;
 
-        // Background with glow
+        const gradient = ctx.createLinearGradient(
+            canvas.width / 2 - textWidth / 2 - 30, y - 28,
+            canvas.width / 2 + textWidth / 2 + 30, y + 28
+        );
+        gradient.addColorStop(0, 'rgba(74, 44, 94, 0.85)');
+        gradient.addColorStop(0.5, 'rgba(74, 44, 94, 0.95)');
+        gradient.addColorStop(1, 'rgba(74, 44, 94, 0.85)');
+
+        ctx.fillStyle = gradient;
         ctx.shadowColor = '#c49e64';
-        ctx.shadowBlur = 20;
-        ctx.fillStyle = 'rgba(74, 44, 94, 0.95)';
-        ctx.fillRect(canvas.width / 2 - textWidth / 2 - 25, y - 25, textWidth + 50, 42);
+        ctx.shadowBlur = 25;
 
-        // Border
+        // Rounded rectangle
+        const x = canvas.width / 2 - textWidth / 2 - 30;
+        const width = textWidth + 60;
+        const height = 48;
+        const radius = 10;
+
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y - 28);
+        ctx.lineTo(x + width - radius, y - 28);
+        ctx.arcTo(x + width, y - 28, x + width, y - 28 + radius, radius);
+        ctx.lineTo(x + width, y + 20);
+        ctx.arcTo(x + width, y + 20 + radius, x + width - radius, y + 20, radius);
+        ctx.lineTo(x + radius, y + 20);
+        ctx.arcTo(x, y + 20, x, y + 20 - radius, radius);
+        ctx.lineTo(x, y - 28 + radius);
+        ctx.arcTo(x, y - 28, x + radius, y - 28, radius);
+        ctx.closePath();
+        ctx.fill();
+
         ctx.strokeStyle = '#c49e64';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(canvas.width / 2 - textWidth / 2 - 25, y - 25, textWidth + 50, 42);
+        ctx.lineWidth = 3;
+        ctx.stroke();
 
-        // Text
         ctx.shadowBlur = 0;
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = '#FFFFFF';
         ctx.textAlign = 'center';
         ctx.fillText(msg.text, canvas.width / 2, y);
 
@@ -930,10 +1111,12 @@ function updateEra() {
                 currentEraIndex = i;
                 document.getElementById('currentEra').textContent = ERAS[i].name;
                 showQuote();
+                screenShake = 18;
+                createParticles(canvas.width / 2, canvas.height / 2, ERAS[i].primaryColor, 70);
+                playEraChangeSound();
 
-                // Era transition effects
-                screenShake = 15;
-                createParticles(canvas.width / 2, canvas.height / 2, ERAS[i].primaryColor, 60);
+                // Update sky elements
+                initSkyElements();
 
                 if (tutorialMode && tutorialStep === 4) {
                     tutorialMode = false;
@@ -945,7 +1128,18 @@ function updateEra() {
     }
 }
 
-// Show Random Quote
+// Initialize sky elements
+function initSkyElements() {
+    skyElements = [];
+    const era = ERAS[currentEraIndex];
+    const count = era.skyElements.type === 'stars' ? 15 : 8;
+
+    for (let i = 0; i < count; i++) {
+        skyElements.push(new SkyElement(era.skyElements.type));
+    }
+}
+
+// Show Quote
 function showQuote() {
     const quote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
     const quoteEl = document.getElementById('quoteDisplay');
@@ -960,21 +1154,21 @@ function showQuote() {
         setTimeout(() => {
             quoteEl.classList.add('hidden');
         }, 300);
-    }, 4000);
+    }, 4500);
 }
 
 // Update Score
 function updateScore(dt) {
     if (gameRunning && !gamePaused) {
-        score += dt * 0.6;
+        score += dt * 0.5;
         document.getElementById('score').textContent = Math.floor(score / 10);
         updateEra();
         document.getElementById('wisdom').textContent = wisdom;
 
-        // Update combo multiplier display
+        // Combo visual
         if (comboMultiplier > 1) {
-            document.getElementById('wisdom').style.color = '#ffd700';
-            document.getElementById('wisdom').style.transform = `scale(${1 + (comboMultiplier - 1) * 0.1})`;
+            document.getElementById('wisdom').style.color = '#FFD700';
+            document.getElementById('wisdom').style.transform = `scale(${1 + (comboMultiplier - 1) * 0.12})`;
         } else {
             document.getElementById('wisdom').style.color = '';
             document.getElementById('wisdom').style.transform = '';
@@ -996,7 +1190,7 @@ function showCollectedWork(work, points) {
         setTimeout(() => {
             notification.classList.add('hidden');
         }, 300);
-    }, 2500);
+    }, 2800);
 }
 
 // Screen Shake
@@ -1005,31 +1199,24 @@ function applyScreenShake() {
         const shakeX = (Math.random() - 0.5) * screenShake;
         const shakeY = (Math.random() - 0.5) * screenShake;
         ctx.translate(shakeX, shakeY);
-        screenShake *= 0.9;
+        screenShake *= 0.88;
         if (screenShake < 0.5) screenShake = 0;
     }
 }
 
-// Game Over
+// Game Over (now just time's up!)
 function gameOver() {
-    if (activePowerups.shield > 0) {
-        activePowerups.shield = 0;
-        screenShake = 10;
-        floatingTexts.push(new FloatingText(player.x, player.y, 'GERETTET!', '#ffd700'));
-        return;
-    }
-
     gameRunning = false;
     cancelAnimationFrame(animationId);
 
     screenShake = 20;
-    createParticles(player.x + player.width / 2, player.y + player.height / 2, '#ff5252', 40);
+    createParticles(canvas.width / 2, canvas.height / 2, '#FFD700', 50);
 
     const finalScore = Math.floor(score / 10);
     document.getElementById('finalScore').textContent = finalScore;
     document.getElementById('finalWisdom').textContent = wisdom;
     document.getElementById('finalEraName').textContent = ERAS[currentEraIndex].name;
-    document.getElementById('finalEraIcon').textContent = ERAS[currentEraIndex].icon;
+    document.getElementById('finalEraIcon').textContent = ERAS[currentEraIndex].theme.split(' ')[0];
 
     if (finalScore > highScore) {
         highScore = finalScore;
@@ -1038,13 +1225,13 @@ function gameOver() {
 
     setTimeout(() => {
         switchScreen('gameOverScreen');
-    }, 500);
+    }, 600);
 }
 
-// Game Loop with Delta Time
+// Main Game Loop
 function gameLoop(currentTime = 0) {
     if (!lastTime) lastTime = currentTime;
-    deltaTime = Math.min((currentTime - lastTime) / 16.67, 2); // Cap at 2x for lag spikes
+    deltaTime = Math.min((currentTime - lastTime) / 16.67, 2);
     lastTime = currentTime;
 
     if (!gameRunning || gamePaused) {
@@ -1054,37 +1241,54 @@ function gameLoop(currentTime = 0) {
         return;
     }
 
+    // Update timer
+    gameTime += deltaTime * 16.67 / 1000;
+    timeRemaining = Math.max(0, GAME_DURATION - gameTime);
+
+    // Time's up!
+    if (timeRemaining <= 0) {
+        gameOver();
+        return;
+    }
+
+    // Update timer display
+    const minutes = Math.floor(timeRemaining / 60);
+    const seconds = Math.floor(timeRemaining % 60);
+    document.getElementById('philName').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
     ctx.save();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     applyScreenShake();
 
     drawBackground();
+
+    // Update and draw sky elements
+    skyElements.forEach(el => {
+        el.update(deltaTime);
+        el.draw();
+    });
+
     drawGround();
 
-    // Update background offset
     const speedMult = activePowerups.slowmo > 0 ? 0.5 : 1;
-    backgroundOffset += (2 + score / 1000) * speedMult * deltaTime;
+    backgroundOffset += (2.5 + score / 1200) * speedMult * deltaTime;
 
-    // Update and draw particles
+    // Particles
     for (let i = particles.length - 1; i >= 0; i--) {
         particles[i].update(deltaTime);
         particles[i].draw();
-        if (particles[i].isDead()) {
-            particles.splice(i, 1);
-        }
+        if (particles[i].isDead()) particles.splice(i, 1);
     }
 
-    // Update and draw floating texts
+    // Floating texts
     for (let i = floatingTexts.length - 1; i >= 0; i--) {
         floatingTexts[i].update(deltaTime);
         floatingTexts[i].draw();
-        if (floatingTexts[i].isDead()) {
-            floatingTexts.splice(i, 1);
-        }
+        if (floatingTexts[i].isDead()) floatingTexts.splice(i, 1);
     }
 
-    // Update and draw power-ups
+    // Power-ups
     for (let i = powerups.length - 1; i >= 0; i--) {
         powerups[i].update(deltaTime);
         powerups[i].draw();
@@ -1092,30 +1296,37 @@ function gameLoop(currentTime = 0) {
         if (checkCollision(player, powerups[i])) {
             const powerup = powerups[i];
             activePowerups[powerup.type.effect] = Date.now() + powerup.type.duration;
-            floatingTexts.push(new FloatingText(powerup.x, powerup.y, powerup.type.name, powerup.type.color));
-            createParticles(powerup.x, powerup.y, powerup.type.color, 20);
+
+            if (powerup.type.effect === 'doublejump') {
+                player.canDoubleJump = true;
+            }
+
+            floatingTexts.push(new FloatingText(powerup.x, powerup.y, powerup.type.name, powerup.type.color, 28));
+            createParticles(powerup.x, powerup.y, powerup.type.color, 25);
+            playPowerUpSound();
             powerups.splice(i, 1);
         } else if (powerups[i].isOffScreen()) {
             powerups.splice(i, 1);
         }
     }
 
-    // Update and draw collectibles
+    // Collectibles
     for (let i = collectibles.length - 1; i >= 0; i--) {
         collectibles[i].update(deltaTime);
         collectibles[i].draw();
 
         if (checkCollision(player, collectibles[i])) {
             const work = collectibles[i].work;
-            const basePoints = work.points;
+            const laneMultiplier = collectibles[i].lane.multiplier;
+            const basePoints = work.basePoints * laneMultiplier;
             const points = Math.floor(basePoints * comboMultiplier);
 
             score += points;
-            wisdom += Math.floor(10 * comboMultiplier);
+            wisdom += Math.floor(15 * comboMultiplier * laneMultiplier);
 
-            // Combo system
+            // Combo
             const now = Date.now();
-            if (now - lastCollectTime < 2000) {
+            if (now - lastCollectTime < 2500) {
                 comboCount++;
                 comboMultiplier = Math.min(1 + comboCount * 0.5, 5);
             } else {
@@ -1128,11 +1339,13 @@ function gameLoop(currentTime = 0) {
             floatingTexts.push(new FloatingText(
                 collectibles[i].x,
                 collectibles[i].y,
-                `+${points}`,
-                comboMultiplier > 1 ? '#ffd700' : '#4caf50'
+                `+${points}${comboMultiplier > 1 ? ' x' + comboMultiplier.toFixed(1) : ''}`,
+                comboMultiplier > 1 ? '#FFD700' : '#4CAF50',
+                28
             ));
 
-            createParticles(collectibles[i].x, collectibles[i].y, '#4caf50', 20);
+            createParticles(collectibles[i].x, collectibles[i].y, '#4CAF50', 20);
+            playCollectSound();
             collectibles.splice(i, 1);
 
             if (tutorialMode && tutorialStep === 2) {
@@ -1144,15 +1357,24 @@ function gameLoop(currentTime = 0) {
         }
     }
 
-    // Update and draw obstacles
+    // Obstacles - now just bounce/slow!
     for (let i = obstacles.length - 1; i >= 0; i--) {
         obstacles[i].update(deltaTime);
         obstacles[i].draw();
 
-        if (checkCollision(player, obstacles[i])) {
-            gameOver();
-            ctx.restore();
-            return;
+        if (checkCollision(player, obstacles[i]) && player.bounceTimer === 0) {
+            if (obstacles[i].dilemma.effect === 'bounce') {
+                player.bounce();
+                floatingTexts.push(new FloatingText(player.x, player.y, obstacles[i].dilemma.name, '#FF6347', 20));
+            } else {
+                player.slow();
+                floatingTexts.push(new FloatingText(player.x, player.y, '💤 Langsam!', '#4169E1', 20));
+            }
+
+            if (tutorialMode && tutorialStep === 3) {
+                tutorialStep = 4;
+                showTutorialMessage(4);
+            }
         }
 
         if (obstacles[i].isOffScreen()) {
@@ -1165,46 +1387,34 @@ function gameLoop(currentTime = 0) {
     player.update(deltaTime);
     updateScore(deltaTime);
 
-    // Spawn obstacles with patterns
+    // Spawn obstacles
     const diffSettings = DIFFICULTY[currentDifficulty];
     obstacleTimer += deltaTime;
-    const spawnInterval = tutorialMode ? 120 : diffSettings.obstacleInterval - Math.min(score / 150, 40);
+    const spawnInterval = tutorialMode ? 140 : diffSettings.obstacleInterval - Math.min(score / 200, 50);
 
     if (obstacleTimer > spawnInterval) {
-        const pattern = OBSTACLE_PATTERNS[Math.floor(Math.random() * OBSTACLE_PATTERNS.length)];
-        pattern.forEach((spawn, index) => {
-            if (spawn) {
-                setTimeout(() => {
-                    obstacles.push(new Obstacle());
-                }, index * 400);
-            }
-        });
+        obstacles.push(new Obstacle());
         obstacleTimer = 0;
-
-        if (tutorialMode && tutorialStep === 3) {
-            tutorialStep = 4;
-            showTutorialMessage(4);
-        }
     }
 
-    // Spawn collectibles in lanes
+    // Spawn collectibles
     collectibleTimer += deltaTime;
-    if (collectibleTimer > 100) {
+    if (collectibleTimer > 85) {
         const lane = Math.floor(Math.random() * 3);
         collectibles.push(new Collectible(lane));
         collectibleTimer = 0;
     }
 
     // Spawn power-ups
-    if (score > 200 && !tutorialMode) {
+    if (score > 300 && !tutorialMode) {
         powerupTimer += deltaTime;
-        if (powerupTimer > 400) {
+        if (powerupTimer > 450) {
             powerups.push(new PowerUp());
             powerupTimer = 0;
         }
     }
 
-    // Update tutorial messages
+    // Tutorial
     if (tutorialMode) {
         for (let i = tutorialMessages.length - 1; i >= 0; i--) {
             tutorialMessages[i].life -= 16 * deltaTime;
@@ -1216,12 +1426,12 @@ function gameLoop(currentTime = 0) {
 
     drawTutorialMessages();
 
-    // Draw active power-up indicators
+    // Power-up indicators (top right)
     drawPowerUpIndicators();
 
-    // Update combo timer
-    if (Date.now() - lastCollectTime > 2000 && comboMultiplier > 1) {
-        comboMultiplier = Math.max(1, comboMultiplier - 0.1);
+    // Combo decay
+    if (Date.now() - lastCollectTime > 2500 && comboMultiplier > 1) {
+        comboMultiplier = Math.max(1, comboMultiplier - 0.08);
         comboCount = Math.floor((comboMultiplier - 1) * 2);
     }
 
@@ -1229,7 +1439,7 @@ function gameLoop(currentTime = 0) {
     animationId = requestAnimationFrame(gameLoop);
 }
 
-// Draw Power-Up Indicators
+// Power-Up Indicators
 function drawPowerUpIndicators() {
     let yOffset = 90;
     const now = Date.now();
@@ -1240,18 +1450,21 @@ function drawPowerUpIndicators() {
             if (!powerupType) return;
 
             const timeLeft = (activePowerups[key] - now) / 1000;
-            const width = 120;
-            const height = 30;
-            const x = canvas.width - width - 15;
+            const width = 130;
+            const height = 32;
+            const x = canvas.width - width - 12;
             const y = yOffset;
 
-            // Background
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            // Background gradient
+            const bgGradient = ctx.createLinearGradient(x, y, x + width, y);
+            bgGradient.addColorStop(0, 'rgba(0, 0, 0, 0.6)');
+            bgGradient.addColorStop(1, 'rgba(0, 0, 0, 0.8)');
+            ctx.fillStyle = bgGradient;
             ctx.fillRect(x, y, width, height);
 
-            // Progress bar
+            // Progress
             const progress = timeLeft / (powerupType.duration / 1000);
-            ctx.fillStyle = powerupType.color;
+            ctx.fillStyle = powerupType.color + 'BB';
             ctx.fillRect(x, y, width * progress, height);
 
             // Border
@@ -1259,16 +1472,19 @@ function drawPowerUpIndicators() {
             ctx.lineWidth = 2;
             ctx.strokeRect(x, y, width, height);
 
-            // Icon and text
-            ctx.font = 'bold 18px Arial';
-            ctx.fillStyle = '#fff';
+            // Text
+            ctx.font = 'bold 16px Arial';
+            ctx.fillStyle = '#FFFFFF';
             ctx.textAlign = 'left';
-            ctx.fillText(powerupType.icon, x + 5, y + 20);
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+            ctx.shadowBlur = 4;
+            ctx.fillText(powerupType.icon, x + 6, y + 21);
 
-            ctx.font = 'bold 12px Arial';
-            ctx.fillText(`${Math.ceil(timeLeft)}s`, x + 35, y + 20);
+            ctx.font = 'bold 13px Arial';
+            ctx.fillText(`${Math.ceil(timeLeft)}s`, x + 40, y + 21);
+            ctx.shadowBlur = 0;
 
-            yOffset += 35;
+            yOffset += 38;
         }
     });
 }
@@ -1279,6 +1495,8 @@ function startGame() {
     gamePaused = false;
     score = 0;
     wisdom = 0;
+    gameTime = 0;
+    timeRemaining = GAME_DURATION;
     currentEraIndex = 0;
     obstacles = [];
     collectibles = [];
@@ -1297,13 +1515,14 @@ function startGame() {
     screenShake = 0;
     backgroundOffset = 0;
     lastTime = 0;
-    activePowerups = { slowmo: 0, shield: 0, magnet: 0 };
+    activePowerups = { slowmo: 0, magnet: 0, doublejump: 0 };
 
     player.reset();
+    initSkyElements();
+
     document.getElementById('score').textContent = '0';
     document.getElementById('wisdom').textContent = '0';
     document.getElementById('currentEra').textContent = ERAS[0].name;
-    document.getElementById('philName').textContent = PHILOSOPHERS[selectedPhilosopherIndex].name;
     document.getElementById('philIcon').textContent = PHILOSOPHERS[selectedPhilosopherIndex].icon;
 
     switchScreen('gameScreen');
@@ -1312,7 +1531,7 @@ function startGame() {
     setTimeout(() => {
         tutorialStep = 1;
         showTutorialMessage(1);
-    }, 3000);
+    }, 3200);
 
     animationId = requestAnimationFrame(gameLoop);
 }
@@ -1335,12 +1554,12 @@ function closePanel(panelId) {
     document.getElementById(panelId).classList.remove('open');
     if (gameRunning) {
         gamePaused = false;
-        lastTime = 0; // Reset delta time
+        lastTime = 0;
         animationId = requestAnimationFrame(gameLoop);
     }
 }
 
-// Utility function
+// Utility
 function adjustColor(color, amount) {
     const num = parseInt(color.replace('#', ''), 16);
     const r = Math.min(255, Math.max(0, (num >> 16) + amount));
@@ -1361,25 +1580,49 @@ function updateCharacterSelection() {
 }
 
 // Event Listeners
+let isJumpKeyDown = false;
+
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Space' || e.key === ' ') {
         e.preventDefault();
-        if (gameRunning) {
-            player.jump();
+        if (gameRunning && !isJumpKeyDown) {
+            isJumpKeyDown = true;
+            player.jump(true);
         }
     }
 });
 
-canvas.addEventListener('click', () => {
+document.addEventListener('keyup', (e) => {
+    if (e.code === 'Space' || e.key === ' ') {
+        e.preventDefault();
+        isJumpKeyDown = false;
+        player.releaseJump();
+    }
+});
+
+canvas.addEventListener('mousedown', () => {
     if (gameRunning) {
-        player.jump();
+        player.jump(true);
+    }
+});
+
+canvas.addEventListener('mouseup', () => {
+    if (gameRunning) {
+        player.releaseJump();
     }
 });
 
 canvas.addEventListener('touchstart', (e) => {
     e.preventDefault();
     if (gameRunning) {
-        player.jump();
+        player.jump(true);
+    }
+}, { passive: false });
+
+canvas.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    if (gameRunning) {
+        player.releaseJump();
     }
 }, { passive: false });
 
@@ -1398,7 +1641,7 @@ document.querySelectorAll('.phil-card').forEach((card, index) => {
     });
 });
 
-// Difficulty Selection
+// Difficulty
 document.querySelectorAll('.diff-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         currentDifficulty = btn.dataset.diff;
