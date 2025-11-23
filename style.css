@@ -630,3 +630,22 @@ body {
 .hidden {
     display: none !important;
 }
+
+/* ===== ANIMATIONS ===== */
+@keyframes flashFade {
+    0% {
+        opacity: 0.7;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes progressPulse {
+    0%, 100% {
+        box-shadow: 0 0 10px currentColor;
+    }
+    50% {
+        box-shadow: 0 0 20px currentColor;
+    }
+}

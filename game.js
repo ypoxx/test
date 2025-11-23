@@ -31,14 +31,14 @@ const GROUND_LEVEL = baseHeight - 80;
 const LEVEL_DURATION = 180; // 3 minutes per level
 const TOTAL_LEVELS = 6;
 
-// Level Requirements (books to collect per level)
+// Level Requirements (books to collect per level) - BALANCED!
 const LEVEL_REQUIREMENTS = [
-    { level: 1, name: 'Antike', books: 50, era: 0 },
-    { level: 2, name: 'Mittelalter', books: 55, era: 1 },
-    { level: 3, name: 'Renaissance', books: 60, era: 2 },
-    { level: 4, name: 'Aufklärung', books: 65, era: 3 },
-    { level: 5, name: 'Moderne', books: 70, era: 4 },
-    { level: 6, name: 'Gegenwart', books: 75, era: 5 }
+    { level: 1, name: 'Antike', books: 20, era: 0, color: '#FFD700' },
+    { level: 2, name: 'Mittelalter', books: 24, era: 1, color: '#8B4513' },
+    { level: 3, name: 'Renaissance', books: 28, era: 2, color: '#FF6347' },
+    { level: 4, name: 'Aufklärung', books: 32, era: 3, color: '#4169E1' },
+    { level: 5, name: 'Moderne', books: 36, era: 4, color: '#9370DB' },
+    { level: 6, name: 'Gegenwart', books: 40, era: 5, color: '#00CED1' }
 ];
 
 // Physics constants
@@ -63,6 +63,15 @@ let gameTime = 0;
 let timeRemaining = LEVEL_DURATION;
 let currentLevel = 1;
 let booksCollected = 0;
+let totalBooksCollected = 0;
+let achievements = {
+    speedDemon: false,
+    comboMaster: false,
+    powerUpCollector: false,
+    allLevelsComplete: false
+};
+let maxCombo = 0;
+let powerupsCollected = 0;
 
 // Sound System
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -273,39 +282,39 @@ const POWERUP_TYPES = [
         color: '#FFD700',
         effect: 'doublejump'
     },
-    // New Power-Ups
+    // New Power-Ups - EXTENDED DURATIONS!
     {
         name: 'Time Freeze',
         icon: '⏸️',
-        duration: 4000,
+        duration: 6000,
         color: '#4169E1',
         effect: 'timefreeze'
     },
     {
         name: 'Invincibility',
         icon: '⭐',
-        duration: 6000,
+        duration: 8000,
         color: '#FFD700',
         effect: 'invincibility'
     },
     {
         name: 'Score Multiplier',
         icon: '💎',
-        duration: 8000,
+        duration: 12000,
         color: '#9370DB',
         effect: 'scoremultiplier'
     },
     {
         name: 'Speed Boost',
         icon: '⚡',
-        duration: 5000,
+        duration: 7000,
         color: '#FF6347',
         effect: 'speedboost'
     },
     {
         name: 'Ghost Mode',
         icon: '👻',
-        duration: 5000,
+        duration: 7000,
         color: '#E0E0E0',
         effect: 'ghostmode'
     },
@@ -1261,6 +1270,28 @@ function showQuote() {
     }, 4500);
 }
 
+// Show Achievement
+function showAchievement(title, subtitle) {
+    const notification = document.getElementById('workNotification');
+    document.getElementById('notifTitle').textContent = title;
+    document.getElementById('notifAuthor').textContent = subtitle;
+
+    notification.classList.remove('hidden');
+    notification.classList.add('show');
+
+    // Big celebration!
+    screenShake = 12;
+    createParticles(baseWidth / 2, baseHeight / 2, '#FFD700', 50);
+    playEraChangeSound();
+
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            notification.classList.add('hidden');
+        }, 300);
+    }, 3500);
+}
+
 // Update Score
 function updateScore(dt) {
     if (gameRunning && !gamePaused) {
@@ -1272,13 +1303,18 @@ function updateScore(dt) {
         const levelReq = LEVEL_REQUIREMENTS[currentLevel - 1];
         document.getElementById('wisdom').textContent = `${booksCollected}/${levelReq.books}`;
 
-        // Combo visual
+        // Combo visual - BIG EFFECT!
         if (comboMultiplier > 1) {
+            const scale = 1 + (comboMultiplier - 1) * 0.15;
             document.getElementById('wisdom').style.color = '#FFD700';
-            document.getElementById('wisdom').style.transform = `scale(${1 + (comboMultiplier - 1) * 0.12})`;
+            document.getElementById('wisdom').style.transform = `scale(${scale})`;
+            document.getElementById('wisdom').style.textShadow = '0 0 10px #FFD700, 0 0 20px #FFD700';
+            document.getElementById('wisdom').style.fontWeight = '900';
         } else {
             document.getElementById('wisdom').style.color = '';
             document.getElementById('wisdom').style.transform = '';
+            document.getElementById('wisdom').style.textShadow = '';
+            document.getElementById('wisdom').style.fontWeight = '';
         }
     }
 }
@@ -1333,11 +1369,39 @@ function checkLevelComplete() {
             document.getElementById('currentLevel').textContent = currentLevel;
             initSkyElements();
 
-            // Show level up message
-            screenShake = 15;
-            createParticles(baseWidth / 2, baseHeight / 2, ERAS[currentEraIndex].primaryColor, 60);
+            // MASSIVE LEVEL UP CELEBRATION! 🎉
+            screenShake = 25;
+            createParticles(baseWidth / 2, baseHeight / 2, ERAS[currentEraIndex].primaryColor, 100);
+
+            // Flash screen
+            const flash = document.createElement('div');
+            flash.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: ${LEVEL_REQUIREMENTS[currentLevel - 1].color};
+                opacity: 0.6;
+                z-index: 9999;
+                pointer-events: none;
+                animation: flashFade 0.8s ease-out;
+            `;
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), 800);
+
             playEraChangeSound();
+            setTimeout(() => playEraChangeSound(), 200);
             showQuote();
+
+            // Show level complete message
+            floatingTexts.push(new FloatingText(
+                baseWidth / 2,
+                baseHeight / 2 - 50,
+                `LEVEL ${currentLevel - 1} ABGESCHLOSSEN! 🎉`,
+                '#FFD700',
+                40
+            ));
         }
     } else {
         // Failed to collect enough books - Game Over
@@ -1345,7 +1409,7 @@ function checkLevelComplete() {
     }
 }
 
-// Game Over
+// Game Over - MUCH MORE INFORMATIVE!
 function gameOver(victory = false) {
     gameRunning = false;
     cancelAnimationFrame(animationId);
@@ -1355,9 +1419,32 @@ function gameOver(victory = false) {
 
     const finalScore = Math.floor(score / 10);
     document.getElementById('finalScore').textContent = finalScore;
-    document.getElementById('finalWisdom').textContent = wisdom;
-    document.getElementById('finalEraName').textContent = ERAS[currentEraIndex].name;
-    document.getElementById('finalEraIcon').textContent = ERAS[currentEraIndex].theme.split(' ')[0];
+    document.getElementById('finalWisdom').textContent = `${totalBooksCollected} Bücher`;
+    document.getElementById('finalEraName').textContent = victory ? '🏆 ALLE LEVELS!' : ERAS[currentEraIndex].name;
+    document.getElementById('finalEraIcon').textContent = victory ? '🎉' : ERAS[currentEraIndex].theme.split(' ')[0];
+
+    // Show stats in Game Over screen title
+    const titleEl = document.querySelector('#gameOverScreen .screen-title');
+    if (titleEl) {
+        if (victory) {
+            titleEl.textContent = '🎉 VICTORY! 🎉';
+            titleEl.style.color = '#FFD700';
+        } else {
+            titleEl.textContent = `Level ${currentLevel} - Zeit abgelaufen`;
+            titleEl.style.color = '#FF6347';
+        }
+    }
+
+    // Check for all levels complete achievement
+    if (victory && !achievements.allLevelsComplete) {
+        achievements.allLevelsComplete = true;
+    }
+
+    // Speed demon achievement - complete in under 15 min
+    const totalTime = (currentLevel - 1) * LEVEL_DURATION + (LEVEL_DURATION - timeRemaining);
+    if (victory && totalTime < 900 && !achievements.speedDemon) {
+        achievements.speedDemon = true;
+    }
 
     if (finalScore > highScore) {
         highScore = finalScore;
@@ -1453,8 +1540,16 @@ function gameLoop(currentTime = 0) {
                 }
             }
 
-            floatingTexts.push(new FloatingText(powerup.x, powerup.y, powerup.type.name, powerup.type.color, 28));
-            createParticles(powerup.x, powerup.y, powerup.type.color, 25);
+            // Track power-ups collected
+            powerupsCollected++;
+            if (powerupsCollected >= 20 && !achievements.powerUpCollector) {
+                achievements.powerUpCollector = true;
+                showAchievement('🎁 Power-Up Sammler!', 'Sammle 20 Power-Ups!');
+            }
+
+            floatingTexts.push(new FloatingText(powerup.x, powerup.y, powerup.type.name, powerup.type.color, 32));
+            createParticles(powerup.x, powerup.y, powerup.type.color, 40);
+            screenShake = 6;
             playPowerUpSound();
             powerups.splice(i, 1);
         } else if (powerups[i].isOffScreen()) {
@@ -1479,12 +1574,22 @@ function gameLoop(currentTime = 0) {
             score += points;
             wisdom += Math.floor(15 * comboMultiplier * laneMultiplier);
             booksCollected++; // Track books for level system
+            totalBooksCollected++;
 
             // Combo
             const now = Date.now();
             if (now - lastCollectTime < 2500) {
                 comboCount++;
                 comboMultiplier = Math.min(1 + comboCount * 0.5, 5);
+
+                // Track max combo
+                if (comboCount > maxCombo) {
+                    maxCombo = comboCount;
+                    if (maxCombo >= 15 && !achievements.comboMaster) {
+                        achievements.comboMaster = true;
+                        showAchievement('🔥 Combo Master!', '15er Combo erreicht!');
+                    }
+                }
             } else {
                 comboCount = 0;
                 comboMultiplier = 1;
@@ -1556,18 +1661,19 @@ function gameLoop(currentTime = 0) {
         obstacleTimer = 0;
     }
 
-    // Spawn collectibles - INCREASED SPAWN RATE (was 85, now 50)
+    // Spawn collectibles - MUCH MORE FREQUENT! (was 85, then 50, now 35)
     collectibleTimer += deltaTime;
-    if (collectibleTimer > 50) {
+    const collectibleSpawnRate = tutorialMode ? 50 : 35;
+    if (collectibleTimer > collectibleSpawnRate) {
         const lane = Math.floor(Math.random() * 3);
         collectibles.push(new Collectible(lane));
         collectibleTimer = 0;
     }
 
-    // Spawn power-ups
-    if (score > 300 && !tutorialMode) {
+    // Spawn power-ups - MORE FREQUENT! (was 450, now 280)
+    if (score > 200 && !tutorialMode) {
         powerupTimer += deltaTime;
-        if (powerupTimer > 450) {
+        if (powerupTimer > 280) {
             powerups.push(new PowerUp());
             powerupTimer = 0;
         }
@@ -1587,6 +1693,14 @@ function gameLoop(currentTime = 0) {
 
     // Power-up indicators (top right)
     drawPowerUpIndicators();
+
+    // Level progress bar (bottom of screen)
+    drawLevelProgressBar();
+
+    // Combo counter (top center)
+    if (comboMultiplier > 1) {
+        drawComboCounter();
+    }
 
     // Combo decay
     if (Date.now() - lastCollectTime > 2500 && comboMultiplier > 1) {
@@ -1611,7 +1725,7 @@ function drawPowerUpIndicators() {
             const timeLeft = (activePowerups[key] - now) / 1000;
             const width = 130;
             const height = 32;
-            const x = canvas.width - width - 12;
+            const x = baseWidth - width - 12;
             const y = yOffset;
 
             // Background gradient
@@ -1648,6 +1762,95 @@ function drawPowerUpIndicators() {
     });
 }
 
+// Combo Counter - MASSIVE VISUAL!
+function drawComboCounter() {
+    const scale = 1 + (comboMultiplier - 1) * 0.1;
+    const pulse = Math.sin(Date.now() / 150) * 0.1 + 0.9;
+
+    ctx.save();
+    ctx.translate(baseWidth / 2, 70);
+    ctx.scale(scale * pulse, scale * pulse);
+
+    // Glow background
+    const glowSize = 80 + comboCount * 5;
+    const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, glowSize);
+    gradient.addColorStop(0, 'rgba(255, 215, 0, 0.4)');
+    gradient.addColorStop(0.5, 'rgba(255, 215, 0, 0.2)');
+    gradient.addColorStop(1, 'transparent');
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(0, 0, glowSize, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Main text
+    ctx.font = `bold ${36 + comboCount * 2}px Philosopher, Arial`;
+    ctx.fillStyle = '#FFD700';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = '#FFD700';
+    ctx.shadowBlur = 20;
+    ctx.fillText(`${comboCount}x COMBO!`, 0, 0);
+
+    // Multiplier
+    ctx.font = 'bold 18px Philosopher, Arial';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.shadowBlur = 10;
+    ctx.fillText(`${comboMultiplier.toFixed(1)}x Multiplikator`, 0, 30);
+
+    ctx.restore();
+}
+
+// Level Progress Bar - BEAUTIFUL!
+function drawLevelProgressBar() {
+    const levelReq = LEVEL_REQUIREMENTS[currentLevel - 1];
+    const progress = Math.min(booksCollected / levelReq.books, 1);
+
+    const barWidth = baseWidth - 40;
+    const barHeight = 8;
+    const x = 20;
+    const y = baseHeight - 20;
+
+    // Shadow
+    ctx.save();
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.fillRect(x, y + 2, barWidth, barHeight);
+
+    // Background
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+    ctx.fillRect(x, y, barWidth, barHeight);
+
+    // Progress gradient
+    const gradient = ctx.createLinearGradient(x, y, x + barWidth, y);
+    gradient.addColorStop(0, levelReq.color);
+    gradient.addColorStop(1, adjustColor(levelReq.color, 40));
+    ctx.fillStyle = gradient;
+    ctx.fillRect(x, y, barWidth * progress, barHeight);
+
+    // Pulsing glow when near completion
+    if (progress > 0.8) {
+        const pulse = Math.sin(Date.now() / 200) * 0.3 + 0.7;
+        ctx.shadowColor = levelReq.color;
+        ctx.shadowBlur = 15 * pulse;
+        ctx.fillRect(x, y, barWidth * progress, barHeight);
+        ctx.shadowBlur = 0;
+    }
+
+    // Border
+    ctx.strokeStyle = levelReq.color;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x, y, barWidth, barHeight);
+
+    // Text overlay
+    ctx.font = 'bold 11px Philosopher, Arial';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textAlign = 'center';
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+    ctx.shadowBlur = 4;
+    ctx.fillText(`${booksCollected} / ${levelReq.books} Bücher`, baseWidth / 2, y + 6);
+
+    ctx.restore();
+}
+
 // Start Game
 function startGame() {
     gameRunning = true;
@@ -1658,6 +1861,9 @@ function startGame() {
     timeRemaining = LEVEL_DURATION;
     currentLevel = 1;
     booksCollected = 0;
+    totalBooksCollected = 0;
+    maxCombo = 0;
+    powerupsCollected = 0;
     currentEraIndex = 0;
     obstacles = [];
     collectibles = [];
@@ -1691,7 +1897,7 @@ function startGame() {
     initSkyElements();
 
     document.getElementById('score').textContent = '0';
-    document.getElementById('wisdom').textContent = '0/50';
+    document.getElementById('wisdom').textContent = '0/20';
     document.getElementById('currentEra').textContent = ERAS[0].name;
     document.getElementById('currentLevel').textContent = '1';
     document.getElementById('philIcon').textContent = PHILOSOPHERS[selectedPhilosopherIndex].icon;
