@@ -414,23 +414,33 @@ const player = {
     slowTimer: 0,
 
     draw() {
-        // Enhanced trail
+        // MEGA Enhanced trail with MORE layers!
         ctx.save();
         this.trail.forEach((point, i) => {
-            const alpha = (i / this.trail.length) * 0.4;
+            const alpha = (i / this.trail.length) * 0.5;
             const era = ERAS[currentEraIndex];
             ctx.globalAlpha = alpha;
 
-            const gradient = ctx.createRadialGradient(point.x, point.y, 0, point.x, point.y, 30);
-            gradient.addColorStop(0, era.primaryColor);
-            gradient.addColorStop(1, 'transparent');
-            ctx.fillStyle = gradient;
+            // Triple-layer trail for THICKNESS
+            for (let layer = 0; layer < 3; layer++) {
+                const offset = layer * 3;
+                const gradient = ctx.createRadialGradient(
+                    point.x, point.y, 0,
+                    point.x, point.y, 35 + offset
+                );
+                gradient.addColorStop(0, era.primaryColor);
+                gradient.addColorStop(0.5, era.secondaryColor);
+                gradient.addColorStop(1, 'transparent');
+                ctx.fillStyle = gradient;
 
-            const size = (i / this.trail.length) * this.width * 0.9;
-            ctx.font = `${size}px Philosopher, Arial`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(PHILOSOPHERS[selectedPhilosopherIndex].icon, point.x, point.y);
+                const size = (i / this.trail.length) * this.width * 1.1;
+                ctx.font = `${size}px Philosopher, Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.shadowColor = era.primaryColor;
+                ctx.shadowBlur = 20;
+                ctx.fillText(PHILOSOPHERS[selectedPhilosopherIndex].icon, point.x, point.y);
+            }
         });
         ctx.restore();
 
@@ -559,13 +569,13 @@ const player = {
         this.squashStretch.x += (1 - this.squashStretch.x) * 0.15;
         this.squashStretch.y += (1 - this.squashStretch.y) * 0.15;
 
-        // Trail
-        if (gameRunning && Date.now() % 2 === 0) {
+        // Trail - EVERY FRAME for MAXIMUM smoothness!
+        if (gameRunning) {
             this.trail.push({
                 x: this.x + this.width / 2,
                 y: this.y + this.height / 2
             });
-            if (this.trail.length > 10) this.trail.shift();
+            if (this.trail.length > 15) this.trail.shift(); // Longer trail!
         }
     },
 
@@ -756,6 +766,53 @@ function createFirework(x, y) {
         const vy = (Math.random() - 0.5) * 8 - 5;
         particles.push(new Particle(x, y, colors[Math.floor(Math.random() * colors.length)], vx, vy, 'confetti'));
     }
+}
+
+// Light Beam Effect - MAGICAL!
+function createLightBeam(x1, y1, x2, y2, color) {
+    floatingTexts.push({
+        x: x1,
+        y: y1,
+        targetX: x2,
+        targetY: y2,
+        color: color,
+        life: 1,
+        isBeam: true,
+        update(dt) {
+            this.life -= 0.05 * dt;
+        },
+        draw() {
+            if (this.life <= 0) return;
+            ctx.save();
+            ctx.globalAlpha = this.life * 0.6;
+
+            // Thicker beam with gradient
+            const gradient = ctx.createLinearGradient(this.x, this.y, this.targetX, this.targetY);
+            gradient.addColorStop(0, this.color);
+            gradient.addColorStop(0.5, adjustColor(this.color, 60));
+            gradient.addColorStop(1, 'transparent');
+
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 8;
+            ctx.shadowColor = this.color;
+            ctx.shadowBlur = 20;
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.targetX, this.targetY);
+            ctx.stroke();
+
+            // Inner bright line
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.shadowBlur = 10;
+            ctx.stroke();
+
+            ctx.restore();
+        },
+        isDead() {
+            return this.life <= 0;
+        }
+    });
 }
 
 // Sky Elements (clouds, stars, etc.)
@@ -1748,15 +1805,24 @@ function gameLoop(currentTime = 0) {
             lastCollectTime = now;
 
             showCollectedWork(work, points);
+
+            // MEGA Collection Effect with LIGHT BEAMS! ✨
+            const comboColor = comboMultiplier > 2 ? '#FFD700' : '#4CAF50';
+
+            // Light beam from collect to player
+            createLightBeam(collectibles[i].x, collectibles[i].y, player.x + player.width/2, player.y + player.height/2, comboColor);
+
             floatingTexts.push(new FloatingText(
                 collectibles[i].x,
                 collectibles[i].y,
                 `+${points}${comboMultiplier > 1 ? ' x' + comboMultiplier.toFixed(1) : ''}`,
-                comboMultiplier > 1 ? '#FFD700' : '#4CAF50',
-                28
+                comboColor,
+                32 + comboCount * 2
             ));
 
-            createParticles(collectibles[i].x, collectibles[i].y, '#4CAF50', 20);
+            createExplosion(collectibles[i].x, collectibles[i].y, comboColor, 0.5);
+            createParticles(collectibles[i].x, collectibles[i].y, comboColor, 15, 'star');
+            createParticles(collectibles[i].x, collectibles[i].y, '#FFFFFF', 10, 'confetti');
             playCollectSound();
             collectibles.splice(i, 1);
 
@@ -1853,6 +1919,11 @@ function gameLoop(currentTime = 0) {
         drawComboCounter();
     }
 
+    // Combo Meter (left side)
+    if (comboCount > 0) {
+        drawComboMeter();
+    }
+
     // Fireworks (during celebrations)
     if (fireworksTimer > 0) {
         fireworksTimer--;
@@ -1921,6 +1992,63 @@ function drawPowerUpIndicators() {
             yOffset += 38;
         }
     });
+}
+
+// Combo Meter (left side) - VISUAL PROGRESSION!
+function drawComboMeter() {
+    const maxComboHeight = 300;
+    const progress = Math.min(comboCount / 30, 1); // Max at 30 combo
+    const height = maxComboHeight * progress;
+
+    const x = 15;
+    const y = baseHeight / 2 - maxComboHeight / 2;
+    const width = 12;
+
+    ctx.save();
+
+    // Background bar
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+    ctx.fillRect(x, y, width, maxComboHeight);
+
+    // Combo fill with gradient
+    const gradient = ctx.createLinearGradient(x, y + maxComboHeight, x, y);
+    gradient.addColorStop(0, '#4CAF50');
+    gradient.addColorStop(0.5, '#FFD700');
+    gradient.addColorStop(1, '#FF6347');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(x, y + maxComboHeight - height, width, height);
+
+    // Pulsing glow
+    const pulse = Math.sin(Date.now() / 150) * 0.3 + 0.7;
+    ctx.shadowColor = comboMultiplier > 2 ? '#FFD700' : '#4CAF50';
+    ctx.shadowBlur = 15 * pulse;
+    ctx.fillRect(x, y + maxComboHeight - height, width, height);
+
+    // Border
+    ctx.strokeStyle = '#FFFFFF';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x, y, width, maxComboHeight);
+
+    // Markers every 5 combo
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+        const markerY = y + (maxComboHeight / 6) * i;
+        ctx.beginPath();
+        ctx.moveTo(x, markerY);
+        ctx.lineTo(x + width, markerY);
+        ctx.stroke();
+    }
+
+    // Text
+    ctx.font = 'bold 10px Philosopher, Arial';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textAlign = 'center';
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+    ctx.shadowBlur = 4;
+    ctx.fillText(`${comboCount}`, x + width / 2, y - 5);
+
+    ctx.restore();
 }
 
 // Combo Counter - ULTRA MASSIVE VISUAL!
