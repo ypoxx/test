@@ -362,6 +362,10 @@ let tutorialMessages = [];
 let screenShake = 0;
 let backgroundOffset = 0;
 let slowMotionTimer = 0;
+let chromaticAberration = 0;
+let vignette = 0;
+let fireworksTimer = 0;
+let backgroundLayers = [];
 
 // Active power-ups
 let activePowerups = {
@@ -633,18 +637,22 @@ const player = {
     }
 };
 
-// Enhanced Particle
+// Enhanced Particle with types
 class Particle {
-    constructor(x, y, color, velocityX = null, velocityY = null) {
+    constructor(x, y, color, velocityX = null, velocityY = null, type = 'normal') {
         this.x = x;
         this.y = y;
         this.color = color;
+        this.type = type;
         this.velocityX = velocityX !== null ? velocityX : (Math.random() - 0.5) * 6;
         this.velocityY = velocityY !== null ? velocityY : (Math.random() - 0.5) * 6 - 3;
-        this.size = Math.random() * 6 + 2;
+        this.size = type === 'star' ? Math.random() * 8 + 4 : Math.random() * 6 + 2;
         this.life = 1;
-        this.decay = 0.012;
-        this.gravity = 0.12;
+        this.decay = type === 'star' ? 0.008 : 0.012;
+        this.gravity = type === 'confetti' ? 0.2 : 0.12;
+        this.rotation = Math.random() * Math.PI * 2;
+        this.rotationSpeed = (Math.random() - 0.5) * 0.2;
+        this.initialLife = 1;
     }
 
     update(dt) {
@@ -652,20 +660,56 @@ class Particle {
         this.y += this.velocityY * dt;
         this.velocityY += this.gravity * dt;
         this.life -= this.decay * dt;
+        this.rotation += this.rotationSpeed * dt;
+
+        // Add drag
+        this.velocityX *= 0.98;
+        this.velocityY *= 0.98;
     }
 
     draw() {
         ctx.save();
         ctx.globalAlpha = this.life;
 
-        const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
-        gradient.addColorStop(0, this.color);
-        gradient.addColorStop(1, 'transparent');
+        if (this.type === 'star') {
+            // Animated star
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.rotation);
+            ctx.fillStyle = this.color;
+            ctx.shadowColor = this.color;
+            ctx.shadowBlur = 15;
 
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
+            // Draw star shape
+            ctx.beginPath();
+            for (let i = 0; i < 5; i++) {
+                const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+                const radius = i % 2 === 0 ? this.size : this.size * 0.4;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.fill();
+        } else if (this.type === 'confetti') {
+            // Rectangle confetti
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.rotation);
+            ctx.fillStyle = this.color;
+            ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size * 1.5);
+        } else {
+            // Normal particle with glow
+            const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+            gradient.addColorStop(0, this.color);
+            gradient.addColorStop(1, 'transparent');
+
+            ctx.fillStyle = gradient;
+            ctx.shadowColor = this.color;
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
         ctx.restore();
     }
 
@@ -674,9 +718,43 @@ class Particle {
     }
 }
 
-function createParticles(x, y, color, count) {
+function createParticles(x, y, color, count, type = 'normal') {
     for (let i = 0; i < count; i++) {
-        particles.push(new Particle(x, y, color));
+        particles.push(new Particle(x, y, color, null, null, type));
+    }
+}
+
+// Create explosion effect
+function createExplosion(x, y, color, intensity = 1) {
+    const count = Math.floor(50 * intensity);
+    for (let i = 0; i < count; i++) {
+        const angle = (Math.PI * 2 * i) / count;
+        const speed = (Math.random() * 8 + 4) * intensity;
+        const vx = Math.cos(angle) * speed;
+        const vy = Math.sin(angle) * speed;
+        particles.push(new Particle(x, y, color, vx, vy, 'normal'));
+    }
+}
+
+// Create firework burst
+function createFirework(x, y) {
+    const colors = ['#FFD700', '#FF6347', '#4169E1', '#9370DB', '#00CED1', '#FF69B4'];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+
+    // Main burst
+    for (let i = 0; i < 40; i++) {
+        const angle = (Math.PI * 2 * i) / 40;
+        const speed = Math.random() * 6 + 3;
+        const vx = Math.cos(angle) * speed;
+        const vy = Math.sin(angle) * speed;
+        particles.push(new Particle(x, y, color, vx, vy, 'star'));
+    }
+
+    // Confetti
+    for (let i = 0; i < 20; i++) {
+        const vx = (Math.random() - 0.5) * 8;
+        const vy = (Math.random() - 0.5) * 8 - 5;
+        particles.push(new Particle(x, y, colors[Math.floor(Math.random() * colors.length)], vx, vy, 'confetti'));
     }
 }
 
@@ -1279,10 +1357,14 @@ function showAchievement(title, subtitle) {
     notification.classList.remove('hidden');
     notification.classList.add('show');
 
-    // Big celebration!
-    screenShake = 12;
-    createParticles(baseWidth / 2, baseHeight / 2, '#FFD700', 50);
+    // BIG ACHIEVEMENT celebration!
+    screenShake = 20;
+    chromaticAberration = 8;
+    createExplosion(baseWidth / 2, baseHeight / 2, '#FFD700', 1.5);
+    createFirework(baseWidth / 2 - 100, baseHeight / 2 - 50);
+    createFirework(baseWidth / 2 + 100, baseHeight / 2 - 50);
     playEraChangeSound();
+    setTimeout(() => playEraChangeSound(), 100);
 
     setTimeout(() => {
         notification.classList.remove('show');
@@ -1336,6 +1418,33 @@ function showCollectedWork(work, points) {
     }, 2800);
 }
 
+// Screen Effects
+function applyScreenEffects() {
+    // Chromatic aberration decay
+    if (chromaticAberration > 0) {
+        chromaticAberration *= 0.9;
+        if (chromaticAberration < 0.1) chromaticAberration = 0;
+    }
+
+    // Vignette decay
+    if (vignette > 0) {
+        vignette *= 0.95;
+        if (vignette < 0.01) vignette = 0;
+    }
+
+    // Draw vignette
+    if (vignette > 0) {
+        const gradient = ctx.createRadialGradient(
+            baseWidth / 2, baseHeight / 2, baseHeight * 0.3,
+            baseWidth / 2, baseHeight / 2, baseHeight * 0.8
+        );
+        gradient.addColorStop(0, 'transparent');
+        gradient.addColorStop(1, `rgba(0, 0, 0, ${vignette * 0.6})`);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, baseWidth, baseHeight);
+    }
+}
+
 // Screen Shake
 function applyScreenShake() {
     if (screenShake > 0) {
@@ -1369,11 +1478,20 @@ function checkLevelComplete() {
             document.getElementById('currentLevel').textContent = currentLevel;
             initSkyElements();
 
-            // MASSIVE LEVEL UP CELEBRATION! 🎉
-            screenShake = 25;
-            createParticles(baseWidth / 2, baseHeight / 2, ERAS[currentEraIndex].primaryColor, 100);
+            // MASSIVE LEVEL UP CELEBRATION! 🎉🎆
+            screenShake = 35;
+            chromaticAberration = 15;
+            vignette = 0.6;
 
-            // Flash screen
+            // EXPLOSION of particles!
+            createExplosion(baseWidth / 2, baseHeight / 2, ERAS[currentEraIndex].primaryColor, 2);
+            createParticles(baseWidth / 2, baseHeight / 2, ERAS[currentEraIndex].primaryColor, 150, 'star');
+            createParticles(baseWidth / 2, baseHeight / 2, '#FFD700', 80, 'confetti');
+
+            // Start fireworks sequence
+            fireworksTimer = 120; // 2 seconds of fireworks
+
+            // Flash screen with pulse
             const flash = document.createElement('div');
             flash.style.cssText = `
                 position: fixed;
@@ -1381,17 +1499,19 @@ function checkLevelComplete() {
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: ${LEVEL_REQUIREMENTS[currentLevel - 1].color};
-                opacity: 0.6;
+                background: radial-gradient(circle, ${LEVEL_REQUIREMENTS[currentLevel - 1].color}, transparent);
+                opacity: 0.8;
                 z-index: 9999;
                 pointer-events: none;
-                animation: flashFade 0.8s ease-out;
+                animation: flashFade 1s ease-out;
             `;
             document.body.appendChild(flash);
-            setTimeout(() => flash.remove(), 800);
+            setTimeout(() => flash.remove(), 1000);
 
+            // Triple sound burst
             playEraChangeSound();
-            setTimeout(() => playEraChangeSound(), 200);
+            setTimeout(() => playEraChangeSound(), 150);
+            setTimeout(() => playEraChangeSound(), 300);
             showQuote();
 
             // Show level complete message
@@ -1414,8 +1534,30 @@ function gameOver(victory = false) {
     gameRunning = false;
     cancelAnimationFrame(animationId);
 
-    screenShake = 20;
-    createParticles(baseWidth / 2, baseHeight / 2, victory ? '#FFD700' : '#FF6347', 50);
+    if (victory) {
+        // ULTIMATE VICTORY CELEBRATION! 🎆🎉
+        screenShake = 40;
+        chromaticAberration = 20;
+        vignette = 0.8;
+
+        // MASSIVE fireworks show!
+        fireworksTimer = 300; // 5 seconds!
+
+        // Create mega explosions
+        createExplosion(baseWidth / 2, baseHeight / 2, '#FFD700', 3);
+        createParticles(baseWidth / 2, baseHeight / 2, '#FFD700', 200, 'star');
+        createParticles(baseWidth / 2, baseHeight / 2, '#FF6347', 100, 'confetti');
+        createParticles(baseWidth / 2, baseHeight / 2, '#4169E1', 100, 'confetti');
+
+        // Create fireworks in corners
+        setTimeout(() => createFirework(100, 100), 200);
+        setTimeout(() => createFirework(baseWidth - 100, 100), 400);
+        setTimeout(() => createFirework(100, baseHeight - 100), 600);
+        setTimeout(() => createFirework(baseWidth - 100, baseHeight - 100), 800);
+    } else {
+        screenShake = 20;
+        createParticles(baseWidth / 2, baseHeight / 2, '#FF6347', 50);
+    }
 
     const finalScore = Math.floor(score / 10);
     document.getElementById('finalScore').textContent = finalScore;
@@ -1487,8 +1629,10 @@ function gameLoop(currentTime = 0) {
     document.getElementById('philName').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
     ctx.save();
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, baseWidth, baseHeight);
 
+    // Apply screen effects
+    applyScreenEffects();
     applyScreenShake();
 
     drawBackground();
@@ -1547,9 +1691,16 @@ function gameLoop(currentTime = 0) {
                 showAchievement('🎁 Power-Up Sammler!', 'Sammle 20 Power-Ups!');
             }
 
-            floatingTexts.push(new FloatingText(powerup.x, powerup.y, powerup.type.name, powerup.type.color, 32));
-            createParticles(powerup.x, powerup.y, powerup.type.color, 40);
-            screenShake = 6;
+            // MEGA power-up collection effect!
+            floatingTexts.push(new FloatingText(powerup.x, powerup.y, powerup.type.name, powerup.type.color, 36));
+            createExplosion(powerup.x, powerup.y, powerup.type.color, 0.8);
+            createParticles(powerup.x, powerup.y, powerup.type.color, 30, 'star');
+            screenShake = 10;
+            chromaticAberration = 5;
+
+            // Screen flash for power-up
+            vignette = 0.3;
+
             playPowerUpSound();
             powerups.splice(i, 1);
         } else if (powerups[i].isOffScreen()) {
@@ -1702,6 +1853,16 @@ function gameLoop(currentTime = 0) {
         drawComboCounter();
     }
 
+    // Fireworks (during celebrations)
+    if (fireworksTimer > 0) {
+        fireworksTimer--;
+        if (fireworksTimer % 15 === 0) {
+            const x = Math.random() * baseWidth;
+            const y = Math.random() * baseHeight * 0.6;
+            createFirework(x, y);
+        }
+    }
+
     // Combo decay
     if (Date.now() - lastCollectTime > 2500 && comboMultiplier > 1) {
         comboMultiplier = Math.max(1, comboMultiplier - 0.08);
@@ -1762,42 +1923,99 @@ function drawPowerUpIndicators() {
     });
 }
 
-// Combo Counter - MASSIVE VISUAL!
+// Combo Counter - ULTRA MASSIVE VISUAL!
 function drawComboCounter() {
-    const scale = 1 + (comboMultiplier - 1) * 0.1;
-    const pulse = Math.sin(Date.now() / 150) * 0.1 + 0.9;
+    const scale = 1 + (comboMultiplier - 1) * 0.12;
+    const pulse = Math.sin(Date.now() / 120) * 0.15 + 0.85;
+    const rotation = Math.sin(Date.now() / 500) * 0.05;
 
     ctx.save();
     ctx.translate(baseWidth / 2, 70);
+    ctx.rotate(rotation);
     ctx.scale(scale * pulse, scale * pulse);
 
-    // Glow background
-    const glowSize = 80 + comboCount * 5;
-    const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, glowSize);
-    gradient.addColorStop(0, 'rgba(255, 215, 0, 0.4)');
-    gradient.addColorStop(0.5, 'rgba(255, 215, 0, 0.2)');
-    gradient.addColorStop(1, 'transparent');
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.arc(0, 0, glowSize, 0, Math.PI * 2);
-    ctx.fill();
+    // Multiple glow layers
+    for (let i = 3; i >= 0; i--) {
+        const glowSize = (100 + comboCount * 6) * (1 + i * 0.3);
+        const alpha = (0.4 - i * 0.08) * (comboMultiplier / 5);
+        const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, glowSize);
+        gradient.addColorStop(0, `rgba(255, 215, 0, ${alpha})`);
+        gradient.addColorStop(0.5, `rgba(255, 165, 0, ${alpha * 0.6})`);
+        gradient.addColorStop(1, 'transparent');
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(0, 0, glowSize, 0, Math.PI * 2);
+        ctx.fill();
+    }
 
-    // Main text
-    ctx.font = `bold ${36 + comboCount * 2}px Philosopher, Arial`;
-    ctx.fillStyle = '#FFD700';
+    // Rotating stars for high combos
+    if (comboCount >= 10) {
+        ctx.save();
+        const starRotation = Date.now() / 1000;
+        ctx.rotate(starRotation);
+        for (let i = 0; i < 8; i++) {
+            const angle = (i / 8) * Math.PI * 2;
+            const dist = 80 + Math.sin(Date.now() / 300 + i) * 10;
+            const x = Math.cos(angle) * dist;
+            const y = Math.sin(angle) * dist;
+
+            ctx.fillStyle = '#FFD700';
+            ctx.shadowColor = '#FFD700';
+            ctx.shadowBlur = 15;
+            ctx.font = 'bold 20px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('✨', x, y);
+        }
+        ctx.restore();
+    }
+
+    // Main text with outline
+    const fontSize = 40 + comboCount * 2;
+    ctx.font = `bold ${fontSize}px Philosopher, Arial`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
+
+    // Outline
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 6;
+    ctx.strokeText(`${comboCount}x COMBO!`, 0, 0);
+
+    // Fill
+    const textGradient = ctx.createLinearGradient(0, -fontSize/2, 0, fontSize/2);
+    textGradient.addColorStop(0, '#FFD700');
+    textGradient.addColorStop(0.5, '#FFA500');
+    textGradient.addColorStop(1, '#FF8C00');
+    ctx.fillStyle = textGradient;
     ctx.shadowColor = '#FFD700';
-    ctx.shadowBlur = 20;
+    ctx.shadowBlur = 25;
     ctx.fillText(`${comboCount}x COMBO!`, 0, 0);
 
-    // Multiplier
-    ctx.font = 'bold 18px Philosopher, Arial';
+    // Multiplier with glow
+    ctx.font = 'bold 20px Philosopher, Arial';
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 4;
+    ctx.strokeText(`${comboMultiplier.toFixed(1)}x Multiplikator`, 0, 35);
     ctx.fillStyle = '#FFFFFF';
-    ctx.shadowBlur = 10;
-    ctx.fillText(`${comboMultiplier.toFixed(1)}x Multiplikator`, 0, 30);
+    ctx.shadowBlur = 15;
+    ctx.fillText(`${comboMultiplier.toFixed(1)}x Multiplikator`, 0, 35);
 
     ctx.restore();
+
+    // Screen-wide effect for mega combos
+    if (comboCount >= 20) {
+        ctx.save();
+        const megaPulse = Math.sin(Date.now() / 100) * 0.2 + 0.8;
+        ctx.globalAlpha = 0.1 * megaPulse;
+        const bgGradient = ctx.createRadialGradient(
+            baseWidth / 2, baseHeight / 2, 0,
+            baseWidth / 2, baseHeight / 2, baseWidth / 2
+        );
+        bgGradient.addColorStop(0, '#FFD700');
+        bgGradient.addColorStop(1, 'transparent');
+        ctx.fillStyle = bgGradient;
+        ctx.fillRect(0, 0, baseWidth, baseHeight);
+        ctx.restore();
+    }
 }
 
 // Level Progress Bar - BEAUTIFUL!
