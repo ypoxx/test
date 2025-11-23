@@ -77,46 +77,109 @@ let powerupsCollected = 0;
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 let soundEnabled = true;
 
-function playSound(frequency, duration, type = 'sine', volume = 0.3) {
+// Enhanced Sound System with ADSR Envelopes
+function playSound(frequency, duration, type = 'sine', volume = 0.3, envelope = {}) {
     if (!soundEnabled || !audioContext) return;
+
+    const { attack = 0.01, decay = 0.1, sustain = 0.7, release = 0.2 } = envelope;
 
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
+    const filter = audioContext.createBiquadFilter();
 
-    oscillator.connect(gainNode);
+    // Routing: Oscillator -> Filter -> Gain -> Destination
+    oscillator.connect(filter);
+    filter.connect(gainNode);
     gainNode.connect(audioContext.destination);
 
+    // Oscillator setup
     oscillator.frequency.value = frequency;
     oscillator.type = type;
-    gainNode.gain.value = volume;
 
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + duration);
+    // Lowpass filter for warmth (reduces harsh high frequencies)
+    filter.type = 'lowpass';
+    filter.frequency.value = 2000;
+    filter.Q.value = 1;
+
+    const now = audioContext.currentTime;
+
+    // ADSR Envelope
+    gainNode.gain.setValueAtTime(0, now);
+    gainNode.gain.linearRampToValueAtTime(volume, now + attack); // Attack
+    gainNode.gain.linearRampToValueAtTime(volume * sustain, now + attack + decay); // Decay to Sustain
+    gainNode.gain.setValueAtTime(volume * sustain, now + duration - release); // Hold Sustain
+    gainNode.gain.linearRampToValueAtTime(0, now + duration); // Release
+
+    oscillator.start(now);
+    oscillator.stop(now + duration);
+}
+
+// Play multiple notes simultaneously (chords/harmony)
+function playChord(frequencies, duration, type = 'sine', volume = 0.2, envelope = {}) {
+    frequencies.forEach(freq => playSound(freq, duration, type, volume, envelope));
 }
 
 function playJumpSound() {
-    playSound(440, 0.1, 'square', 0.2);
+    // Modern "whoosh" jump sound
+    playSound(440, 0.12, 'triangle', 0.25, { attack: 0.005, decay: 0.03, sustain: 0.3, release: 0.08 });
+    setTimeout(() => playSound(660, 0.08, 'sine', 0.15, { attack: 0.002, decay: 0.02, sustain: 0.5, release: 0.05 }), 20);
 }
 
 function playCollectSound() {
-    playSound(880, 0.15, 'sine', 0.25);
-    setTimeout(() => playSound(1320, 0.1, 'sine', 0.15), 50);
+    // Magical sparkle with major chord (C-E-G)
+    const chord = [523.25, 659.25, 783.99]; // C5, E5, G5
+    playChord(chord, 0.25, 'sine', 0.15, { attack: 0.002, decay: 0.08, sustain: 0.6, release: 0.15 });
+
+    // Sparkle overtone
+    setTimeout(() => playSound(1318.51, 0.15, 'sine', 0.08, { attack: 0.001, decay: 0.05, sustain: 0.4, release: 0.1 }), 40);
 }
 
 function playBounceSound() {
-    playSound(220, 0.15, 'sawtooth', 0.2);
+    // Bouncy "boing" with pitch bend effect
+    playSound(330, 0.08, 'triangle', 0.22, { attack: 0.005, decay: 0.02, sustain: 0.5, release: 0.05 });
+    setTimeout(() => playSound(220, 0.12, 'triangle', 0.18, { attack: 0.01, decay: 0.03, sustain: 0.6, release: 0.08 }), 30);
 }
 
 function playPowerUpSound() {
-    playSound(660, 0.1, 'sine', 0.2);
-    setTimeout(() => playSound(880, 0.1, 'sine', 0.2), 80);
-    setTimeout(() => playSound(1100, 0.15, 'sine', 0.2), 160);
+    // Epic arpeggio with bass punch (A major: A-C#-E-A)
+    const notes = [220, 277.18, 329.63, 440]; // A3, C#4, E4, A4
+
+    // Bass punch
+    playSound(110, 0.15, 'sine', 0.3, { attack: 0.005, decay: 0.05, sustain: 0.4, release: 0.1 });
+
+    // Arpeggio
+    notes.forEach((freq, i) => {
+        setTimeout(() => {
+            playSound(freq, 0.2, 'triangle', 0.2, { attack: 0.005, decay: 0.06, sustain: 0.7, release: 0.13 });
+        }, i * 60);
+    });
+
+    // Bright harmony on top
+    setTimeout(() => playChord([880, 1108.73], 0.3, 'sine', 0.12, { attack: 0.01, decay: 0.1, sustain: 0.6, release: 0.2 }), 180);
 }
 
 function playEraChangeSound() {
-    playSound(523, 0.2, 'triangle', 0.25);
-    setTimeout(() => playSound(659, 0.2, 'triangle', 0.25), 100);
-    setTimeout(() => playSound(784, 0.3, 'triangle', 0.25), 200);
+    // Triumphant ascending melody with harmony (C-E-G-C major scale)
+    const melody = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+
+    // Bass foundation
+    playSound(130.81, 0.6, 'sine', 0.25, { attack: 0.01, decay: 0.15, sustain: 0.7, release: 0.25 });
+
+    // Melody with harmony
+    melody.forEach((freq, i) => {
+        setTimeout(() => {
+            // Main note
+            playSound(freq, 0.25, 'triangle', 0.22, { attack: 0.008, decay: 0.08, sustain: 0.65, release: 0.15 });
+
+            // Harmony (fifth above)
+            playSound(freq * 1.5, 0.25, 'sine', 0.15, { attack: 0.01, decay: 0.09, sustain: 0.6, release: 0.15 });
+        }, i * 120);
+    });
+
+    // Final celebration chord
+    setTimeout(() => {
+        playChord([1046.50, 1318.51, 1567.98], 0.5, 'sine', 0.18, { attack: 0.02, decay: 0.15, sustain: 0.75, release: 0.3 });
+    }, 480);
 }
 
 // Enhanced Eras with beautiful colors
