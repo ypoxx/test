@@ -89,8 +89,9 @@ function Match({ progress, onMatchEnd }) {
   }
 
   const finishMatch = (lastAnswerCorrect) => {
-    const finalMsvGoals = lastAnswerCorrect ? msvGoals + 1 : msvGoals
-    const finalOpponentGoals = lastAnswerCorrect ? opponentGoals : opponentGoals + 1
+    // Use current scores - they're already updated in handleAnswer!
+    const finalMsvGoals = msvGoals
+    const finalOpponentGoals = opponentGoals
 
     const result = calculateMatchResult(finalMsvGoals, vocabs.length)
 
@@ -127,8 +128,8 @@ function Match({ progress, onMatchEnd }) {
   }
 
   const handleContinue = () => {
-    // Show achievements one by one
-    if (newAchievements.length > 0 && showAchievementIndex < newAchievements.length) {
+    // Simplified: Check if we have achievements to show
+    if (newAchievements.length > 0 && !showingAchievement) {
       setShowingAchievement(true)
     } else {
       onMatchEnd(matchResult)
@@ -141,6 +142,7 @@ function Match({ progress, onMatchEnd }) {
       setShowAchievementIndex(nextIndex)
     } else {
       setShowingAchievement(false)
+      // Go to stadium after all achievements shown
       onMatchEnd(matchResult)
     }
   }
