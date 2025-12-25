@@ -5,6 +5,7 @@ import vocabsData from '../data/vocabs.json'
 import { selectVocabsForMatch } from '../utils/spacedRepetition'
 import { selectRandomOpponent, checkAnswer, calculateMatchResult, getMatchSummaryMessage } from '../utils/matchLogic'
 import { updateVocabProgress, updateGoalsAndLeague, addMatchToHistory } from '../utils/localStorage'
+import { generateMultipleChoiceOptions } from '../utils/multipleChoice'
 
 function Match({ progress, onMatchEnd }) {
   const [opponent] = useState(selectRandomOpponent())
@@ -18,7 +19,14 @@ function Match({ progress, onMatchEnd }) {
   useEffect(() => {
     // Select vocabs for this match using spaced repetition
     const selectedVocabs = selectVocabsForMatch(vocabsData, progress, 10)
-    setVocabs(selectedVocabs)
+
+    // Generate multiple choice options for each vocab
+    const vocabsWithOptions = selectedVocabs.map(vocab => ({
+      ...vocab,
+      options: generateMultipleChoiceOptions(vocab, vocabsData)
+    }))
+
+    setVocabs(vocabsWithOptions)
   }, [progress])
 
   const handleAnswer = (userAnswer) => {
@@ -43,7 +51,7 @@ function Match({ progress, onMatchEnd }) {
         // Match finished
         finishMatch(isCorrect)
       }
-    }, 1500)
+    }, 2000)
 
     return isCorrect
   }
@@ -140,6 +148,7 @@ function Match({ progress, onMatchEnd }) {
       <div className="flex-1 flex items-center justify-center">
         <VocabCard
           vocab={vocabs[currentVocabIndex]}
+          options={vocabs[currentVocabIndex].options}
           onAnswer={handleAnswer}
           currentIndex={currentVocabIndex}
           total={vocabs.length}
