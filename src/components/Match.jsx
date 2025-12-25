@@ -4,8 +4,10 @@ import ScoreDisplay from './ScoreDisplay'
 import vocabsData from '../data/vocabs.json'
 import { selectVocabsForMatch } from '../utils/spacedRepetition'
 import { selectRandomOpponent, checkAnswer, calculateMatchResult, getMatchSummaryMessage } from '../utils/matchLogic'
-import { updateVocabProgress, updateGoalsAndLeague, addMatchToHistory } from '../utils/localStorage'
+import { updateVocabProgress, updateGoalsAndLeague, addMatchToHistory, loadProgress, unlockAchievement } from '../utils/localStorage'
 import { generateMultipleChoiceOptions } from '../utils/multipleChoice'
+import { calculateStreakBonus, getStreakMessage, getStreakEmoji, getStreakColor, triggerHapticFeedback } from '../utils/gameEffects'
+import { checkNewAchievements } from '../utils/achievements'
 
 function Match({ progress, onMatchEnd }) {
   const [opponent] = useState(selectRandomOpponent())
@@ -15,6 +17,9 @@ function Match({ progress, onMatchEnd }) {
   const [opponentGoals, setOpponentGoals] = useState(0)
   const [matchFinished, setMatchFinished] = useState(false)
   const [matchResult, setMatchResult] = useState(null)
+  const [streak, setStreak] = useState(0)
+  const [streakMessage, setStreakMessage] = useState(null)
+  const [newAchievements, setNewAchievements] = useState([])
 
   useEffect(() => {
     // Select vocabs for this match using spaced repetition
@@ -36,11 +41,35 @@ function Match({ progress, onMatchEnd }) {
     // Update vocab progress
     updateVocabProgress(currentVocab.id, isCorrect)
 
-    // Update score
+    // Update streak
+    let newStreak = streak
     if (isCorrect) {
-      setMsvGoals(prev => prev + 1)
+      newStreak = streak + 1
+      setStreak(newStreak)
+
+      // Trigger haptic feedback for correct answer
+      triggerHapticFeedback('success')
+
+      // Check for streak bonus
+      const streakBonus = calculateStreakBonus(newStreak)
+      const message = getStreakMessage(newStreak)
+
+      if (message) {
+        setStreakMessage(message)
+        if (streakBonus > 0) {
+          triggerHapticFeedback('streak')
+        }
+      }
+
+      // Update score (including streak bonus)
+      setMsvGoals(prev => prev + 1 + streakBonus)
     } else {
+      setStreak(0)
+      setStreakMessage(null)
       setOpponentGoals(prev => prev + 1)
+
+      // Trigger haptic feedback for wrong answer
+      triggerHapticFeedback('error')
     }
 
     // Move to next vocab after a delay
@@ -62,6 +91,9 @@ function Match({ progress, onMatchEnd }) {
 
     const result = calculateMatchResult(finalMsvGoals, vocabs.length)
 
+    // Save old progress for achievement comparison
+    const oldProgress = loadProgress()
+
     // Update progress
     updateGoalsAndLeague(finalMsvGoals)
     addMatchToHistory({
@@ -70,6 +102,22 @@ function Match({ progress, onMatchEnd }) {
       vocabsReviewed: vocabs.length,
       goalsScored: finalMsvGoals
     })
+
+    // Check for new achievements
+    const newProgress = loadProgress()
+    const unlockedAchievements = checkNewAchievements(oldProgress, newProgress)
+
+    // Unlock achievements
+    unlockedAchievements.forEach(achievement => {
+      unlockAchievement(achievement.id)
+    })
+
+    setNewAchievements(unlockedAchievements)
+
+    // Trigger victory haptic feedback if won
+    if (result.status === 'win') {
+      triggerHapticFeedback('victory')
+    }
 
     setMatchResult(result)
     setMatchFinished(true)
@@ -134,7 +182,7 @@ function Match({ progress, onMatchEnd }) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col p-4 pt-20">
+    <div className="min-h-screen flex flex-col p-4 pt-28">
       {/* Header with Score */}
       <div className="fixed top-0 left-0 right-0 bg-field-green/95 backdrop-blur-sm p-4 z-10 border-b border-white/10">
         <ScoreDisplay
@@ -142,6 +190,25 @@ function Match({ progress, onMatchEnd }) {
           opponentGoals={opponentGoals}
           opponent={opponent}
         />
+
+        {/* Streak Display */}
+        {streak > 0 && (
+          <div className="mt-2 text-center animate-fade-in">
+            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 ${getStreakColor(streak)}`}>
+              <span className="text-2xl">{getStreakEmoji(streak)}</span>
+              <span className="font-bold">{streak} in Folge!</span>
+            </div>
+          </div>
+        )}
+
+        {/* Streak Message */}
+        {streakMessage && (
+          <div className="mt-2 text-center animate-bounce-in">
+            <div className="text-sm font-bold text-yellow-300">
+              {streakMessage}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Vocab Card */}

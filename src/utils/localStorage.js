@@ -6,7 +6,9 @@ const DEFAULT_PROGRESS = {
   totalGoalsScored: 0,
   currentLeague: 'kreisliga', // kreisliga, regionalliga, zweite_liga, bundesliga
   vocabProgress: {},
-  matchHistory: []
+  matchHistory: [],
+  achievements: [], // Array of unlocked achievement IDs
+  newAchievements: [] // Recently unlocked, shown in notification
 }
 
 /**
@@ -199,4 +201,30 @@ export const getLeagueProgress = (currentGoals) => {
     goalsNeeded,
     progressPercent: Math.min(progress, 100)
   }
+}
+
+/**
+ * Unlock achievement
+ * @param {string} achievementId - ID of the achievement to unlock
+ */
+export const unlockAchievement = (achievementId) => {
+  const progress = loadProgress()
+
+  if (!progress.achievements.includes(achievementId)) {
+    progress.achievements.push(achievementId)
+    progress.newAchievements.push(achievementId)
+    saveProgress(progress)
+  }
+
+  return progress
+}
+
+/**
+ * Clear new achievements notifications
+ */
+export const clearNewAchievements = () => {
+  const progress = loadProgress()
+  progress.newAchievements = []
+  saveProgress(progress)
+  return progress
 }
