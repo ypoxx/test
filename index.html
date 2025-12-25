@@ -1,201 +1,27 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Philosophen-Odyssee</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <!-- PWA Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Vocab Trainer">
+  <meta name="theme-color" content="#005CA9">
+  <meta name="description" content="Englisch-Vokabeln lernen mit Fußball-Gamification für Maurice">
+
+  <!-- Icons -->
+  <link rel="icon" type="image/svg+xml" href="/icon-192.svg">
+  <link rel="apple-touch-icon" href="/icon-192.svg">
+
+  <!-- Manifest -->
+  <link rel="manifest" href="/manifest.json">
+
+  <title>Maurice's Vokabel-Trainer</title>
 </head>
 <body>
-    <!-- Game Screen -->
-    <div id="gameScreen" class="screen active">
-        <!-- Top HUD -->
-        <div class="hud-top">
-            <div class="hud-left">
-                <div class="stat">
-                    <span class="stat-icon">📚</span>
-                    <div class="stat-info">
-                        <div class="stat-label">Level <span id="currentLevel">1</span></div>
-                        <div class="stat-value" id="currentEra">Antike</div>
-                    </div>
-                </div>
-            </div>
-            <div class="hud-center">
-                <div class="score-display">
-                    <div id="score" class="score-big">0</div>
-                    <div class="score-label">Weisheit</div>
-                </div>
-            </div>
-            <div class="hud-right">
-                <button id="menuBtn" class="icon-btn">☰</button>
-            </div>
-        </div>
-
-        <!-- Canvas -->
-        <canvas id="gameCanvas" width="900" height="450"></canvas>
-
-        <!-- Bottom HUD -->
-        <div class="hud-bottom">
-            <div class="philosopher-display">
-                <span class="phil-icon" id="philIcon">🧔</span>
-                <span class="phil-name" id="philName">Sokrates</span>
-            </div>
-            <div class="wisdom-display">
-                <span class="wisdom-icon">📖</span>
-                <span class="wisdom-value" id="wisdom">0/50</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Start Screen -->
-    <div id="startScreen" class="screen">
-        <div class="screen-content">
-            <h1 class="game-title">🧠<br>Philosophen-<br>Odyssee</h1>
-            <p class="game-subtitle">Reise durch die Epochen</p>
-
-            <!-- Philosopher Selection -->
-            <div class="selection-section">
-                <h3>Wähle deinen Philosophen</h3>
-                <div class="phil-cards">
-                    <div class="phil-card active" data-phil="0">
-                        <div class="phil-card-icon">🧔</div>
-                        <div class="phil-card-name">Sokrates</div>
-                    </div>
-                    <div class="phil-card" data-phil="1">
-                        <div class="phil-card-icon">📿</div>
-                        <div class="phil-card-name">Augustinus</div>
-                    </div>
-                    <div class="phil-card" data-phil="2">
-                        <div class="phil-card-icon">🎩</div>
-                        <div class="phil-card-name">Kant</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Difficulty Selection -->
-            <div class="selection-section">
-                <h3>Schwierigkeit</h3>
-                <div class="diff-buttons">
-                    <button class="diff-btn active" data-diff="easy">🌱 Nachdenklich</button>
-                    <button class="diff-btn" data-diff="normal">🧠 Philosophisch</button>
-                    <button class="diff-btn" data-diff="hard">⚡ Erleuchtung</button>
-                </div>
-            </div>
-
-            <!-- Start Button -->
-            <button id="startGameBtn" class="btn-primary">Spiel Starten</button>
-            <button id="helpBtn" class="btn-secondary">❓ Spielanleitung</button>
-        </div>
-    </div>
-
-    <!-- Game Over Screen -->
-    <div id="gameOverScreen" class="screen">
-        <div class="screen-content">
-            <h2 class="screen-title">Spiel Vorbei</h2>
-            <div class="stats-grid">
-                <div class="stat-box">
-                    <div class="stat-box-value" id="finalScore">0</div>
-                    <div class="stat-box-label">Weisheit</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-box-value" id="finalWisdom">0</div>
-                    <div class="stat-box-label">Erkenntnis</div>
-                </div>
-            </div>
-            <div class="era-badge">
-                <span id="finalEraIcon">🏛️</span>
-                <span id="finalEraName">Antike</span>
-            </div>
-            <button id="restartBtn" class="btn-primary">Nochmal Spielen</button>
-            <button id="backToMenuBtn" class="btn-secondary">Zum Menü</button>
-        </div>
-    </div>
-
-    <!-- Help Panel (Slide-in) -->
-    <div id="helpPanel" class="side-panel">
-        <div class="panel-header">
-            <h2>Spielanleitung</h2>
-            <button id="closeHelpBtn" class="close-btn">✕</button>
-        </div>
-        <div class="panel-content">
-            <div class="help-item">
-                <div class="help-icon">🎮</div>
-                <div class="help-text">
-                    <strong>Steuerung</strong>
-                    <p>Tap/Klick zum Springen</p>
-                </div>
-            </div>
-            <div class="help-item">
-                <div class="help-icon">📚</div>
-                <div class="help-text">
-                    <strong>Werke sammeln</strong>
-                    <p>Philosophische Bücher für Punkte</p>
-                </div>
-            </div>
-            <div class="help-item">
-                <div class="help-icon">⚠️</div>
-                <div class="help-text">
-                    <strong>Dilemmata meiden</strong>
-                    <p>Berührung = Game Over</p>
-                </div>
-            </div>
-            <div class="help-item">
-                <div class="help-icon">🏛️</div>
-                <div class="help-text">
-                    <strong>Epochen erreichen</strong>
-                    <p>6 Epochen von Antike bis Gegenwart</p>
-                </div>
-            </div>
-        </div>
-        <button id="closeHelp2Btn" class="btn-primary">Los geht's!</button>
-    </div>
-
-    <!-- Menu Panel (Slide-in) -->
-    <div id="menuPanel" class="side-panel">
-        <div class="panel-header">
-            <h2>Menü</h2>
-            <button id="closeMenuBtn" class="close-btn">✕</button>
-        </div>
-        <div class="panel-content">
-            <div class="menu-item" id="resumeBtn">
-                <span class="menu-icon">▶️</span>
-                <span class="menu-text">Weiterspielen</span>
-            </div>
-            <div class="menu-item" id="menuHelpBtn">
-                <span class="menu-icon">❓</span>
-                <span class="menu-text">Spielanleitung</span>
-            </div>
-            <div class="menu-item" id="quitBtn">
-                <span class="menu-icon">🏠</span>
-                <span class="menu-text">Zum Startbildschirm</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Work Notification -->
-    <div id="workNotification" class="notification hidden">
-        <div class="notif-content">
-            <div class="notif-icon">📚</div>
-            <div class="notif-text">
-                <div class="notif-title" id="notifTitle">Werk gesammelt</div>
-                <div class="notif-subtitle" id="notifAuthor">+100 Punkte</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quote Display -->
-    <div id="quoteDisplay" class="notification hidden">
-        <div class="notif-content">
-            <div class="notif-icon">💭</div>
-            <div class="notif-text">
-                <div class="notif-quote" id="quoteText"></div>
-                <div class="notif-author" id="quoteAuthor"></div>
-            </div>
-        </div>
-    </div>
-
-    <script src="game.js"></script>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>

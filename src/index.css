@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global Styles */
+@layer base {
+  * {
+    @apply box-border;
+  }
+
+  body {
+    @apply m-0 p-0 font-display bg-field-green text-white antialiased;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    touch-action: manipulation;
+  }
+
+  #root {
+    @apply min-h-screen w-full;
+  }
+
+  button {
+    @apply cursor-pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  input {
+    @apply text-gray-900;
+  }
+}
+
+/* Custom Utilities */
+@layer utilities {
+  .btn-primary {
+    @apply bg-msv-blue text-white font-bold py-3 px-6 rounded-lg shadow-lg
+           hover:bg-blue-700 active:scale-95 transition-all duration-150
+           text-lg min-h-[44px];
+  }
+
+  .btn-secondary {
+    @apply bg-gray-700 text-white font-semibold py-2 px-5 rounded-lg
+           hover:bg-gray-600 active:scale-95 transition-all duration-150
+           min-h-[44px];
+  }
+
+  .card {
+    @apply bg-white/10 backdrop-blur-sm rounded-xl p-4 shadow-xl border border-white/20;
+  }
+
+  .stadium-bg {
+    background: linear-gradient(135deg, #2D8659 0%, #1a5c3a 100%);
+  }
+
+  /* Animations */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.4s ease-out;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-bounce-in {
+    animation: bounceIn 0.5s ease-out;
+  }
+
+  @keyframes bounceIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.3);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+    70% {
+      transform: scale(0.9);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .animate-pulse-glow {
+    animation: pulseGlow 2s infinite;
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% {
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 40px rgba(255, 215, 0, 0.6);
+    }
+  }
+}

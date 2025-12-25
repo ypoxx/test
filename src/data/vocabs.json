@@ -1,0 +1,2802 @@
+[
+  {
+    "id": "vocab_001",
+    "english": "to run",
+    "german": "laufen",
+    "exampleSentence": "The striker runs towards the goal",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_002",
+    "english": "to kick",
+    "german": "treten, schießen",
+    "exampleSentence": "He kicks the ball into the net",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_003",
+    "english": "to score",
+    "german": "ein Tor schießen",
+    "exampleSentence": "MSV Duisburg scores in the last minute",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_004",
+    "english": "to pass",
+    "german": "passen, abgeben",
+    "exampleSentence": "The midfielder passes the ball to his teammate",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_005",
+    "english": "to win",
+    "german": "gewinnen",
+    "exampleSentence": "Our team wants to win the match",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_006",
+    "english": "to lose",
+    "german": "verlieren",
+    "exampleSentence": "They don't want to lose against Bayern",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_007",
+    "english": "to train",
+    "german": "trainieren",
+    "exampleSentence": "The players train every day",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_008",
+    "english": "to catch",
+    "german": "fangen",
+    "exampleSentence": "The goalkeeper catches the ball",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_009",
+    "english": "to jump",
+    "german": "springen",
+    "exampleSentence": "He jumps high to head the ball",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_010",
+    "english": "to tackle",
+    "german": "tackling machen, grätschen",
+    "exampleSentence": "The defender tackles the opponent",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_011",
+    "english": "goal",
+    "german": "Tor",
+    "exampleSentence": "What a beautiful goal by the striker!",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_012",
+    "english": "ball",
+    "german": "Ball",
+    "exampleSentence": "Pass me the ball!",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_013",
+    "english": "team",
+    "german": "Mannschaft, Team",
+    "exampleSentence": "MSV Duisburg is my favorite team",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_014",
+    "english": "player",
+    "german": "Spieler",
+    "exampleSentence": "He is the best player in the team",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_015",
+    "english": "coach",
+    "german": "Trainer",
+    "exampleSentence": "The coach gives instructions from the sideline",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_016",
+    "english": "stadium",
+    "german": "Stadion",
+    "exampleSentence": "The stadium is full of fans",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_017",
+    "english": "match",
+    "german": "Spiel",
+    "exampleSentence": "The match starts at 3 o'clock",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_018",
+    "english": "to defend",
+    "german": "verteidigen",
+    "exampleSentence": "We need to defend better",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_019",
+    "english": "to attack",
+    "german": "angreifen",
+    "exampleSentence": "The team attacks with five players",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_020",
+    "english": "goalkeeper",
+    "german": "Torwart",
+    "exampleSentence": "The goalkeeper saves the penalty",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_021",
+    "english": "striker",
+    "german": "Stürmer",
+    "exampleSentence": "The striker scores two goals",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_022",
+    "english": "defender",
+    "german": "Verteidiger",
+    "exampleSentence": "The defender blocks the shot",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_023",
+    "english": "midfielder",
+    "german": "Mittelfeldspieler",
+    "exampleSentence": "The midfielder controls the game",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_024",
+    "english": "referee",
+    "german": "Schiedsrichter",
+    "exampleSentence": "The referee shows a yellow card",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_025",
+    "english": "fan",
+    "german": "Fan",
+    "exampleSentence": "The fans cheer for their team",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_026",
+    "english": "jersey",
+    "german": "Trikot",
+    "exampleSentence": "He wears the blue and white MSV jersey",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_027",
+    "english": "penalty",
+    "german": "Elfmeter",
+    "exampleSentence": "The referee gives a penalty",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_028",
+    "english": "corner",
+    "german": "Ecke, Eckball",
+    "exampleSentence": "We get a corner kick",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_029",
+    "english": "offside",
+    "german": "Abseits",
+    "exampleSentence": "The goal doesn't count, it's offside",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_030",
+    "english": "to dribble",
+    "german": "dribbeln",
+    "exampleSentence": "He dribbles past three defenders",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_031",
+    "english": "to shoot",
+    "german": "schießen",
+    "exampleSentence": "He shoots from 20 meters",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_032",
+    "english": "to save",
+    "german": "retten, halten",
+    "exampleSentence": "The goalkeeper saves the shot",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_033",
+    "english": "half-time",
+    "german": "Halbzeit",
+    "exampleSentence": "The score at half-time is 1-1",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_034",
+    "english": "championship",
+    "german": "Meisterschaft",
+    "exampleSentence": "They won the championship last year",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_035",
+    "english": "tournament",
+    "german": "Turnier",
+    "exampleSentence": "The World Cup is a big tournament",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_036",
+    "english": "to celebrate",
+    "german": "feiern",
+    "exampleSentence": "The players celebrate the victory",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_037",
+    "english": "trophy",
+    "german": "Pokal",
+    "exampleSentence": "They lift the trophy",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_038",
+    "english": "foul",
+    "german": "Foul",
+    "exampleSentence": "That was a clear foul",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_039",
+    "english": "substitute",
+    "german": "Auswechselspieler, Ersatzspieler",
+    "exampleSentence": "The coach brings on a substitute",
+    "category": "sport",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_040",
+    "english": "to whistle",
+    "german": "pfeifen",
+    "exampleSentence": "The referee whistles for full-time",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_041",
+    "english": "pitch",
+    "german": "Spielfeld",
+    "exampleSentence": "The pitch is in perfect condition",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_042",
+    "english": "captain",
+    "german": "Kapitän",
+    "exampleSentence": "The captain leads the team",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_043",
+    "english": "league",
+    "german": "Liga",
+    "exampleSentence": "MSV plays in the third league",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_044",
+    "english": "season",
+    "german": "Saison",
+    "exampleSentence": "This season we play better",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_045",
+    "english": "opponent",
+    "german": "Gegner",
+    "exampleSentence": "Our opponent today is very strong",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_046",
+    "english": "fitness",
+    "german": "Fitness",
+    "exampleSentence": "Good fitness is important for football",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_047",
+    "english": "injury",
+    "german": "Verletzung",
+    "exampleSentence": "The player has an injury",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_048",
+    "english": "to practice",
+    "german": "üben",
+    "exampleSentence": "We practice free kicks after training",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_049",
+    "english": "competitive",
+    "german": "wettbewerbsorientiert",
+    "exampleSentence": "Football is a very competitive sport",
+    "category": "sport",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_050",
+    "english": "teamwork",
+    "german": "Teamarbeit",
+    "exampleSentence": "Good teamwork wins matches",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_051",
+    "english": "to cheer",
+    "german": "anfeuern, jubeln",
+    "exampleSentence": "The fans cheer loudly",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_052",
+    "english": "victory",
+    "german": "Sieg",
+    "exampleSentence": "What a great victory!",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_053",
+    "english": "defeat",
+    "german": "Niederlage",
+    "exampleSentence": "They suffered a heavy defeat",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_054",
+    "english": "draw",
+    "german": "Unentschieden",
+    "exampleSentence": "The match ends in a 2-2 draw",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_055",
+    "english": "to head",
+    "german": "köpfen",
+    "exampleSentence": "He heads the ball into the goal",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_056",
+    "english": "free kick",
+    "german": "Freistoß",
+    "exampleSentence": "We get a free kick near the goal",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_057",
+    "english": "crossbar",
+    "german": "Querlatte",
+    "exampleSentence": "The ball hits the crossbar",
+    "category": "sport",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_058",
+    "english": "net",
+    "german": "Netz",
+    "exampleSentence": "The ball is in the net!",
+    "category": "sport",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_059",
+    "english": "to warm up",
+    "german": "aufwärmen",
+    "exampleSentence": "The players warm up before the match",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_060",
+    "english": "tactics",
+    "german": "Taktik",
+    "exampleSentence": "The coach explains the tactics",
+    "category": "sport",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_061",
+    "english": "comeback",
+    "german": "Aufholjagd, Comeback",
+    "exampleSentence": "They make an amazing comeback",
+    "category": "sport",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_062",
+    "english": "extra time",
+    "german": "Verlängerung",
+    "exampleSentence": "The match goes to extra time",
+    "category": "sport",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_063",
+    "english": "yellow card",
+    "german": "Gelbe Karte",
+    "exampleSentence": "The player receives a yellow card",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_064",
+    "english": "red card",
+    "german": "Rote Karte",
+    "exampleSentence": "He gets a red card and must leave",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_065",
+    "english": "to block",
+    "german": "blocken",
+    "exampleSentence": "The defender blocks the shot",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_066",
+    "english": "formation",
+    "german": "Aufstellung",
+    "exampleSentence": "They play in a 4-4-2 formation",
+    "category": "sport",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_067",
+    "english": "to intercept",
+    "german": "abfangen",
+    "exampleSentence": "He intercepts the pass",
+    "category": "sport",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_068",
+    "english": "possession",
+    "german": "Ballbesitz",
+    "exampleSentence": "We have 60% possession",
+    "category": "sport",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_069",
+    "english": "assist",
+    "german": "Vorlage",
+    "exampleSentence": "He gets an assist for the goal",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_070",
+    "english": "to score a hat-trick",
+    "german": "drei Tore schießen",
+    "exampleSentence": "The striker scores a hat-trick",
+    "category": "sport",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_071",
+    "english": "handball",
+    "german": "Handspiel",
+    "exampleSentence": "The referee calls handball",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_072",
+    "english": "throw-in",
+    "german": "Einwurf",
+    "exampleSentence": "We get a throw-in",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_073",
+    "english": "substitution",
+    "german": "Auswechslung",
+    "exampleSentence": "The coach makes a substitution",
+    "category": "sport",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_074",
+    "english": "to equalize",
+    "german": "ausgleichen",
+    "exampleSentence": "They equalize in the 89th minute",
+    "category": "sport",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_075",
+    "english": "decisive",
+    "german": "entscheidend",
+    "exampleSentence": "This is the decisive match",
+    "category": "sport",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_076",
+    "english": "skillful",
+    "german": "geschickt",
+    "exampleSentence": "He is a very skillful player",
+    "category": "sport",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_077",
+    "english": "aggressive",
+    "german": "aggressiv",
+    "exampleSentence": "Their style is very aggressive",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_078",
+    "english": "professional",
+    "german": "professionell",
+    "exampleSentence": "He is a professional footballer",
+    "category": "sport",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_079",
+    "english": "amateur",
+    "german": "Amateur",
+    "exampleSentence": "They are still amateur players",
+    "category": "sport",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_080",
+    "english": "legendary",
+    "german": "legendär",
+    "exampleSentence": "That was a legendary match",
+    "category": "sport",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_081",
+    "english": "to learn",
+    "german": "lernen",
+    "exampleSentence": "I learn English at school",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_082",
+    "english": "to teach",
+    "german": "unterrichten",
+    "exampleSentence": "Mrs. Smith teaches mathematics",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_083",
+    "english": "teacher",
+    "german": "Lehrer",
+    "exampleSentence": "Our teacher is very nice",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_084",
+    "english": "student",
+    "german": "Schüler",
+    "exampleSentence": "There are 25 students in our class",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_085",
+    "english": "classroom",
+    "german": "Klassenzimmer",
+    "exampleSentence": "We sit in the classroom",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_086",
+    "english": "homework",
+    "german": "Hausaufgaben",
+    "exampleSentence": "I do my homework after school",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_087",
+    "english": "test",
+    "german": "Klassenarbeit, Test",
+    "exampleSentence": "We have a test tomorrow",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_088",
+    "english": "book",
+    "german": "Buch",
+    "exampleSentence": "Please open your book on page 10",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_089",
+    "english": "notebook",
+    "german": "Heft",
+    "exampleSentence": "Write the notes in your notebook",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_090",
+    "english": "pencil",
+    "german": "Bleistift",
+    "exampleSentence": "I need a pencil for drawing",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_091",
+    "english": "pen",
+    "german": "Stift, Kugelschreiber",
+    "exampleSentence": "Can I borrow your pen?",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_092",
+    "english": "eraser",
+    "german": "Radiergummi",
+    "exampleSentence": "I use an eraser to correct mistakes",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_093",
+    "english": "ruler",
+    "german": "Lineal",
+    "exampleSentence": "Use a ruler to draw straight lines",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_094",
+    "english": "backpack",
+    "german": "Rucksack",
+    "exampleSentence": "My backpack is very heavy",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_095",
+    "english": "lesson",
+    "german": "Unterrichtsstunde",
+    "exampleSentence": "The lesson starts at 8 o'clock",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_096",
+    "english": "subject",
+    "german": "Schulfach",
+    "exampleSentence": "My favorite subject is PE",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_097",
+    "english": "mathematics",
+    "german": "Mathematik",
+    "exampleSentence": "I have mathematics in the first lesson",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_098",
+    "english": "science",
+    "german": "Naturwissenschaften",
+    "exampleSentence": "Science is interesting",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_099",
+    "english": "history",
+    "german": "Geschichte",
+    "exampleSentence": "We learn about World War II in history",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_100",
+    "english": "geography",
+    "german": "Erdkunde",
+    "exampleSentence": "In geography we study maps",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_101",
+    "english": "art",
+    "german": "Kunst",
+    "exampleSentence": "I like art because we can paint",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_102",
+    "english": "music",
+    "german": "Musik",
+    "exampleSentence": "In music we play instruments",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_103",
+    "english": "PE (physical education)",
+    "german": "Sport",
+    "exampleSentence": "We play football in PE",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_104",
+    "english": "break",
+    "german": "Pause",
+    "exampleSentence": "We have a break at 10 o'clock",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_105",
+    "english": "timetable",
+    "german": "Stundenplan",
+    "exampleSentence": "Check your timetable for tomorrow",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_106",
+    "english": "grade",
+    "german": "Note",
+    "exampleSentence": "I got a good grade in the test",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_107",
+    "english": "exam",
+    "german": "Prüfung",
+    "exampleSentence": "The final exam is in June",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_108",
+    "english": "to answer",
+    "german": "antworten",
+    "exampleSentence": "Please answer the question",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_109",
+    "english": "question",
+    "german": "Frage",
+    "exampleSentence": "Do you have a question?",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_110",
+    "english": "to study",
+    "german": "lernen, studieren",
+    "exampleSentence": "I study for the test",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_111",
+    "english": "to write",
+    "german": "schreiben",
+    "exampleSentence": "Write your name on the paper",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_112",
+    "english": "to read",
+    "german": "lesen",
+    "exampleSentence": "Read the text on page 15",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_113",
+    "english": "to calculate",
+    "german": "rechnen",
+    "exampleSentence": "Calculate the result",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_114",
+    "english": "to explain",
+    "german": "erklären",
+    "exampleSentence": "Can you explain this to me?",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_115",
+    "english": "to understand",
+    "german": "verstehen",
+    "exampleSentence": "I don't understand the exercise",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_116",
+    "english": "difficult",
+    "german": "schwierig",
+    "exampleSentence": "This task is very difficult",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_117",
+    "english": "easy",
+    "german": "einfach, leicht",
+    "exampleSentence": "The test was easy",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_118",
+    "english": "correct",
+    "german": "richtig, korrekt",
+    "exampleSentence": "Your answer is correct",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_119",
+    "english": "wrong",
+    "german": "falsch",
+    "exampleSentence": "That's wrong, try again",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_120",
+    "english": "library",
+    "german": "Bibliothek",
+    "exampleSentence": "I borrow books from the library",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_121",
+    "english": "cafeteria",
+    "german": "Mensa, Cafeteria",
+    "exampleSentence": "We eat lunch in the cafeteria",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_122",
+    "english": "playground",
+    "german": "Schulhof",
+    "exampleSentence": "We play on the playground",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_123",
+    "english": "principal",
+    "german": "Schulleiter",
+    "exampleSentence": "The principal talks to all students",
+    "category": "school",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_124",
+    "english": "to attend",
+    "german": "besuchen, teilnehmen",
+    "exampleSentence": "I attend school every day",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_125",
+    "english": "classmate",
+    "german": "Klassenkamerad",
+    "exampleSentence": "My classmates are friendly",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_126",
+    "english": "to concentrate",
+    "german": "sich konzentrieren",
+    "exampleSentence": "Please concentrate on your work",
+    "category": "school",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_127",
+    "english": "knowledge",
+    "german": "Wissen",
+    "exampleSentence": "Reading gives you knowledge",
+    "category": "school",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_128",
+    "english": "vocabulary",
+    "german": "Wortschatz",
+    "exampleSentence": "Learn new vocabulary every day",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_129",
+    "english": "exercise",
+    "german": "Übung",
+    "exampleSentence": "Do the exercises on page 20",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_130",
+    "english": "project",
+    "german": "Projekt",
+    "exampleSentence": "We work on a group project",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_131",
+    "english": "presentation",
+    "german": "Präsentation, Vortrag",
+    "exampleSentence": "I give a presentation about football",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_132",
+    "english": "dictionary",
+    "german": "Wörterbuch",
+    "exampleSentence": "Look up the word in a dictionary",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_133",
+    "english": "to translate",
+    "german": "übersetzen",
+    "exampleSentence": "Translate the text into German",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_134",
+    "english": "blackboard",
+    "german": "Tafel",
+    "exampleSentence": "The teacher writes on the blackboard",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_135",
+    "english": "chalk",
+    "german": "Kreide",
+    "exampleSentence": "We need chalk for the blackboard",
+    "category": "school",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_136",
+    "english": "to practice",
+    "german": "üben",
+    "exampleSentence": "Practice makes perfect",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_137",
+    "english": "to improve",
+    "german": "verbessern",
+    "exampleSentence": "I want to improve my English",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_138",
+    "english": "mistake",
+    "german": "Fehler",
+    "exampleSentence": "Everyone makes mistakes",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_139",
+    "english": "to pay attention",
+    "german": "aufpassen",
+    "exampleSentence": "Pay attention in class",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_140",
+    "english": "schedule",
+    "german": "Zeitplan",
+    "exampleSentence": "Check the schedule for exams",
+    "category": "school",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_141",
+    "english": "assignment",
+    "german": "Aufgabe",
+    "exampleSentence": "Hand in your assignment tomorrow",
+    "category": "school",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_142",
+    "english": "semester",
+    "german": "Halbjahr, Semester",
+    "exampleSentence": "This is the second semester",
+    "category": "school",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_143",
+    "english": "to graduate",
+    "german": "Abschluss machen",
+    "exampleSentence": "I will graduate in a few years",
+    "category": "school",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_144",
+    "english": "report card",
+    "german": "Zeugnis",
+    "exampleSentence": "I get my report card in summer",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_145",
+    "english": "chemistry",
+    "german": "Chemie",
+    "exampleSentence": "We do experiments in chemistry",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_146",
+    "english": "biology",
+    "german": "Biologie",
+    "exampleSentence": "Biology is about living things",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_147",
+    "english": "physics",
+    "german": "Physik",
+    "exampleSentence": "Physics explains how things work",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_148",
+    "english": "literature",
+    "german": "Literatur",
+    "exampleSentence": "We read classic literature",
+    "category": "school",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_149",
+    "english": "language",
+    "german": "Sprache",
+    "exampleSentence": "English is an important language",
+    "category": "school",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_150",
+    "english": "foreign",
+    "german": "fremd, ausländisch",
+    "exampleSentence": "I learn a foreign language",
+    "category": "school",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_151",
+    "english": "mother",
+    "german": "Mutter",
+    "exampleSentence": "My mother cooks dinner",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_152",
+    "english": "father",
+    "german": "Vater",
+    "exampleSentence": "My father works in an office",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_153",
+    "english": "parents",
+    "german": "Eltern",
+    "exampleSentence": "My parents watch the match with me",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_154",
+    "english": "brother",
+    "german": "Bruder",
+    "exampleSentence": "I have one brother",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_155",
+    "english": "sister",
+    "german": "Schwester",
+    "exampleSentence": "My sister is older than me",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_156",
+    "english": "grandmother",
+    "german": "Großmutter",
+    "exampleSentence": "My grandmother lives nearby",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_157",
+    "english": "grandfather",
+    "german": "Großvater",
+    "exampleSentence": "My grandfather tells great stories",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_158",
+    "english": "grandparents",
+    "german": "Großeltern",
+    "exampleSentence": "I visit my grandparents on Sundays",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_159",
+    "english": "uncle",
+    "german": "Onkel",
+    "exampleSentence": "My uncle takes me to football matches",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_160",
+    "english": "aunt",
+    "german": "Tante",
+    "exampleSentence": "My aunt is very kind",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_161",
+    "english": "cousin",
+    "german": "Cousin, Cousine",
+    "exampleSentence": "My cousin plays football too",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_162",
+    "english": "family",
+    "german": "Familie",
+    "exampleSentence": "My family supports MSV Duisburg",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_163",
+    "english": "to live",
+    "german": "wohnen, leben",
+    "exampleSentence": "We live in Duisburg",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_164",
+    "english": "house",
+    "german": "Haus",
+    "exampleSentence": "We have a house with a garden",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_165",
+    "english": "apartment",
+    "german": "Wohnung",
+    "exampleSentence": "They live in an apartment",
+    "category": "family",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_166",
+    "english": "room",
+    "german": "Zimmer",
+    "exampleSentence": "I have my own room",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_167",
+    "english": "bedroom",
+    "german": "Schlafzimmer",
+    "exampleSentence": "My bedroom is upstairs",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_168",
+    "english": "kitchen",
+    "german": "Küche",
+    "exampleSentence": "We eat breakfast in the kitchen",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_169",
+    "english": "living room",
+    "german": "Wohnzimmer",
+    "exampleSentence": "We watch TV in the living room",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_170",
+    "english": "bathroom",
+    "german": "Badezimmer",
+    "exampleSentence": "The bathroom is clean",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_171",
+    "english": "garden",
+    "german": "Garten",
+    "exampleSentence": "We play football in the garden",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_172",
+    "english": "pet",
+    "german": "Haustier",
+    "exampleSentence": "Do you have a pet?",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_173",
+    "english": "dog",
+    "german": "Hund",
+    "exampleSentence": "Our dog is called Max",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_174",
+    "english": "cat",
+    "german": "Katze",
+    "exampleSentence": "The cat sleeps on the sofa",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_175",
+    "english": "to cook",
+    "german": "kochen",
+    "exampleSentence": "My dad cooks pasta",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_176",
+    "english": "to help",
+    "german": "helfen",
+    "exampleSentence": "I help my mother in the kitchen",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_177",
+    "english": "to clean",
+    "german": "putzen, sauber machen",
+    "exampleSentence": "We clean the house on Saturdays",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_178",
+    "english": "to visit",
+    "german": "besuchen",
+    "exampleSentence": "We visit our grandparents",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_179",
+    "english": "birthday",
+    "german": "Geburtstag",
+    "exampleSentence": "Today is my sister's birthday",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_180",
+    "english": "present",
+    "german": "Geschenk",
+    "exampleSentence": "I get a present for my birthday",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_181",
+    "english": "party",
+    "german": "Party, Feier",
+    "exampleSentence": "We have a birthday party",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_182",
+    "english": "to celebrate",
+    "german": "feiern",
+    "exampleSentence": "We celebrate Christmas together",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_183",
+    "english": "vacation",
+    "german": "Urlaub",
+    "exampleSentence": "We go on vacation in summer",
+    "category": "family",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_184",
+    "english": "together",
+    "german": "zusammen",
+    "exampleSentence": "We play together",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_185",
+    "english": "to love",
+    "german": "lieben",
+    "exampleSentence": "I love my family",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_186",
+    "english": "to care",
+    "german": "sich kümmern",
+    "exampleSentence": "My parents care for me",
+    "category": "family",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_187",
+    "english": "baby",
+    "german": "Baby",
+    "exampleSentence": "My aunt has a baby",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_188",
+    "english": "child",
+    "german": "Kind",
+    "exampleSentence": "Every child likes to play",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_189",
+    "english": "adult",
+    "german": "Erwachsener",
+    "exampleSentence": "Adults have to work",
+    "category": "family",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_190",
+    "english": "young",
+    "german": "jung",
+    "exampleSentence": "I am still young",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_191",
+    "english": "old",
+    "german": "alt",
+    "exampleSentence": "My grandfather is old",
+    "category": "family",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_192",
+    "english": "to grow up",
+    "german": "aufwachsen",
+    "exampleSentence": "I grow up in Duisburg",
+    "category": "family",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_193",
+    "english": "to marry",
+    "german": "heiraten",
+    "exampleSentence": "My parents married 15 years ago",
+    "category": "family",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_194",
+    "english": "wedding",
+    "german": "Hochzeit",
+    "exampleSentence": "The wedding is next month",
+    "category": "family",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_195",
+    "english": "relative",
+    "german": "Verwandter",
+    "exampleSentence": "All our relatives come to the party",
+    "category": "family",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_196",
+    "english": "neighbor",
+    "german": "Nachbar",
+    "exampleSentence": "Our neighbor is very friendly",
+    "category": "family",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_197",
+    "english": "stepfather",
+    "german": "Stiefvater",
+    "exampleSentence": "Her stepfather is nice",
+    "category": "family",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_198",
+    "english": "stepmother",
+    "german": "Stiefmutter",
+    "exampleSentence": "His stepmother helps him",
+    "category": "family",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_199",
+    "english": "twin",
+    "german": "Zwilling",
+    "exampleSentence": "They are twins",
+    "category": "family",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_200",
+    "english": "offspring",
+    "german": "Nachkommen",
+    "exampleSentence": "Parents and their offspring",
+    "category": "family",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_201",
+    "english": "to eat",
+    "german": "essen",
+    "exampleSentence": "I eat pizza after the match",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_202",
+    "english": "to drink",
+    "german": "trinken",
+    "exampleSentence": "I drink water",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_203",
+    "english": "to sleep",
+    "german": "schlafen",
+    "exampleSentence": "I sleep eight hours",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_204",
+    "english": "to wake up",
+    "german": "aufwachen",
+    "exampleSentence": "I wake up at 7 o'clock",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_205",
+    "english": "to get up",
+    "german": "aufstehen",
+    "exampleSentence": "I get up early",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_206",
+    "english": "breakfast",
+    "german": "Frühstück",
+    "exampleSentence": "I have breakfast at home",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_207",
+    "english": "lunch",
+    "german": "Mittagessen",
+    "exampleSentence": "We eat lunch at school",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_208",
+    "english": "dinner",
+    "german": "Abendessen",
+    "exampleSentence": "Dinner is at 6 o'clock",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_209",
+    "english": "food",
+    "german": "Essen",
+    "exampleSentence": "This food is delicious",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_210",
+    "english": "bread",
+    "german": "Brot",
+    "exampleSentence": "I eat bread with butter",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_211",
+    "english": "cheese",
+    "german": "Käse",
+    "exampleSentence": "I like cheese on my sandwich",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_212",
+    "english": "meat",
+    "german": "Fleisch",
+    "exampleSentence": "We have meat for dinner",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_213",
+    "english": "chicken",
+    "german": "Hähnchen",
+    "exampleSentence": "Chicken tastes good",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_214",
+    "english": "fish",
+    "german": "Fisch",
+    "exampleSentence": "Fish is healthy",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_215",
+    "english": "vegetables",
+    "german": "Gemüse",
+    "exampleSentence": "Eat your vegetables!",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_216",
+    "english": "fruit",
+    "german": "Obst",
+    "exampleSentence": "Fruit is sweet and healthy",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_217",
+    "english": "apple",
+    "german": "Apfel",
+    "exampleSentence": "An apple a day keeps the doctor away",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_218",
+    "english": "banana",
+    "german": "Banane",
+    "exampleSentence": "I eat a banana before the match",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_219",
+    "english": "orange",
+    "german": "Orange",
+    "exampleSentence": "Oranges have vitamin C",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_220",
+    "english": "potato",
+    "german": "Kartoffel",
+    "exampleSentence": "We have potatoes and meat",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_221",
+    "english": "rice",
+    "german": "Reis",
+    "exampleSentence": "Rice is a side dish",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_222",
+    "english": "pasta",
+    "german": "Nudeln",
+    "exampleSentence": "I love pasta with tomato sauce",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_223",
+    "english": "pizza",
+    "german": "Pizza",
+    "exampleSentence": "We order pizza on match days",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_224",
+    "english": "cake",
+    "german": "Kuchen",
+    "exampleSentence": "There is cake for dessert",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_225",
+    "english": "chocolate",
+    "german": "Schokolade",
+    "exampleSentence": "I like chocolate ice cream",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_226",
+    "english": "milk",
+    "german": "Milch",
+    "exampleSentence": "I drink milk for breakfast",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_227",
+    "english": "water",
+    "german": "Wasser",
+    "exampleSentence": "Water is important for athletes",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_228",
+    "english": "juice",
+    "german": "Saft",
+    "exampleSentence": "I drink orange juice",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_229",
+    "english": "tea",
+    "german": "Tee",
+    "exampleSentence": "My grandma drinks tea",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_230",
+    "english": "coffee",
+    "german": "Kaffee",
+    "exampleSentence": "My parents drink coffee",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_231",
+    "english": "to buy",
+    "german": "kaufen",
+    "exampleSentence": "I buy a new football",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_232",
+    "english": "to sell",
+    "german": "verkaufen",
+    "exampleSentence": "They sell tickets for the match",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_233",
+    "english": "shop",
+    "german": "Geschäft, Laden",
+    "exampleSentence": "I go to the shop",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_234",
+    "english": "supermarket",
+    "german": "Supermarkt",
+    "exampleSentence": "We buy food at the supermarket",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_235",
+    "english": "money",
+    "german": "Geld",
+    "exampleSentence": "I save money for a new jersey",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_236",
+    "english": "expensive",
+    "german": "teuer",
+    "exampleSentence": "The shoes are expensive",
+    "category": "everyday",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_237",
+    "english": "cheap",
+    "german": "billig, günstig",
+    "exampleSentence": "This ball is cheap",
+    "category": "everyday",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_238",
+    "english": "to wear",
+    "german": "tragen",
+    "exampleSentence": "I wear my MSV jersey",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_239",
+    "english": "clothes",
+    "german": "Kleidung",
+    "exampleSentence": "I need new clothes",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_240",
+    "english": "shirt",
+    "german": "Hemd, T-Shirt",
+    "exampleSentence": "I wear a blue shirt",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_241",
+    "english": "trousers",
+    "german": "Hose",
+    "exampleSentence": "These trousers are comfortable",
+    "category": "everyday",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_242",
+    "english": "shoes",
+    "german": "Schuhe",
+    "exampleSentence": "I need football shoes",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_243",
+    "english": "jacket",
+    "german": "Jacke",
+    "exampleSentence": "It's cold, wear a jacket",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_244",
+    "english": "cap",
+    "german": "Mütze, Kappe",
+    "exampleSentence": "I wear my MSV cap",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_245",
+    "english": "to watch",
+    "german": "schauen, ansehen",
+    "exampleSentence": "I watch football on TV",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_246",
+    "english": "television",
+    "german": "Fernsehen",
+    "exampleSentence": "The match is on television",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_247",
+    "english": "to play",
+    "german": "spielen",
+    "exampleSentence": "We play football every day",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_248",
+    "english": "to listen",
+    "german": "zuhören",
+    "exampleSentence": "I listen to music",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_249",
+    "english": "music",
+    "german": "Musik",
+    "exampleSentence": "Music makes me happy",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_250",
+    "english": "movie",
+    "german": "Film",
+    "exampleSentence": "We watch a movie tonight",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_251",
+    "english": "friend",
+    "german": "Freund",
+    "exampleSentence": "My friend plays football with me",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_252",
+    "english": "to meet",
+    "german": "treffen",
+    "exampleSentence": "I meet my friends after school",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_253",
+    "english": "to talk",
+    "german": "reden, sprechen",
+    "exampleSentence": "We talk about football",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_254",
+    "english": "to laugh",
+    "german": "lachen",
+    "exampleSentence": "We laugh together",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_255",
+    "english": "to cry",
+    "german": "weinen",
+    "exampleSentence": "Don't cry, it's just a game",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_256",
+    "english": "happy",
+    "german": "glücklich",
+    "exampleSentence": "I am happy when we win",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_257",
+    "english": "sad",
+    "german": "traurig",
+    "exampleSentence": "I feel sad when we lose",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_258",
+    "english": "angry",
+    "german": "wütend",
+    "exampleSentence": "The coach is angry about the mistake",
+    "category": "everyday",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_259",
+    "english": "tired",
+    "german": "müde",
+    "exampleSentence": "I am tired after training",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_260",
+    "english": "excited",
+    "german": "aufgeregt",
+    "exampleSentence": "I am excited about the match",
+    "category": "everyday",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_261",
+    "english": "to walk",
+    "german": "gehen, laufen",
+    "exampleSentence": "I walk to school",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_262",
+    "english": "to ride",
+    "german": "fahren (Fahrrad)",
+    "exampleSentence": "I ride my bike",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_263",
+    "english": "bicycle",
+    "german": "Fahrrad",
+    "exampleSentence": "My bicycle is blue",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_264",
+    "english": "car",
+    "german": "Auto",
+    "exampleSentence": "My dad drives a car",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_265",
+    "english": "bus",
+    "german": "Bus",
+    "exampleSentence": "I take the bus to the stadium",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_266",
+    "english": "train",
+    "german": "Zug",
+    "exampleSentence": "The train is fast",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_267",
+    "english": "street",
+    "german": "Straße",
+    "exampleSentence": "I live on this street",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_268",
+    "english": "city",
+    "german": "Stadt",
+    "exampleSentence": "Duisburg is my city",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_269",
+    "english": "town",
+    "german": "Kleinstadt",
+    "exampleSentence": "It's a small town",
+    "category": "everyday",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_270",
+    "english": "village",
+    "german": "Dorf",
+    "exampleSentence": "My grandparents live in a village",
+    "category": "everyday",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_271",
+    "english": "to go",
+    "german": "gehen",
+    "exampleSentence": "I go to the stadium",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_272",
+    "english": "to come",
+    "german": "kommen",
+    "exampleSentence": "Come and play with us",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_273",
+    "english": "to stay",
+    "german": "bleiben",
+    "exampleSentence": "I stay at home today",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_274",
+    "english": "to open",
+    "german": "öffnen",
+    "exampleSentence": "Open the door",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_275",
+    "english": "to close",
+    "german": "schließen",
+    "exampleSentence": "Close the window",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_276",
+    "english": "to give",
+    "german": "geben",
+    "exampleSentence": "Give me the ball",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_277",
+    "english": "to take",
+    "german": "nehmen",
+    "exampleSentence": "Take this with you",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_278",
+    "english": "to bring",
+    "german": "bringen, mitbringen",
+    "exampleSentence": "Bring your football boots",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_279",
+    "english": "to put",
+    "german": "legen, stellen",
+    "exampleSentence": "Put the ball on the ground",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_280",
+    "english": "to find",
+    "german": "finden",
+    "exampleSentence": "I can't find my shoes",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_281",
+    "english": "to look for",
+    "german": "suchen",
+    "exampleSentence": "I look for my keys",
+    "category": "everyday",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_282",
+    "english": "to see",
+    "german": "sehen",
+    "exampleSentence": "I see the goal",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_283",
+    "english": "to hear",
+    "german": "hören",
+    "exampleSentence": "I hear the referee's whistle",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_284",
+    "english": "to smell",
+    "german": "riechen",
+    "exampleSentence": "I smell the fresh grass",
+    "category": "everyday",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_285",
+    "english": "to taste",
+    "german": "schmecken",
+    "exampleSentence": "This pizza tastes great",
+    "category": "everyday",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_286",
+    "english": "to feel",
+    "german": "fühlen",
+    "exampleSentence": "I feel good today",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_287",
+    "english": "to think",
+    "german": "denken",
+    "exampleSentence": "I think we will win",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_288",
+    "english": "to know",
+    "german": "wissen",
+    "exampleSentence": "I know the answer",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_289",
+    "english": "to remember",
+    "german": "sich erinnern",
+    "exampleSentence": "I remember the great match",
+    "category": "everyday",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_290",
+    "english": "to forget",
+    "german": "vergessen",
+    "exampleSentence": "Don't forget your homework",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_291",
+    "english": "to want",
+    "german": "wollen",
+    "exampleSentence": "I want to play football",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_292",
+    "english": "to need",
+    "german": "brauchen",
+    "exampleSentence": "I need new shoes",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_293",
+    "english": "to like",
+    "german": "mögen",
+    "exampleSentence": "I like pizza",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_294",
+    "english": "to prefer",
+    "german": "bevorzugen, lieber mögen",
+    "exampleSentence": "I prefer playing to watching",
+    "category": "everyday",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_295",
+    "english": "to hope",
+    "german": "hoffen",
+    "exampleSentence": "I hope we win today",
+    "category": "everyday",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_296",
+    "english": "to try",
+    "german": "versuchen",
+    "exampleSentence": "Try your best!",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_297",
+    "english": "to work",
+    "german": "arbeiten",
+    "exampleSentence": "My parents work hard",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_298",
+    "english": "to start",
+    "german": "starten, anfangen",
+    "exampleSentence": "The match starts soon",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_299",
+    "english": "to finish",
+    "german": "beenden",
+    "exampleSentence": "I finish my homework",
+    "category": "everyday",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_300",
+    "english": "to continue",
+    "german": "fortfahren, weitermachen",
+    "exampleSentence": "Continue playing!",
+    "category": "everyday",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_301",
+    "english": "tree",
+    "german": "Baum",
+    "exampleSentence": "The ball is stuck in the tree",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_302",
+    "english": "flower",
+    "german": "Blume",
+    "exampleSentence": "Flowers grow in the garden",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_303",
+    "english": "grass",
+    "german": "Gras",
+    "exampleSentence": "We play on the grass",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_304",
+    "english": "forest",
+    "german": "Wald",
+    "exampleSentence": "The forest is green",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_305",
+    "english": "mountain",
+    "german": "Berg",
+    "exampleSentence": "The mountain is very high",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_306",
+    "english": "river",
+    "german": "Fluss",
+    "exampleSentence": "The Rhine is a big river",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_307",
+    "english": "lake",
+    "german": "See",
+    "exampleSentence": "We swim in the lake",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_308",
+    "english": "sea",
+    "german": "Meer",
+    "exampleSentence": "We go to the sea in summer",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_309",
+    "english": "ocean",
+    "german": "Ozean",
+    "exampleSentence": "The ocean is very big",
+    "category": "nature",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_310",
+    "english": "beach",
+    "german": "Strand",
+    "exampleSentence": "We play beach football",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_311",
+    "english": "island",
+    "german": "Insel",
+    "exampleSentence": "The island is beautiful",
+    "category": "nature",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_312",
+    "english": "sky",
+    "german": "Himmel",
+    "exampleSentence": "The sky is blue",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_313",
+    "english": "cloud",
+    "german": "Wolke",
+    "exampleSentence": "There are clouds in the sky",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_314",
+    "english": "sun",
+    "german": "Sonne",
+    "exampleSentence": "The sun is shining",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_315",
+    "english": "moon",
+    "german": "Mond",
+    "exampleSentence": "We see the moon at night",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_316",
+    "english": "star",
+    "german": "Stern",
+    "exampleSentence": "The stars shine brightly",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_317",
+    "english": "rain",
+    "german": "Regen",
+    "exampleSentence": "The match is cancelled because of rain",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_318",
+    "english": "snow",
+    "german": "Schnee",
+    "exampleSentence": "We can't play in the snow",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_319",
+    "english": "wind",
+    "german": "Wind",
+    "exampleSentence": "The wind is strong today",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_320",
+    "english": "storm",
+    "german": "Sturm",
+    "exampleSentence": "The storm is dangerous",
+    "category": "nature",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_321",
+    "english": "weather",
+    "german": "Wetter",
+    "exampleSentence": "The weather is good for football",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_322",
+    "english": "hot",
+    "german": "heiß",
+    "exampleSentence": "It's very hot today",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_323",
+    "english": "cold",
+    "german": "kalt",
+    "exampleSentence": "It's cold in winter",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_324",
+    "english": "warm",
+    "german": "warm",
+    "exampleSentence": "The weather is warm and sunny",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_325",
+    "english": "cool",
+    "german": "kühl",
+    "exampleSentence": "The evening is cool",
+    "category": "nature",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_326",
+    "english": "season",
+    "german": "Jahreszeit",
+    "exampleSentence": "Summer is my favorite season",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_327",
+    "english": "spring",
+    "german": "Frühling",
+    "exampleSentence": "Flowers bloom in spring",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_328",
+    "english": "summer",
+    "german": "Sommer",
+    "exampleSentence": "We have vacation in summer",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_329",
+    "english": "autumn",
+    "german": "Herbst",
+    "exampleSentence": "Leaves fall in autumn",
+    "category": "nature",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_330",
+    "english": "winter",
+    "german": "Winter",
+    "exampleSentence": "Winter is the cold season",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_331",
+    "english": "animal",
+    "german": "Tier",
+    "exampleSentence": "I like animals",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_332",
+    "english": "bird",
+    "german": "Vogel",
+    "exampleSentence": "Birds fly in the sky",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_333",
+    "english": "horse",
+    "german": "Pferd",
+    "exampleSentence": "The horse runs fast",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_334",
+    "english": "cow",
+    "german": "Kuh",
+    "exampleSentence": "Cows give milk",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_335",
+    "english": "pig",
+    "german": "Schwein",
+    "exampleSentence": "Pigs live on a farm",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_336",
+    "english": "sheep",
+    "german": "Schaf",
+    "exampleSentence": "Sheep have wool",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_337",
+    "english": "rabbit",
+    "german": "Kaninchen",
+    "exampleSentence": "Rabbits are cute",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_338",
+    "english": "mouse",
+    "german": "Maus",
+    "exampleSentence": "The mouse is small",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_339",
+    "english": "lion",
+    "german": "Löwe",
+    "exampleSentence": "The lion is the king of animals",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_340",
+    "english": "elephant",
+    "german": "Elefant",
+    "exampleSentence": "Elephants are big",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_341",
+    "english": "monkey",
+    "german": "Affe",
+    "exampleSentence": "Monkeys climb trees",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_342",
+    "english": "bear",
+    "german": "Bär",
+    "exampleSentence": "Bears are strong",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_343",
+    "english": "wolf",
+    "german": "Wolf",
+    "exampleSentence": "Wolves live in packs",
+    "category": "nature",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_344",
+    "english": "fox",
+    "german": "Fuchs",
+    "exampleSentence": "The fox is clever",
+    "category": "nature",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_345",
+    "english": "butterfly",
+    "german": "Schmetterling",
+    "exampleSentence": "Butterflies are colorful",
+    "category": "nature",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_346",
+    "english": "bee",
+    "german": "Biene",
+    "exampleSentence": "Bees make honey",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_347",
+    "english": "snake",
+    "german": "Schlange",
+    "exampleSentence": "Snakes have no legs",
+    "category": "nature",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_348",
+    "english": "frog",
+    "german": "Frosch",
+    "exampleSentence": "Frogs can jump",
+    "category": "nature",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_349",
+    "english": "to grow",
+    "german": "wachsen",
+    "exampleSentence": "Plants grow in spring",
+    "category": "nature",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_350",
+    "english": "environment",
+    "german": "Umwelt",
+    "exampleSentence": "We must protect the environment",
+    "category": "nature",
+    "difficulty": 3
+  }
+]
