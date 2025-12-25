@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import VocabCard from './VocabCard'
 import ScoreDisplay from './ScoreDisplay'
 import AchievementUnlocked from './AchievementUnlocked'
+import ConfettiExplosion from './ConfettiExplosion'
 import vocabsData from '../data/vocabs.json'
 import { selectVocabsForMatch } from '../utils/spacedRepetition'
 import { selectRandomOpponent, checkAnswer, calculateMatchResult, getMatchSummaryMessage } from '../utils/matchLogic'
@@ -9,6 +10,7 @@ import { updateVocabProgress, updateGoalsAndLeague, addMatchToHistory, loadProgr
 import { generateMultipleChoiceOptions } from '../utils/multipleChoice'
 import { calculateStreakBonus, getStreakMessage, getStreakEmoji, getStreakColor, triggerHapticFeedback } from '../utils/gameEffects'
 import { checkNewAchievements } from '../utils/achievements'
+import soundManager from '../utils/sounds'
 
 function Match({ progress, onMatchEnd }) {
   const [opponent] = useState(selectRandomOpponent())
@@ -23,8 +25,12 @@ function Match({ progress, onMatchEnd }) {
   const [newAchievements, setNewAchievements] = useState([])
   const [showAchievementIndex, setShowAchievementIndex] = useState(0)
   const [showingAchievement, setShowingAchievement] = useState(false)
+  const [showConfetti, setShowConfetti] = useState(false)
 
   useEffect(() => {
+    // Initialize sound system on component mount
+    soundManager.init()
+
     // Select vocabs for this match using spaced repetition
     const selectedVocabs = selectVocabsForMatch(vocabsData, progress, 10)
 
@@ -53,6 +59,9 @@ function Match({ progress, onMatchEnd }) {
       // Trigger haptic feedback for correct answer
       triggerHapticFeedback('success')
 
+      // Play goal sound! ⚽
+      soundManager.playGoal()
+
       // Check for streak bonus
       const streakBonus = calculateStreakBonus(newStreak)
       const message = getStreakMessage(newStreak)
@@ -61,6 +70,8 @@ function Match({ progress, onMatchEnd }) {
         setStreakMessage(message)
         if (streakBonus > 0) {
           triggerHapticFeedback('streak')
+          // Play streak sound with level
+          soundManager.playStreak(newStreak >= 5 ? 2 : 1)
         }
       }
 
@@ -73,6 +84,9 @@ function Match({ progress, onMatchEnd }) {
 
       // Trigger haptic feedback for wrong answer
       triggerHapticFeedback('error')
+
+      // Play wrong answer sound
+      soundManager.playWrong()
     }
 
     // Move to next vocab after a delay
@@ -118,9 +132,14 @@ function Match({ progress, onMatchEnd }) {
 
     setNewAchievements(unlockedAchievements)
 
-    // Trigger victory haptic feedback if won
+    // Trigger victory haptic feedback and sounds
     if (result.status === 'win') {
       triggerHapticFeedback('victory')
+      soundManager.playVictory()
+      soundManager.playCrowd()
+      setShowConfetti(true)
+    } else if (result.status === 'loss') {
+      soundManager.playDefeat()
     }
 
     setMatchResult(result)
@@ -159,8 +178,12 @@ function Match({ progress, onMatchEnd }) {
     const summary = getMatchSummaryMessage(matchResult, opponent)
 
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4">
-        <div className="w-full max-w-2xl">
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 stadium-scene field-pattern relative overflow-hidden">
+        {/* Floodlights */}
+        <div className="floodlight top-10 left-10" />
+        <div className="floodlight top-10 right-10" />
+
+        <div className="w-full max-w-2xl relative z-10">
           {/* Result Card */}
           <div className="card p-8 text-center mb-6">
             <div className="text-6xl mb-4">{summary.emoji}</div>
@@ -202,7 +225,7 @@ function Match({ progress, onMatchEnd }) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col p-4 pt-28">
+    <div className="min-h-screen flex flex-col p-4 pt-28 stadium-scene field-pattern relative">
       {/* Header with Score */}
       <div className="fixed top-0 left-0 right-0 bg-field-green/95 backdrop-blur-sm p-4 z-10 border-b border-white/10">
         <ScoreDisplay
@@ -214,9 +237,11 @@ function Match({ progress, onMatchEnd }) {
         {/* Streak Display */}
         {streak > 0 && (
           <div className="mt-2 text-center animate-fade-in">
-            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 ${getStreakColor(streak)}`}>
+            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 ${getStreakColor(streak)} ${streak >= 5 ? 'streak-lightning' : streak >= 3 ? 'streak-fire' : ''}`}>
               <span className="text-2xl">{getStreakEmoji(streak)}</span>
               <span className="font-bold">{streak} in Folge!</span>
+              {streak >= 5 && <span className="text-2xl">⚡</span>}
+              {streak >= 3 && streak < 5 && <span className="text-2xl">🔥</span>}
             </div>
           </div>
         )}
@@ -249,6 +274,9 @@ function Match({ progress, onMatchEnd }) {
           onClose={handleAchievementClose}
         />
       )}
+
+      {/* Confetti for victories */}
+      <ConfettiExplosion trigger={showConfetti} />
     </div>
   )
 }

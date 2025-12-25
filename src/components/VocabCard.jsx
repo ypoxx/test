@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import GoalAnimation from './GoalAnimation'
 
 function VocabCard({ vocab, options, onAnswer, currentIndex, total }) {
   const [selectedAnswer, setSelectedAnswer] = useState(null)
@@ -109,6 +110,9 @@ function VocabCard({ vocab, options, onAnswer, currentIndex, total }) {
           </div>
         </div>
       )}
+
+      {/* Goal Animation */}
+      <GoalAnimation isCorrect={showFeedback && isCorrect} />
     </div>
   )
 }

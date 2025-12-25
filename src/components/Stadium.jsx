@@ -1,13 +1,28 @@
+import { useState } from 'react'
 import LeagueProgress from './LeagueProgress'
+import TrophyCase from './TrophyCase'
 import { getVocabStats } from '../utils/spacedRepetition'
 import vocabsData from '../data/vocabs.json'
 
 function Stadium({ progress, onStartMatch }) {
   const stats = getVocabStats(vocabsData, progress)
+  const [showTrophyCase, setShowTrophyCase] = useState(false)
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-2xl">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 stadium-scene field-pattern relative overflow-hidden">
+      {/* Floodlights */}
+      <div className="floodlight top-10 left-10" />
+      <div className="floodlight top-10 right-10" />
+
+      {/* Crowd silhouette at top */}
+      <div className="crowd-silhouette absolute top-0 left-0 right-0 flex justify-around items-end px-4">
+        <div className="crowd-wave text-6xl opacity-40">👤👤👤</div>
+        <div className="crowd-wave text-6xl opacity-40">👤👤👤</div>
+        <div className="crowd-wave text-6xl opacity-40">👤👤👤</div>
+        <div className="crowd-wave text-6xl opacity-40">👤👤👤</div>
+      </div>
+
+      <div className="w-full max-w-2xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold text-white mb-2">
@@ -26,9 +41,17 @@ function Stadium({ progress, onStartMatch }) {
         {/* Start Match Button */}
         <button
           onClick={onStartMatch}
-          className="btn-primary w-full mb-6 text-xl py-4"
+          className="btn-primary w-full mb-3 text-xl py-4"
         >
           ⚽ Neues Spiel starten
+        </button>
+
+        {/* Trophy Case Button */}
+        <button
+          onClick={() => setShowTrophyCase(true)}
+          className="btn-secondary w-full mb-6 text-lg py-3"
+        >
+          🏆 Meine Trophäen ({progress.achievements?.length || 0})
         </button>
 
         {/* Stats Grid */}
@@ -102,6 +125,14 @@ function Stadium({ progress, onStartMatch }) {
           Made with ⚽ for Maurice
         </div>
       </div>
+
+      {/* Trophy Case Modal */}
+      {showTrophyCase && (
+        <TrophyCase
+          unlockedAchievementIds={progress.achievements || []}
+          onClose={() => setShowTrophyCase(false)}
+        />
+      )}
     </div>
   )
 }
