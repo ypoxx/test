@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import GoalAnimation from './GoalAnimation'
+import soundManager from '../utils/sounds'
 
 function VocabCard({ vocab, options, onAnswer, currentIndex, total }) {
   const [selectedAnswer, setSelectedAnswer] = useState(null)
@@ -8,6 +9,12 @@ function VocabCard({ vocab, options, onAnswer, currentIndex, total }) {
 
   const handleSelectAnswer = (answer) => {
     if (showFeedback) return // Prevent multiple selections
+
+    // Initialize sound on first user click!
+    if (!soundManager.initialized) {
+      soundManager.init()
+      console.log('🎵 Sound initialized on first click!')
+    }
 
     setSelectedAnswer(answer)
     const correct = answer === vocab.german
