@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import GoalAnimation from './GoalAnimation'
 
 function VocabCard({ vocab, options, onAnswer, currentIndex, total }) {
   const [selectedAnswer, setSelectedAnswer] = useState(null)
@@ -24,42 +25,42 @@ function VocabCard({ vocab, options, onAnswer, currentIndex, total }) {
   }
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-4">
+    <div className="w-full max-w-2xl mx-auto px-3 py-2">
       {/* Progress Indicator */}
-      <div className="mb-4 text-center">
-        <span className="text-white/70 text-sm">
+      <div className="mb-2 text-center">
+        <span className="text-white/70 text-xs">
           Vokabel {currentIndex + 1} / {total}
         </span>
       </div>
 
       {/* Vocab Card */}
-      <div className="card p-6 mb-6">
+      <div className="card p-4 mb-3">
         {/* English Word */}
-        <div className="text-center mb-6">
-          <div className="text-white/70 text-sm mb-2">Englisch:</div>
-          <div className="text-4xl font-bold text-white mb-4">
+        <div className="text-center mb-3">
+          <div className="text-white/70 text-xs mb-1">Englisch:</div>
+          <div className="text-2xl md:text-3xl font-bold text-white mb-2">
             {vocab.english}
           </div>
         </div>
 
         {/* Example Sentence */}
-        <div className="bg-white/5 rounded-lg p-4 mb-6">
+        <div className="bg-white/5 rounded-lg p-2 mb-3">
           <div className="text-white/70 text-xs mb-1">Beispiel:</div>
-          <div className="text-white/90 italic text-sm md:text-base">
+          <div className="text-white/90 italic text-xs md:text-sm">
             "{vocab.exampleSentence}"
           </div>
         </div>
 
         {/* Multiple Choice Options */}
-        <div className="space-y-3">
-          <div className="text-white/70 text-sm mb-2 text-center">
+        <div className="space-y-2">
+          <div className="text-white/70 text-xs mb-1 text-center">
             Wähle die richtige deutsche Übersetzung:
           </div>
           {options.map((option, index) => {
             const isSelected = selectedAnswer === option
             const isCorrectOption = option === vocab.german
 
-            let buttonClass = 'w-full px-6 py-4 rounded-lg font-semibold text-lg transition-all duration-200 '
+            let buttonClass = 'w-full px-4 py-3 rounded-lg font-semibold text-sm md:text-base transition-all duration-200 '
 
             if (!showFeedback) {
               // Before answer
@@ -95,20 +96,23 @@ function VocabCard({ vocab, options, onAnswer, currentIndex, total }) {
       {/* Feedback */}
       {showFeedback && (
         <div
-          className={`card p-6 text-center animate-bounce-in ${
+          className={`card p-4 text-center animate-bounce-in ${
             isCorrect ? 'bg-success/20 border-success' : 'bg-error/20 border-error'
           }`}
         >
-          <div className="text-5xl mb-3">
+          <div className="text-4xl mb-2">
             {isCorrect ? '⚽ TOR!' : '❌ Daneben!'}
           </div>
-          <div className="text-xl font-bold mb-2">
+          <div className="text-base md:text-lg font-bold">
             {isCorrect
               ? 'Richtig! MSV Duisburg schießt ein Tor!'
               : `Leider falsch. Richtig ist: "${vocab.german}"`}
           </div>
         </div>
       )}
+
+      {/* Goal Animation */}
+      <GoalAnimation isCorrect={showFeedback && isCorrect} />
     </div>
   )
 }

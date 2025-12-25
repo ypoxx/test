@@ -1,11 +1,16 @@
 import { useState, useEffect } from 'react'
 import VocabCard from './VocabCard'
 import ScoreDisplay from './ScoreDisplay'
+import AchievementUnlocked from './AchievementUnlocked'
+import ConfettiExplosion from './ConfettiExplosion'
 import vocabsData from '../data/vocabs.json'
 import { selectVocabsForMatch } from '../utils/spacedRepetition'
 import { selectRandomOpponent, checkAnswer, calculateMatchResult, getMatchSummaryMessage } from '../utils/matchLogic'
-import { updateVocabProgress, updateGoalsAndLeague, addMatchToHistory } from '../utils/localStorage'
+import { updateVocabProgress, updateGoalsAndLeague, addMatchToHistory, loadProgress, unlockAchievement } from '../utils/localStorage'
 import { generateMultipleChoiceOptions } from '../utils/multipleChoice'
+import { calculateStreakBonus, getStreakMessage, getStreakEmoji, getStreakColor, triggerHapticFeedback } from '../utils/gameEffects'
+import { checkNewAchievements } from '../utils/achievements'
+import soundManager from '../utils/sounds'
 
 function Match({ progress, onMatchEnd }) {
   const [opponent] = useState(selectRandomOpponent())
@@ -15,8 +20,17 @@ function Match({ progress, onMatchEnd }) {
   const [opponentGoals, setOpponentGoals] = useState(0)
   const [matchFinished, setMatchFinished] = useState(false)
   const [matchResult, setMatchResult] = useState(null)
+  const [streak, setStreak] = useState(0)
+  const [streakMessage, setStreakMessage] = useState(null)
+  const [newAchievements, setNewAchievements] = useState([])
+  const [showAchievementIndex, setShowAchievementIndex] = useState(0)
+  const [showingAchievement, setShowingAchievement] = useState(false)
+  const [showConfetti, setShowConfetti] = useState(false)
 
   useEffect(() => {
+    // Initialize sound system on component mount
+    soundManager.init()
+
     // Select vocabs for this match using spaced repetition
     const selectedVocabs = selectVocabsForMatch(vocabsData, progress, 10)
 
@@ -36,11 +50,43 @@ function Match({ progress, onMatchEnd }) {
     // Update vocab progress
     updateVocabProgress(currentVocab.id, isCorrect)
 
-    // Update score
+    // Update streak
+    let newStreak = streak
     if (isCorrect) {
-      setMsvGoals(prev => prev + 1)
+      newStreak = streak + 1
+      setStreak(newStreak)
+
+      // Trigger haptic feedback for correct answer
+      triggerHapticFeedback('success')
+
+      // Play goal sound! ⚽
+      soundManager.playGoal()
+
+      // Check for streak bonus
+      const streakBonus = calculateStreakBonus(newStreak)
+      const message = getStreakMessage(newStreak)
+
+      if (message) {
+        setStreakMessage(message)
+        if (streakBonus > 0) {
+          triggerHapticFeedback('streak')
+          // Play streak sound with level
+          soundManager.playStreak(newStreak >= 5 ? 2 : 1)
+        }
+      }
+
+      // Update score (including streak bonus)
+      setMsvGoals(prev => prev + 1 + streakBonus)
     } else {
+      setStreak(0)
+      setStreakMessage(null)
       setOpponentGoals(prev => prev + 1)
+
+      // Trigger haptic feedback for wrong answer
+      triggerHapticFeedback('error')
+
+      // Play wrong answer sound
+      soundManager.playWrong()
     }
 
     // Move to next vocab after a delay
@@ -57,10 +103,14 @@ function Match({ progress, onMatchEnd }) {
   }
 
   const finishMatch = (lastAnswerCorrect) => {
-    const finalMsvGoals = lastAnswerCorrect ? msvGoals + 1 : msvGoals
-    const finalOpponentGoals = lastAnswerCorrect ? opponentGoals : opponentGoals + 1
+    // Use current scores - they're already updated in handleAnswer!
+    const finalMsvGoals = msvGoals
+    const finalOpponentGoals = opponentGoals
 
     const result = calculateMatchResult(finalMsvGoals, vocabs.length)
+
+    // Save old progress for achievement comparison
+    const oldProgress = loadProgress()
 
     // Update progress
     updateGoalsAndLeague(finalMsvGoals)
@@ -71,12 +121,49 @@ function Match({ progress, onMatchEnd }) {
       goalsScored: finalMsvGoals
     })
 
+    // Check for new achievements
+    const newProgress = loadProgress()
+    const unlockedAchievements = checkNewAchievements(oldProgress, newProgress)
+
+    // Unlock achievements
+    unlockedAchievements.forEach(achievement => {
+      unlockAchievement(achievement.id)
+    })
+
+    setNewAchievements(unlockedAchievements)
+
+    // Trigger victory haptic feedback and sounds
+    if (result.status === 'win') {
+      triggerHapticFeedback('victory')
+      soundManager.playVictory()
+      soundManager.playCrowd()
+      setShowConfetti(true)
+    } else if (result.status === 'loss') {
+      soundManager.playDefeat()
+    }
+
     setMatchResult(result)
     setMatchFinished(true)
   }
 
   const handleContinue = () => {
-    onMatchEnd(matchResult)
+    // Simplified: Check if we have achievements to show
+    if (newAchievements.length > 0 && !showingAchievement) {
+      setShowingAchievement(true)
+    } else {
+      onMatchEnd(matchResult)
+    }
+  }
+
+  const handleAchievementClose = () => {
+    const nextIndex = showAchievementIndex + 1
+    if (nextIndex < newAchievements.length) {
+      setShowAchievementIndex(nextIndex)
+    } else {
+      setShowingAchievement(false)
+      // Go to stadium after all achievements shown
+      onMatchEnd(matchResult)
+    }
   }
 
   if (vocabs.length === 0) {
@@ -91,8 +178,12 @@ function Match({ progress, onMatchEnd }) {
     const summary = getMatchSummaryMessage(matchResult, opponent)
 
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4">
-        <div className="w-full max-w-2xl">
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 stadium-scene field-pattern relative overflow-hidden">
+        {/* Floodlights */}
+        <div className="floodlight top-10 left-10" />
+        <div className="floodlight top-10 right-10" />
+
+        <div className="w-full max-w-2xl relative z-10">
           {/* Result Card */}
           <div className="card p-8 text-center mb-6">
             <div className="text-6xl mb-4">{summary.emoji}</div>
@@ -134,7 +225,7 @@ function Match({ progress, onMatchEnd }) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col p-4 pt-20">
+    <div className="min-h-screen flex flex-col p-4 pt-28 stadium-scene field-pattern relative">
       {/* Header with Score */}
       <div className="fixed top-0 left-0 right-0 bg-field-green/95 backdrop-blur-sm p-4 z-10 border-b border-white/10">
         <ScoreDisplay
@@ -142,6 +233,27 @@ function Match({ progress, onMatchEnd }) {
           opponentGoals={opponentGoals}
           opponent={opponent}
         />
+
+        {/* Streak Display */}
+        {streak > 0 && (
+          <div className="mt-2 text-center animate-fade-in">
+            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 ${getStreakColor(streak)} ${streak >= 5 ? 'streak-lightning' : streak >= 3 ? 'streak-fire' : ''}`}>
+              <span className="text-2xl">{getStreakEmoji(streak)}</span>
+              <span className="font-bold">{streak} in Folge!</span>
+              {streak >= 5 && <span className="text-2xl">⚡</span>}
+              {streak >= 3 && streak < 5 && <span className="text-2xl">🔥</span>}
+            </div>
+          </div>
+        )}
+
+        {/* Streak Message */}
+        {streakMessage && (
+          <div className="mt-2 text-center animate-bounce-in">
+            <div className="text-sm font-bold text-yellow-300">
+              {streakMessage}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Vocab Card */}
@@ -154,6 +266,17 @@ function Match({ progress, onMatchEnd }) {
           total={vocabs.length}
         />
       </div>
+
+      {/* Achievement Unlocked Modal */}
+      {showingAchievement && newAchievements[showAchievementIndex] && (
+        <AchievementUnlocked
+          achievement={newAchievements[showAchievementIndex]}
+          onClose={handleAchievementClose}
+        />
+      )}
+
+      {/* Confetti for victories */}
+      <ConfettiExplosion trigger={showConfetti} />
     </div>
   )
 }
