@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import VocabCard from './VocabCard'
 import ScoreDisplay from './ScoreDisplay'
+import AchievementUnlocked from './AchievementUnlocked'
 import vocabsData from '../data/vocabs.json'
 import { selectVocabsForMatch } from '../utils/spacedRepetition'
 import { selectRandomOpponent, checkAnswer, calculateMatchResult, getMatchSummaryMessage } from '../utils/matchLogic'
@@ -20,6 +21,8 @@ function Match({ progress, onMatchEnd }) {
   const [streak, setStreak] = useState(0)
   const [streakMessage, setStreakMessage] = useState(null)
   const [newAchievements, setNewAchievements] = useState([])
+  const [showAchievementIndex, setShowAchievementIndex] = useState(0)
+  const [showingAchievement, setShowingAchievement] = useState(false)
 
   useEffect(() => {
     // Select vocabs for this match using spaced repetition
@@ -124,7 +127,22 @@ function Match({ progress, onMatchEnd }) {
   }
 
   const handleContinue = () => {
-    onMatchEnd(matchResult)
+    // Show achievements one by one
+    if (newAchievements.length > 0 && showAchievementIndex < newAchievements.length) {
+      setShowingAchievement(true)
+    } else {
+      onMatchEnd(matchResult)
+    }
+  }
+
+  const handleAchievementClose = () => {
+    const nextIndex = showAchievementIndex + 1
+    if (nextIndex < newAchievements.length) {
+      setShowAchievementIndex(nextIndex)
+    } else {
+      setShowingAchievement(false)
+      onMatchEnd(matchResult)
+    }
   }
 
   if (vocabs.length === 0) {
@@ -221,6 +239,14 @@ function Match({ progress, onMatchEnd }) {
           total={vocabs.length}
         />
       </div>
+
+      {/* Achievement Unlocked Modal */}
+      {showingAchievement && newAchievements[showAchievementIndex] && (
+        <AchievementUnlocked
+          achievement={newAchievements[showAchievementIndex]}
+          onClose={handleAchievementClose}
+        />
+      )}
     </div>
   )
 }
