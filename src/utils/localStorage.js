@@ -1,0 +1,202 @@
+const STORAGE_KEY = 'maurice_vocab_trainer_progress'
+
+// Initial default progress
+const DEFAULT_PROGRESS = {
+  userId: 'maurice',
+  totalGoalsScored: 0,
+  currentLeague: 'kreisliga', // kreisliga, regionalliga, zweite_liga, bundesliga
+  vocabProgress: {},
+  matchHistory: []
+}
+
+/**
+ * Save progress to localStorage
+ * @param {Object} progressData - The progress data to save
+ */
+export const saveProgress = (progressData) => {
+  try {
+    const dataToSave = {
+      ...progressData,
+      lastSaved: new Date().toISOString()
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave))
+    return true
+  } catch (error) {
+    console.error('Error saving progress:', error)
+    return false
+  }
+}
+
+/**
+ * Load progress from localStorage
+ * @returns {Object} - The loaded progress or default progress if none exists
+ */
+export const loadProgress = () => {
+  try {
+    const savedData = localStorage.getItem(STORAGE_KEY)
+
+    if (savedData) {
+      const parsed = JSON.parse(savedData)
+
+      // Ensure all required fields exist
+      return {
+        ...DEFAULT_PROGRESS,
+        ...parsed
+      }
+    }
+
+    // No saved data - return and save default progress
+    saveProgress(DEFAULT_PROGRESS)
+    return DEFAULT_PROGRESS
+  } catch (error) {
+    console.error('Error loading progress:', error)
+    return DEFAULT_PROGRESS
+  }
+}
+
+/**
+ * Reset progress to default
+ * @returns {Object} - The default progress
+ */
+export const resetProgress = () => {
+  try {
+    localStorage.removeItem(STORAGE_KEY)
+    saveProgress(DEFAULT_PROGRESS)
+    return DEFAULT_PROGRESS
+  } catch (error) {
+    console.error('Error resetting progress:', error)
+    return DEFAULT_PROGRESS
+  }
+}
+
+/**
+ * Update vocab progress for a specific vocabulary
+ * @param {string} vocabId - The ID of the vocabulary
+ * @param {boolean} wasCorrect - Whether the answer was correct
+ */
+export const updateVocabProgress = (vocabId, wasCorrect) => {
+  const progress = loadProgress()
+
+  if (!progress.vocabProgress[vocabId]) {
+    progress.vocabProgress[vocabId] = {
+      correct: 0,
+      incorrect: 0,
+      lastReviewed: null,
+      mastered: false
+    }
+  }
+
+  const vocabProgress = progress.vocabProgress[vocabId]
+
+  if (wasCorrect) {
+    vocabProgress.correct += 1
+  } else {
+    vocabProgress.incorrect += 1
+  }
+
+  vocabProgress.lastReviewed = new Date().toISOString()
+
+  // Mark as mastered if correct 5+ times and accuracy > 80%
+  const total = vocabProgress.correct + vocabProgress.incorrect
+  const accuracy = vocabProgress.correct / total
+  vocabProgress.mastered = vocabProgress.correct >= 5 && accuracy > 0.8
+
+  saveProgress(progress)
+  return progress
+}
+
+/**
+ * Add a match to history
+ * @param {Object} matchData - The match data to add
+ */
+export const addMatchToHistory = (matchData) => {
+  const progress = loadProgress()
+
+  const match = {
+    date: new Date().toISOString(),
+    ...matchData
+  }
+
+  progress.matchHistory.unshift(match) // Add to beginning
+
+  // Keep only last 20 matches
+  if (progress.matchHistory.length > 20) {
+    progress.matchHistory = progress.matchHistory.slice(0, 20)
+  }
+
+  saveProgress(progress)
+  return progress
+}
+
+/**
+ * Update total goals and league
+ * @param {number} goalsToAdd - Number of goals to add
+ */
+export const updateGoalsAndLeague = (goalsToAdd) => {
+  const progress = loadProgress()
+
+  progress.totalGoalsScored += goalsToAdd
+
+  // Update league based on total goals
+  if (progress.totalGoalsScored >= 1000) {
+    progress.currentLeague = 'bundesliga'
+  } else if (progress.totalGoalsScored >= 500) {
+    progress.currentLeague = 'zweite_liga'
+  } else if (progress.totalGoalsScored >= 200) {
+    progress.currentLeague = 'regionalliga'
+  } else {
+    progress.currentLeague = 'kreisliga'
+  }
+
+  saveProgress(progress)
+  return progress
+}
+
+/**
+ * Get league thresholds
+ */
+export const LEAGUE_THRESHOLDS = {
+  kreisliga: { min: 0, max: 199, name: 'Kreisliga', emoji: '⚽', color: '#8B4513' },
+  regionalliga: { min: 200, max: 499, name: 'Regionalliga West', emoji: '🏆', color: '#C0C0C0' },
+  zweite_liga: { min: 500, max: 999, name: '2. Bundesliga', emoji: '🥈', color: '#FFD700' },
+  bundesliga: { min: 1000, max: Infinity, name: 'Bundesliga', emoji: '👑', color: '#FFD700' }
+}
+
+/**
+ * Get progress to next league
+ * @param {number} currentGoals - Current total goals
+ * @returns {Object} - Progress info
+ */
+export const getLeagueProgress = (currentGoals) => {
+  let currentLeague = 'kreisliga'
+  let nextLeague = 'regionalliga'
+  let goalsNeeded = 200 - currentGoals
+
+  if (currentGoals >= 1000) {
+    currentLeague = 'bundesliga'
+    nextLeague = null
+    goalsNeeded = 0
+  } else if (currentGoals >= 500) {
+    currentLeague = 'zweite_liga'
+    nextLeague = 'bundesliga'
+    goalsNeeded = 1000 - currentGoals
+  } else if (currentGoals >= 200) {
+    currentLeague = 'regionalliga'
+    nextLeague = 'zweite_liga'
+    goalsNeeded = 500 - currentGoals
+  }
+
+  const currentLeagueInfo = LEAGUE_THRESHOLDS[currentLeague]
+  const progress = currentLeagueInfo.max === Infinity
+    ? 100
+    : ((currentGoals - currentLeagueInfo.min) / (currentLeagueInfo.max - currentLeagueInfo.min + 1)) * 100
+
+  return {
+    currentLeague,
+    currentLeagueInfo,
+    nextLeague,
+    nextLeagueInfo: nextLeague ? LEAGUE_THRESHOLDS[nextLeague] : null,
+    goalsNeeded,
+    progressPercent: Math.min(progress, 100)
+  }
+}
