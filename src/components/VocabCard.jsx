@@ -1,24 +1,26 @@
 import { useState } from 'react'
 
-function VocabCard({ vocab, onAnswer, currentIndex, total }) {
-  const [userAnswer, setUserAnswer] = useState('')
+function VocabCard({ vocab, options, onAnswer, currentIndex, total }) {
+  const [selectedAnswer, setSelectedAnswer] = useState(null)
   const [showFeedback, setShowFeedback] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const handleSelectAnswer = (answer) => {
+    if (showFeedback) return // Prevent multiple selections
 
-    if (!userAnswer.trim()) return
-
-    const correct = onAnswer(userAnswer.trim())
+    setSelectedAnswer(answer)
+    const correct = answer === vocab.german
     setIsCorrect(correct)
     setShowFeedback(true)
 
-    // Auto-advance after 1.5 seconds
+    // Call parent callback
+    onAnswer(answer)
+
+    // Auto-advance after 2 seconds
     setTimeout(() => {
       setShowFeedback(false)
-      setUserAnswer('')
-    }, 1500)
+      setSelectedAnswer(null)
+    }, 2000)
   }
 
   return (
@@ -35,7 +37,7 @@ function VocabCard({ vocab, onAnswer, currentIndex, total }) {
         {/* English Word */}
         <div className="text-center mb-6">
           <div className="text-white/70 text-sm mb-2">Englisch:</div>
-          <div className="text-3xl font-bold text-white mb-4">
+          <div className="text-4xl font-bold text-white mb-4">
             {vocab.english}
           </div>
         </div>
@@ -43,54 +45,66 @@ function VocabCard({ vocab, onAnswer, currentIndex, total }) {
         {/* Example Sentence */}
         <div className="bg-white/5 rounded-lg p-4 mb-6">
           <div className="text-white/70 text-xs mb-1">Beispiel:</div>
-          <div className="text-white/90 italic">
+          <div className="text-white/90 italic text-sm md:text-base">
             "{vocab.exampleSentence}"
           </div>
         </div>
 
-        {/* Input Form */}
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-white/70 text-sm mb-2">
-              Deutsche Übersetzung:
-            </label>
-            <input
-              type="text"
-              value={userAnswer}
-              onChange={(e) => setUserAnswer(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-white/10 border-2 border-white/20
-                       text-white text-lg placeholder-white/40
-                       focus:outline-none focus:border-msv-blue transition-colors"
-              placeholder="Deine Antwort..."
-              disabled={showFeedback}
-              autoFocus
-              autoComplete="off"
-            />
+        {/* Multiple Choice Options */}
+        <div className="space-y-3">
+          <div className="text-white/70 text-sm mb-2 text-center">
+            Wähle die richtige deutsche Übersetzung:
           </div>
+          {options.map((option, index) => {
+            const isSelected = selectedAnswer === option
+            const isCorrectOption = option === vocab.german
 
-          <button
-            type="submit"
-            disabled={!userAnswer.trim() || showFeedback}
-            className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Antwort prüfen
-          </button>
-        </form>
+            let buttonClass = 'w-full px-6 py-4 rounded-lg font-semibold text-lg transition-all duration-200 '
+
+            if (!showFeedback) {
+              // Before answer
+              buttonClass += 'bg-white/10 hover:bg-white/20 border-2 border-white/30 hover:border-msv-blue text-white active:scale-95'
+            } else if (isSelected && isCorrect) {
+              // Selected and correct
+              buttonClass += 'bg-success border-2 border-success text-white scale-105 shadow-lg'
+            } else if (isSelected && !isCorrect) {
+              // Selected and wrong
+              buttonClass += 'bg-error border-2 border-error text-white'
+            } else if (isCorrectOption) {
+              // Show correct answer
+              buttonClass += 'bg-success/50 border-2 border-success text-white'
+            } else {
+              // Other options (dimmed)
+              buttonClass += 'bg-white/5 border-2 border-white/10 text-white/50'
+            }
+
+            return (
+              <button
+                key={index}
+                onClick={() => handleSelectAnswer(option)}
+                disabled={showFeedback}
+                className={buttonClass}
+              >
+                {option}
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       {/* Feedback */}
       {showFeedback && (
         <div
-          className={`card p-6 text-center animate-fade-in ${
+          className={`card p-6 text-center animate-bounce-in ${
             isCorrect ? 'bg-success/20 border-success' : 'bg-error/20 border-error'
           }`}
         >
-          <div className="text-4xl mb-2">
+          <div className="text-5xl mb-3">
             {isCorrect ? '⚽ TOR!' : '❌ Daneben!'}
           </div>
           <div className="text-xl font-bold mb-2">
             {isCorrect
-              ? 'Richtig! MSV schießt ein Tor!'
+              ? 'Richtig! MSV Duisburg schießt ein Tor!'
               : `Leider falsch. Richtig ist: "${vocab.german}"`}
           </div>
         </div>
