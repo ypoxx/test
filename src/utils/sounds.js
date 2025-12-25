@@ -18,14 +18,28 @@ class SoundManager {
    * Initialize audio context (must be called after user interaction)
    */
   init() {
-    if (this.initialized) return
+    if (this.initialized) {
+      console.log('🔊 Sound already initialized')
+      return
+    }
 
     try {
       this.audioContext = new (window.AudioContext || window.webkitAudioContext)()
+
+      // Resume if suspended (browser autoplay policy)
+      if (this.audioContext.state === 'suspended') {
+        console.log('🔊 AudioContext suspended, resuming...')
+        this.audioContext.resume().then(() => {
+          console.log('✅ AudioContext resumed!')
+        })
+      }
+
       this.initialized = true
-      console.log('🔊 Sound System initialized')
+      console.log('🔊 Sound System initialized!')
+      console.log('   - State:', this.audioContext.state)
+      console.log('   - Sample Rate:', this.audioContext.sampleRate)
     } catch (error) {
-      console.warn('Web Audio API not supported:', error)
+      console.error('❌ Web Audio API not supported:', error)
       this.enabled = false
     }
   }
@@ -54,8 +68,17 @@ class SoundManager {
    * Play goal celebration sound (ascending melody)
    */
   playGoal() {
-    if (!this.enabled || !this.initialized) return
+    if (!this.enabled || !this.initialized) {
+      console.warn('🔇 Sound not playing - not initialized yet')
+      return
+    }
 
+    // Resume if suspended
+    if (this.audioContext.state === 'suspended') {
+      this.audioContext.resume()
+    }
+
+    console.log('🎵 Playing goal sound!')
     const now = this.audioContext.currentTime
     const melody = [
       { freq: 523.25, time: 0, duration: 0.15 },      // C5

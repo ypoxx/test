@@ -1,12 +1,26 @@
 import { useState } from 'react'
 import LeagueProgress from './LeagueProgress'
 import TrophyCase from './TrophyCase'
+import soundManager from '../utils/sounds'
 import { getVocabStats } from '../utils/spacedRepetition'
 import vocabsData from '../data/vocabs.json'
 
 function Stadium({ progress, onStartMatch }) {
   const stats = getVocabStats(vocabsData, progress)
   const [showTrophyCase, setShowTrophyCase] = useState(false)
+
+  const testSound = () => {
+    // Initialize if not already
+    if (!soundManager.initialized) {
+      soundManager.init()
+    }
+    // Play test sound
+    soundManager.playGoal()
+    console.log('🔊 Sound test clicked!')
+    console.log('   - Initialized:', soundManager.initialized)
+    console.log('   - Enabled:', soundManager.enabled)
+    console.log('   - AudioContext:', soundManager.audioContext)
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 stadium-scene field-pattern relative overflow-hidden">
@@ -49,9 +63,17 @@ function Stadium({ progress, onStartMatch }) {
         {/* Trophy Case Button */}
         <button
           onClick={() => setShowTrophyCase(true)}
-          className="btn-secondary w-full mb-6 text-lg py-3"
+          className="btn-secondary w-full mb-3 text-lg py-3"
         >
           🏆 Meine Trophäen ({progress.achievements?.length || 0})
+        </button>
+
+        {/* Sound Test Button */}
+        <button
+          onClick={testSound}
+          className="btn-secondary w-full mb-6 text-base py-3 bg-purple-600 hover:bg-purple-700"
+        >
+          🔊 Sound testen
         </button>
 
         {/* Stats Grid */}
