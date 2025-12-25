@@ -7,9 +7,10 @@ function TrophyCase({ unlockedAchievementIds, onClose }) {
   const achievementsArray = Object.values(ACHIEVEMENTS)
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
-      <div className="w-full max-w-4xl my-8">
-        <div className="card p-6">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm">
+      <div className="min-h-screen flex items-start justify-center p-4 py-8">
+        <div className="w-full max-w-4xl">
+          <div className="card p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-3xl font-bold text-white">
@@ -98,6 +99,7 @@ function TrophyCase({ unlockedAchievementIds, onClose }) {
           >
             Zurück zum Stadion
           </button>
+          </div>
         </div>
       </div>
     </div>
