@@ -36,9 +36,6 @@ function Match({ progress, onMatchEnd }) {
   const [matchStarted, setMatchStarted] = useState(false)
 
   useEffect(() => {
-    // Initialize sound system on component mount
-    soundManager.init()
-
     // Select vocabs for this match using spaced repetition
     const selectedVocabs = selectVocabsForMatch(vocabsData, progress, 10)
 

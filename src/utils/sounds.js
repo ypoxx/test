@@ -25,15 +25,6 @@ class SoundManager {
 
     try {
       this.audioContext = new (window.AudioContext || window.webkitAudioContext)()
-
-      // Resume if suspended (browser autoplay policy)
-      if (this.audioContext.state === 'suspended') {
-        console.log('🔊 AudioContext suspended, resuming...')
-        this.audioContext.resume().then(() => {
-          console.log('✅ AudioContext resumed!')
-        })
-      }
-
       this.initialized = true
       console.log('🔊 Sound System initialized!')
       console.log('   - State:', this.audioContext.state)
@@ -42,6 +33,29 @@ class SoundManager {
       console.error('❌ Web Audio API not supported:', error)
       this.enabled = false
     }
+  }
+
+  /**
+   * Ensure AudioContext is running (critical for iOS Safari)
+   * Must be called before playing any sound
+   */
+  async ensureRunning() {
+    if (!this.enabled || !this.initialized || !this.audioContext) {
+      return false
+    }
+
+    if (this.audioContext.state === 'suspended') {
+      console.log('🔊 AudioContext suspended, resuming...')
+      try {
+        await this.audioContext.resume()
+        console.log('✅ AudioContext resumed! State:', this.audioContext.state)
+      } catch (error) {
+        console.error('❌ Failed to resume AudioContext:', error)
+        return false
+      }
+    }
+
+    return this.audioContext.state === 'running'
   }
 
   /**
@@ -67,15 +81,17 @@ class SoundManager {
   /**
    * Play goal celebration sound (ascending melody)
    */
-  playGoal() {
+  async playGoal() {
     if (!this.enabled || !this.initialized) {
       console.warn('🔇 Sound not playing - not initialized yet')
       return
     }
 
-    // Resume if suspended
-    if (this.audioContext.state === 'suspended') {
-      this.audioContext.resume()
+    // Ensure AudioContext is running (critical for iOS)
+    const isRunning = await this.ensureRunning()
+    if (!isRunning) {
+      console.warn('🔇 AudioContext not running, cannot play sound')
+      return
     }
 
     console.log('🎵 Playing goal sound!')
@@ -109,8 +125,12 @@ class SoundManager {
   /**
    * Play wrong answer sound (descending tone)
    */
-  playWrong() {
+  async playWrong() {
     if (!this.enabled || !this.initialized) return
+
+    // Ensure AudioContext is running (critical for iOS)
+    const isRunning = await this.ensureRunning()
+    if (!isRunning) return
 
     const now = this.audioContext.currentTime
     const oscillator = this.audioContext.createOscillator()
@@ -133,8 +153,12 @@ class SoundManager {
   /**
    * Play streak sound (exciting rising tone)
    */
-  playStreak(streakLevel = 1) {
+  async playStreak(streakLevel = 1) {
     if (!this.enabled || !this.initialized) return
+
+    // Ensure AudioContext is running (critical for iOS)
+    const isRunning = await this.ensureRunning()
+    if (!isRunning) return
 
     const now = this.audioContext.currentTime
     const baseFreq = 400 + (streakLevel * 100)
@@ -161,8 +185,12 @@ class SoundManager {
   /**
    * Play achievement unlock sound (magical chime)
    */
-  playAchievement(rarity = 'common') {
+  async playAchievement(rarity = 'common') {
     if (!this.enabled || !this.initialized) return
+
+    // Ensure AudioContext is running (critical for iOS)
+    const isRunning = await this.ensureRunning()
+    if (!isRunning) return
 
     const now = this.audioContext.currentTime
     const rarityMultiplier = {
@@ -200,8 +228,12 @@ class SoundManager {
   /**
    * Play victory fanfare (triumphant melody)
    */
-  playVictory() {
+  async playVictory() {
     if (!this.enabled || !this.initialized) return
+
+    // Ensure AudioContext is running (critical for iOS)
+    const isRunning = await this.ensureRunning()
+    if (!isRunning) return
 
     const now = this.audioContext.currentTime
     const melody = [
@@ -233,8 +265,12 @@ class SoundManager {
   /**
    * Play defeat sound (sad trombone)
    */
-  playDefeat() {
+  async playDefeat() {
     if (!this.enabled || !this.initialized) return
+
+    // Ensure AudioContext is running (critical for iOS)
+    const isRunning = await this.ensureRunning()
+    if (!isRunning) return
 
     const now = this.audioContext.currentTime
     const melody = [
@@ -265,8 +301,12 @@ class SoundManager {
   /**
    * Play crowd cheer sound (noise burst)
    */
-  playCrowd() {
+  async playCrowd() {
     if (!this.enabled || !this.initialized) return
+
+    // Ensure AudioContext is running (critical for iOS)
+    const isRunning = await this.ensureRunning()
+    if (!isRunning) return
 
     const now = this.audioContext.currentTime
     const bufferSize = this.audioContext.sampleRate * 0.5
