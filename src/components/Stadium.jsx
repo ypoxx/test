@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import LeagueProgress from './LeagueProgress'
 import TrophyCase from './TrophyCase'
+import XPBar from './XPBar'
+import CategoryStats from './CategoryStats'
 import soundManager from '../utils/sounds'
 import { getVocabStats } from '../utils/spacedRepetition'
 import vocabsData from '../data/vocabs.json'
@@ -45,6 +47,11 @@ function Stadium({ progress, onStartMatch }) {
           <p className="text-xl text-white/80">
             MSV Duisburg Edition
           </p>
+        </div>
+
+        {/* XP and Level */}
+        <div className="mb-6">
+          <XPBar xp={progress.xp || 0} level={progress.level || 1} />
         </div>
 
         {/* League Progress */}
@@ -102,6 +109,11 @@ function Stadium({ progress, onStartMatch }) {
             </div>
             <div className="text-sm text-white/70">Genauigkeit</div>
           </div>
+        </div>
+
+        {/* Category Stats */}
+        <div className="mb-6">
+          <CategoryStats progress={progress} />
         </div>
 
         {/* Recent Matches */}

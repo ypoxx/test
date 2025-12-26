@@ -3,13 +3,16 @@ import VocabCard from './VocabCard'
 import ScoreDisplay from './ScoreDisplay'
 import AchievementUnlocked from './AchievementUnlocked'
 import ConfettiExplosion from './ConfettiExplosion'
+import LevelUpNotification from './LevelUpNotification'
+import MatchCountdown from './MatchCountdown'
 import vocabsData from '../data/vocabs.json'
 import { selectVocabsForMatch } from '../utils/spacedRepetition'
 import { selectRandomOpponent, checkAnswer, calculateMatchResult, getMatchSummaryMessage } from '../utils/matchLogic'
-import { updateVocabProgress, updateGoalsAndLeague, addMatchToHistory, loadProgress, unlockAchievement } from '../utils/localStorage'
+import { updateVocabProgress, updateGoalsAndLeague, addMatchToHistory, loadProgress, unlockAchievement, addXP, updateDailyStreak } from '../utils/localStorage'
 import { generateMultipleChoiceOptions } from '../utils/multipleChoice'
 import { calculateStreakBonus, getStreakMessage, getStreakEmoji, getStreakColor, triggerHapticFeedback } from '../utils/gameEffects'
 import { checkNewAchievements } from '../utils/achievements'
+import { calculateXPReward } from '../utils/xpSystem'
 import soundManager from '../utils/sounds'
 
 function Match({ progress, onMatchEnd }) {
@@ -26,6 +29,11 @@ function Match({ progress, onMatchEnd }) {
   const [showAchievementIndex, setShowAchievementIndex] = useState(0)
   const [showingAchievement, setShowingAchievement] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
+  const [xpGained, setXPGained] = useState(0)
+  const [showLevelUp, setShowLevelUp] = useState(false)
+  const [leveledUpTo, setLeveledUpTo] = useState(null)
+  const [showCountdown, setShowCountdown] = useState(true)
+  const [matchStarted, setMatchStarted] = useState(false)
 
   useEffect(() => {
     // Initialize sound system on component mount
@@ -61,6 +69,10 @@ function Match({ progress, onMatchEnd }) {
 
       // Play goal sound! ⚽
       soundManager.playGoal()
+
+      // Calculate and add XP
+      const xpReward = calculateXPReward(newStreak, currentVocab.difficulty)
+      setXPGained(prev => prev + xpReward)
 
       // Check for streak bonus
       const streakBonus = calculateStreakBonus(newStreak)
@@ -132,6 +144,16 @@ function Match({ progress, onMatchEnd }) {
 
     setNewAchievements(unlockedAchievements)
 
+    // Add XP and check for level up
+    const xpResult = addXP(xpGained)
+    if (xpResult.leveledUp) {
+      setLeveledUpTo(xpResult.newLevel)
+      setShowLevelUp(true)
+    }
+
+    // Update daily streak
+    updateDailyStreak()
+
     // Trigger victory haptic feedback and sounds
     if (result.status === 'win') {
       triggerHapticFeedback('victory')
@@ -164,6 +186,19 @@ function Match({ progress, onMatchEnd }) {
       // Go to stadium after all achievements shown
       onMatchEnd(matchResult)
     }
+  }
+
+  // Show countdown before match starts
+  if (showCountdown && vocabs.length > 0) {
+    return (
+      <MatchCountdown
+        opponent={opponent}
+        onComplete={() => {
+          setShowCountdown(false)
+          setMatchStarted(true)
+        }}
+      />
+    )
   }
 
   if (vocabs.length === 0) {
@@ -201,13 +236,21 @@ function Match({ progress, onMatchEnd }) {
 
             {/* Stats */}
             <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="bg-white/5 rounded-lg p-4">
+              <div className="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-all">
                 <div className="text-3xl font-bold text-goal">{matchResult.msvGoals}</div>
-                <div className="text-sm text-white/70">Tore geschossen</div>
+                <div className="text-sm text-white/70">⚽ Tore geschossen</div>
               </div>
-              <div className="bg-white/5 rounded-lg p-4">
+              <div className="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-all">
                 <div className="text-3xl font-bold text-white">{matchResult.accuracy}%</div>
-                <div className="text-sm text-white/70">Genauigkeit</div>
+                <div className="text-sm text-white/70">🎯 Genauigkeit</div>
+              </div>
+              <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg p-4 border-2 border-blue-400/50 animate-pulse-glow hover:scale-105 transition-all">
+                <div className="text-3xl font-bold text-blue-300">+{xpGained} XP</div>
+                <div className="text-sm text-white/70">⭐ Erfahrung gewonnen</div>
+              </div>
+              <div className="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-all">
+                <div className="text-3xl font-bold text-yellow-300">{progress.level || 1}</div>
+                <div className="text-sm text-white/70">💪 Dein Level</div>
               </div>
             </div>
 
@@ -277,6 +320,14 @@ function Match({ progress, onMatchEnd }) {
 
       {/* Confetti for victories */}
       <ConfettiExplosion trigger={showConfetti} />
+
+      {/* Level Up Notification */}
+      {showLevelUp && leveledUpTo && (
+        <LevelUpNotification
+          newLevel={leveledUpTo}
+          onClose={() => setShowLevelUp(false)}
+        />
+      )}
     </div>
   )
 }
