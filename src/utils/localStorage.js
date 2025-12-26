@@ -8,7 +8,11 @@ const DEFAULT_PROGRESS = {
   vocabProgress: {},
   matchHistory: [],
   achievements: [], // Array of unlocked achievement IDs
-  newAchievements: [] // Recently unlocked, shown in notification
+  newAchievements: [], // Recently unlocked, shown in notification
+  xp: 0, // Total XP earned
+  level: 1, // Current level
+  lastPlayedDate: null, // For daily streak tracking
+  dailyStreak: 0 // Consecutive days played
 }
 
 /**
@@ -227,4 +231,80 @@ export const clearNewAchievements = () => {
   progress.newAchievements = []
   saveProgress(progress)
   return progress
+}
+
+/**
+ * Add XP and update level
+ * @param {number} xpToAdd - Amount of XP to add
+ * @returns {Object} - { leveledUp: boolean, oldLevel: number, newLevel: number, progress: Object }
+ */
+export const addXP = (xpToAdd) => {
+  const progress = loadProgress()
+
+  const oldLevel = progress.level || 1
+  const oldXP = progress.xp || 0
+
+  progress.xp = oldXP + xpToAdd
+
+  // Calculate new level based on total XP
+  const { calculateLevel } = require('./xpSystem')
+  const newLevel = calculateLevel(progress.xp)
+
+  const leveledUp = newLevel > oldLevel
+  progress.level = newLevel
+
+  saveProgress(progress)
+
+  return {
+    leveledUp,
+    oldLevel,
+    newLevel,
+    xpGained: xpToAdd,
+    totalXP: progress.xp,
+    progress
+  }
+}
+
+/**
+ * Update daily streak
+ * @returns {Object} - { streakIncreased: boolean, currentStreak: number }
+ */
+export const updateDailyStreak = () => {
+  const progress = loadProgress()
+  const today = new Date().toDateString()
+  const lastPlayed = progress.lastPlayedDate
+
+  let streakIncreased = false
+
+  if (!lastPlayed) {
+    // First time playing
+    progress.dailyStreak = 1
+    streakIncreased = true
+  } else {
+    const lastPlayedDate = new Date(lastPlayed)
+    const yesterday = new Date()
+    yesterday.setDate(yesterday.getDate() - 1)
+
+    if (lastPlayed === today) {
+      // Already played today, no change
+      streakIncreased = false
+    } else if (lastPlayedDate.toDateString() === yesterday.toDateString()) {
+      // Played yesterday, increase streak
+      progress.dailyStreak = (progress.dailyStreak || 0) + 1
+      streakIncreased = true
+    } else {
+      // Streak broken, reset to 1
+      progress.dailyStreak = 1
+      streakIncreased = false
+    }
+  }
+
+  progress.lastPlayedDate = today
+  saveProgress(progress)
+
+  return {
+    streakIncreased,
+    currentStreak: progress.dailyStreak,
+    progress
+  }
 }
