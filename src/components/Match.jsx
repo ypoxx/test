@@ -319,6 +319,7 @@ function Match({ progress, onMatchEnd }) {
           onAnswer={handleAnswer}
           currentIndex={currentVocabIndex}
           total={vocabs.length}
+          isFinishing={isFinishing}
         />
       </div>
 

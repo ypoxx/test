@@ -2,7 +2,7 @@ import { useState } from 'react'
 import GoalAnimation from './GoalAnimation'
 import soundManager from '../utils/sounds'
 
-function VocabCard({ vocab, options, onAnswer, currentIndex, total }) {
+function VocabCard({ vocab, options, onAnswer, currentIndex, total, isFinishing = false }) {
   const [selectedAnswer, setSelectedAnswer] = useState(null)
   const [showFeedback, setShowFeedback] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
@@ -24,10 +24,12 @@ function VocabCard({ vocab, options, onAnswer, currentIndex, total }) {
     // Call parent callback
     onAnswer(answer)
 
-    // Auto-advance after 2 seconds
+    // Auto-advance after 2 seconds (unless match is finishing)
     setTimeout(() => {
-      setShowFeedback(false)
-      setSelectedAnswer(null)
+      if (!isFinishing) {
+        setShowFeedback(false)
+        setSelectedAnswer(null)
+      }
     }, 2000)
   }
 
