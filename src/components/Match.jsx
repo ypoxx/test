@@ -34,6 +34,7 @@ function Match({ progress, onMatchEnd }) {
   const [leveledUpTo, setLeveledUpTo] = useState(null)
   const [showCountdown, setShowCountdown] = useState(true)
   const [matchStarted, setMatchStarted] = useState(false)
+  const [isFinishing, setIsFinishing] = useState(false)
 
   useEffect(() => {
     // Initialize sound system on component mount
@@ -52,6 +53,9 @@ function Match({ progress, onMatchEnd }) {
   }, [progress])
 
   const handleAnswer = (userAnswer) => {
+    // Prevent answering if match is finishing
+    if (isFinishing || matchFinished) return
+
     const currentVocab = vocabs[currentVocabIndex]
     const isCorrect = checkAnswer(userAnswer, currentVocab.german)
 
@@ -99,6 +103,14 @@ function Match({ progress, onMatchEnd }) {
 
       // Play wrong answer sound
       soundManager.playWrong()
+    }
+
+    // Check if this is the last question
+    const isLastQuestion = currentVocabIndex >= vocabs.length - 1
+
+    // If last question, set isFinishing immediately to prevent further answers
+    if (isLastQuestion) {
+      setIsFinishing(true)
     }
 
     // Move to next vocab after a delay
