@@ -7,13 +7,14 @@ function VocabCard({ vocab, options, onAnswer, currentIndex, total }) {
   const [showFeedback, setShowFeedback] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
 
-  const handleSelectAnswer = (answer) => {
+  const handleSelectAnswer = async (answer) => {
     if (showFeedback) return // Prevent multiple selections
 
     // Initialize sound on first user click!
     if (!soundManager.initialized) {
-      soundManager.init()
-      console.log('🎵 Sound initialized on first click!')
+      console.log('🎵 Initializing sound on first click...')
+      await soundManager.init()
+      console.log('🎵 Sound initialized!')
     }
 
     setSelectedAnswer(answer)

@@ -11,13 +11,14 @@ function Stadium({ progress, onStartMatch }) {
   const stats = getVocabStats(vocabsData, progress)
   const [showTrophyCase, setShowTrophyCase] = useState(false)
 
-  const testSound = () => {
+  const testSound = async () => {
     // Initialize if not already
     if (!soundManager.initialized) {
-      soundManager.init()
+      console.log('🔊 Initializing sound...')
+      await soundManager.init()
     }
     // Play test sound
-    soundManager.playGoal()
+    await soundManager.playGoal()
     console.log('🔊 Sound test clicked!')
     console.log('   - Initialized:', soundManager.initialized)
     console.log('   - Enabled:', soundManager.enabled)

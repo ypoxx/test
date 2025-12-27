@@ -16,11 +16,12 @@ class SoundManager {
 
   /**
    * Initialize audio context (must be called after user interaction)
+   * Returns a promise that resolves when AudioContext is ready
    */
-  init() {
+  async init() {
     if (this.initialized) {
       console.log('🔊 Sound already initialized')
-      return
+      return true
     }
 
     try {
@@ -29,9 +30,30 @@ class SoundManager {
       console.log('🔊 Sound System initialized!')
       console.log('   - State:', this.audioContext.state)
       console.log('   - Sample Rate:', this.audioContext.sampleRate)
+
+      // iOS FIX: Immediately resume AudioContext and play silent sound
+      if (this.audioContext.state === 'suspended') {
+        console.log('🔊 iOS detected - resuming AudioContext immediately...')
+        await this.audioContext.resume()
+        console.log('✅ AudioContext resumed! State:', this.audioContext.state)
+      }
+
+      // iOS FIX: Play a silent sound to "unlock" audio
+      // This is a well-known iOS Safari workaround
+      const silentOscillator = this.audioContext.createOscillator()
+      const silentGain = this.audioContext.createGain()
+      silentGain.gain.value = 0.001 // Almost silent
+      silentOscillator.connect(silentGain)
+      silentGain.connect(this.audioContext.destination)
+      silentOscillator.start(this.audioContext.currentTime)
+      silentOscillator.stop(this.audioContext.currentTime + 0.001)
+      console.log('🔊 Silent sound played to unlock iOS audio')
+
+      return true
     } catch (error) {
       console.error('❌ Web Audio API not supported:', error)
       this.enabled = false
+      return false
     }
   }
 
