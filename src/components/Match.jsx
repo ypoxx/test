@@ -5,6 +5,7 @@ import AchievementUnlocked from './AchievementUnlocked'
 import ConfettiExplosion from './ConfettiExplosion'
 import LevelUpNotification from './LevelUpNotification'
 import MatchCountdown from './MatchCountdown'
+import CardReveal from './CardReveal'
 import vocabsData from '../data/vocabs.json'
 import { selectVocabsForMatch } from '../utils/spacedRepetition'
 import { selectRandomOpponent, checkAnswer, calculateMatchResult, getMatchSummaryMessage } from '../utils/matchLogic'
@@ -13,6 +14,7 @@ import { generateMultipleChoiceOptions } from '../utils/multipleChoice'
 import { calculateStreakBonus, getStreakMessage, getStreakEmoji, getStreakColor, triggerHapticFeedback } from '../utils/gameEffects'
 import { checkNewAchievements } from '../utils/achievements'
 import { calculateXPReward } from '../utils/xpSystem'
+import { rollCardReward } from '../utils/cardRewards'
 import soundManager from '../utils/sounds'
 
 function Match({ progress, onMatchEnd }) {
@@ -34,6 +36,8 @@ function Match({ progress, onMatchEnd }) {
   const [leveledUpTo, setLeveledUpTo] = useState(null)
   const [showCountdown, setShowCountdown] = useState(true)
   const [matchStarted, setMatchStarted] = useState(false)
+  const [cardReward, setCardReward] = useState(null)
+  const [showCardReveal, setShowCardReveal] = useState(false)
 
   useEffect(() => {
     // Initialize sound system on component mount
@@ -154,6 +158,9 @@ function Match({ progress, onMatchEnd }) {
     // Update daily streak
     updateDailyStreak()
 
+    const reward = rollCardReward({ resultStatus: result.status, streak })
+    setCardReward(reward)
+
     // Trigger victory haptic feedback and sounds
     if (result.status === 'win') {
       triggerHapticFeedback('victory')
@@ -172,6 +179,8 @@ function Match({ progress, onMatchEnd }) {
     // Simplified: Check if we have achievements to show
     if (newAchievements.length > 0 && !showingAchievement) {
       setShowingAchievement(true)
+    } else if (cardReward && !showCardReveal) {
+      setShowCardReveal(true)
     } else {
       onMatchEnd(matchResult)
     }
@@ -211,6 +220,16 @@ function Match({ progress, onMatchEnd }) {
 
   if (matchFinished && matchResult) {
     const summary = getMatchSummaryMessage(matchResult, opponent)
+
+    if (showCardReveal && cardReward) {
+      return (
+        <CardReveal
+          card={cardReward.card}
+          isNew={cardReward.isNew}
+          onClose={() => onMatchEnd(matchResult)}
+        />
+      )
+    }
 
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4 stadium-scene field-pattern relative overflow-hidden">
@@ -259,7 +278,7 @@ function Match({ progress, onMatchEnd }) {
               onClick={handleContinue}
               className="btn-primary w-full"
             >
-              Zurück zum Stadion
+              {cardReward ? 'Kartenpack öffnen' : 'Zurück zum Stadion'}
             </button>
           </div>
         </div>

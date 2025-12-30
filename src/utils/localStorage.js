@@ -12,7 +12,8 @@ const DEFAULT_PROGRESS = {
   xp: 0, // Total XP earned
   level: 1, // Current level
   lastPlayedDate: null, // For daily streak tracking
-  dailyStreak: 0 // Consecutive days played
+  dailyStreak: 0, // Consecutive days played
+  unlockedCards: [] // Array of unlocked card IDs
 }
 
 /**
