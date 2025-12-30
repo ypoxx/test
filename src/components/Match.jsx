@@ -21,6 +21,8 @@ function Match({ progress, onMatchEnd }) {
   const [currentVocabIndex, setCurrentVocabIndex] = useState(0)
   const [msvGoals, setMsvGoals] = useState(0)
   const [opponentGoals, setOpponentGoals] = useState(0)
+  const [correctAnswers, setCorrectAnswers] = useState(0)
+  const [wasDownThree, setWasDownThree] = useState(false)
   const [matchFinished, setMatchFinished] = useState(false)
   const [matchResult, setMatchResult] = useState(null)
   const [streak, setStreak] = useState(0)
@@ -89,10 +91,15 @@ function Match({ progress, onMatchEnd }) {
 
       // Update score (including streak bonus)
       setMsvGoals(prev => prev + 1 + streakBonus)
+      setCorrectAnswers(prev => prev + 1)
     } else {
       setStreak(0)
       setStreakMessage(null)
-      setOpponentGoals(prev => prev + 1)
+      const nextOpponentGoals = opponentGoals + 1
+      setOpponentGoals(nextOpponentGoals)
+      if (msvGoals === 0 && nextOpponentGoals >= 3) {
+        setWasDownThree(true)
+      }
 
       // Trigger haptic feedback for wrong answer
       triggerHapticFeedback('error')
@@ -107,19 +114,18 @@ function Match({ progress, onMatchEnd }) {
         setCurrentVocabIndex(prev => prev + 1)
       } else {
         // Match finished
-        finishMatch(isCorrect)
+        finishMatch()
       }
     }, 2000)
 
     return isCorrect
   }
 
-  const finishMatch = (lastAnswerCorrect) => {
+  const finishMatch = () => {
     // Use current scores - they're already updated in handleAnswer!
     const finalMsvGoals = msvGoals
-    const finalOpponentGoals = opponentGoals
 
-    const result = calculateMatchResult(finalMsvGoals, vocabs.length)
+    const result = calculateMatchResult(finalMsvGoals, correctAnswers, vocabs.length)
 
     // Save old progress for achievement comparison
     const oldProgress = loadProgress()
@@ -130,7 +136,8 @@ function Match({ progress, onMatchEnd }) {
       opponent: opponent.name,
       score: result.score,
       vocabsReviewed: vocabs.length,
-      goalsScored: finalMsvGoals
+      goalsScored: finalMsvGoals,
+      comebackWin: wasDownThree && result.status === 'win'
     })
 
     // Check for new achievements
