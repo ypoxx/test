@@ -31,3 +31,4 @@ yarn-error.log*
 # PWA
 sw.js
 workbox-*.js
+!public/sw.js

@@ -41,7 +41,7 @@ export const generateWrongAnswers = (correctVocab, allVocabs, count = 3) => {
     if (selected.length >= count) break
 
     // Higher weight = higher chance of selection
-    const chance = vocab.weight / 4 // Max weight is 3
+    const chance = vocab.weight / 3 // Max weight is 3
     if (Math.random() < chance || selected.length < count - 1) {
       selected.push(vocab.german)
     }

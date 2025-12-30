@@ -94,5 +94,131 @@
     "art": "👑",
     "unlockRule": "10 Siege insgesamt",
     "description": "Die Krone der blau-weißen Geschichte." 
+    "id": "card_msv_captain",
+    "name": "Zebras Captain",
+    "rarity": "common",
+    "title": "Kapitän des MSV",
+    "description": "Führt das Team mit Übersicht und Herz.",
+    "unlockRule": "match"
+  },
+  {
+    "id": "card_derby_hero",
+    "name": "Derby-Held",
+    "rarity": "rare",
+    "title": "Derby-Spezialist",
+    "description": "Bleibt in hitzigen Spielen eiskalt.",
+    "unlockRule": "win"
+  },
+  {
+    "id": "card_ruhr_sprinter",
+    "name": "Ruhr-Sprinter",
+    "rarity": "common",
+    "title": "Turbo von der Ruhr",
+    "description": "Explosiv auf den ersten Metern.",
+    "unlockRule": "match"
+  },
+  {
+    "id": "card_stadium_architect",
+    "name": "Stadion-Architekt",
+    "rarity": "rare",
+    "title": "Heimspiel-Planer",
+    "description": "Kennt jede Ecke des Stadions.",
+    "unlockRule": "win"
+  },
+  {
+    "id": "card_goal_poet",
+    "name": "Tor-Poet",
+    "rarity": "epic",
+    "title": "Scorer mit Stil",
+    "description": "Schreibt Geschichten mit jedem Tor.",
+    "unlockRule": "streak"
+  },
+  {
+    "id": "card_goalkeeper_wall",
+    "name": "Torwart-Mauer",
+    "rarity": "common",
+    "title": "Letzte Instanz",
+    "description": "Hält fest wie Beton.",
+    "unlockRule": "match"
+  },
+  {
+    "id": "card_scout_master",
+    "name": "Scout-Meister",
+    "rarity": "rare",
+    "title": "Wort-Entdecker",
+    "description": "Findet starke Vokabeln für neue Matches.",
+    "unlockRule": "match"
+  },
+  {
+    "id": "card_crowd_favorite",
+    "name": "Publikumsliebling",
+    "rarity": "common",
+    "title": "Liebling der Kurve",
+    "description": "Treibt die Fans zum Jubeln.",
+    "unlockRule": "match"
+  },
+  {
+    "id": "card_playmaker",
+    "name": "Regisseur",
+    "rarity": "rare",
+    "title": "Spielmacher",
+    "description": "Sieht den nächsten Pass schon vorher.",
+    "unlockRule": "win"
+  },
+  {
+    "id": "card_speed_dribbler",
+    "name": "Tempo-Dribbler",
+    "rarity": "common",
+    "title": "Finten-Künstler",
+    "description": "Dribbelt an allem vorbei.",
+    "unlockRule": "match"
+  },
+  {
+    "id": "card_matchday_magician",
+    "name": "Matchday-Magier",
+    "rarity": "epic",
+    "title": "Magie am Spieltag",
+    "description": "Wenn es zählt, liefert er ab.",
+    "unlockRule": "streak"
+  },
+  {
+    "id": "card_zebra_legend",
+    "name": "Zebra-Legende",
+    "rarity": "legendary",
+    "title": "Legende des MSV",
+    "description": "Ein Name, den alle kennen.",
+    "unlockRule": "streak"
+  },
+  {
+    "id": "card_ruhr_midfield",
+    "name": "Ruhr-Motor",
+    "rarity": "rare",
+    "title": "Mittelfeld-Motor",
+    "description": "Gibt das Tempo vor.",
+    "unlockRule": "match"
+  },
+  {
+    "id": "card_penalty_ace",
+    "name": "Elfer-Ass",
+    "rarity": "epic",
+    "title": "Nerven wie Stahl",
+    "description": "Trifft vom Punkt.",
+    "unlockRule": "win"
+  },
+  {
+    "id": "card_cup_specialist",
+    "name": "Pokal-Spezialist",
+    "rarity": "rare",
+    "title": "K.O.-Experte",
+    "description": "Holt Siege, wenn es brennt.",
+    "unlockRule": "match"
+  },
+  {
+    "id": "card_calm_finisher",
+    "name": "Eiskalter Vollstrecker",
+    "rarity": "common",
+    "title": "Abschluss-Profi",
+    "description": "Bleibt cool vor dem Tor.",
+    "unlockRule": "match"
   }
 ]
