@@ -38,6 +38,9 @@ function Match({ progress, onMatchEnd }) {
   const [leveledUpTo, setLeveledUpTo] = useState(null)
   const [showCountdown, setShowCountdown] = useState(true)
   const [matchStarted, setMatchStarted] = useState(false)
+  const [matchFeedback, setMatchFeedback] = useState(null)
+  const [goalAnimationKey, setGoalAnimationKey] = useState(0)
+  const [crowdAnimationKey, setCrowdAnimationKey] = useState(0)
   const [cardReward, setCardReward] = useState(null)
   const [showCardReveal, setShowCardReveal] = useState(false)
 
@@ -69,6 +72,9 @@ function Match({ progress, onMatchEnd }) {
     if (isCorrect) {
       newStreak = streak + 1
       setStreak(newStreak)
+      setMatchFeedback('success')
+      setGoalAnimationKey(prev => prev + 1)
+      setCrowdAnimationKey(prev => prev + 1)
 
       // Trigger haptic feedback for correct answer
       triggerHapticFeedback('success')
@@ -99,6 +105,9 @@ function Match({ progress, onMatchEnd }) {
     } else {
       setStreak(0)
       setStreakMessage(null)
+      setOpponentGoals(prev => prev + 1)
+      setMatchFeedback('miss')
+      setCrowdAnimationKey(prev => prev + 1)
       const nextOpponentGoals = opponentGoals + 1
       setOpponentGoals(nextOpponentGoals)
       if (msvGoals === 0 && nextOpponentGoals >= 3) {
@@ -121,6 +130,10 @@ function Match({ progress, onMatchEnd }) {
         finishMatch()
       }
     }, 2000)
+
+    setTimeout(() => {
+      setMatchFeedback(null)
+    }, 700)
 
     return isCorrect
   }
@@ -294,7 +307,24 @@ function Match({ progress, onMatchEnd }) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col p-4 pt-28 stadium-scene field-pattern relative">
+    <div className={`min-h-screen flex flex-col p-4 pt-28 stadium-scene field-pattern relative ${matchFeedback === 'success' ? 'match-success' : matchFeedback === 'miss' ? 'match-miss' : ''}`}>
+      <div className="goal-feedback-layer">
+        {matchFeedback === 'success' && (
+          <>
+            <div key={`ball-${goalAnimationKey}`} className="goal-ball ball-shoot-hero">
+              ⚽
+            </div>
+            <div key={`cheer-${crowdAnimationKey}`} className="crowd-reaction crowd-cheer">
+              🙌🙌🙌
+            </div>
+          </>
+        )}
+        {matchFeedback === 'miss' && (
+          <div key={`groan-${crowdAnimationKey}`} className="crowd-reaction crowd-groan">
+            😬😬😬
+          </div>
+        )}
+      </div>
       {/* Header with Score */}
       <div className="fixed top-0 left-0 right-0 bg-field-green/95 backdrop-blur-sm p-4 z-10 border-b border-white/10">
         <ScoreDisplay
