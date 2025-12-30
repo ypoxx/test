@@ -378,6 +378,98 @@
     animation: fireworkExpand 1s ease-out forwards;
   }
 
+  /* Card reward visuals */
+  .pack-shell {
+    @apply bg-white/10 border border-white/20 rounded-3xl px-10 py-8 shadow-xl;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+  }
+
+  .pack-shell:hover {
+    transform: translateY(-4px) scale(1.02);
+  }
+
+  .pack-glow {
+    position: absolute;
+    inset: -40%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent 60%);
+    animation: pulseGlow 2s infinite;
+  }
+
+  .pack-opening {
+    animation: packOpen 0.9s ease forwards;
+  }
+
+  @keyframes packOpen {
+    0% {
+      transform: scale(1) rotate(0deg);
+    }
+    40% {
+      transform: scale(1.05) rotate(-2deg);
+    }
+    100% {
+      transform: scale(0.9) rotate(2deg);
+      opacity: 0.6;
+    }
+  }
+
+  .card-reveal {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+    position: relative;
+  }
+
+  .card-shine {
+    position: absolute;
+    top: -40%;
+    left: -20%;
+    width: 60%;
+    height: 180%;
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transform: rotate(20deg);
+    animation: shine 3s infinite;
+  }
+
+  .glimmer-particles {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, transparent 40%);
+    opacity: 0.2;
+    animation: glimmer 2.2s infinite alternate;
+    pointer-events: none;
+  }
+
+  @keyframes glimmer {
+    0% {
+      opacity: 0.15;
+      transform: scale(0.95);
+    }
+    100% {
+      opacity: 0.35;
+      transform: scale(1.05);
+    }
+  }
+
+  .card-glow-common {
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
+  }
+
+  .card-glow-rare {
+    box-shadow: 0 0 35px rgba(59, 130, 246, 0.45);
+  }
+
+  .card-glow-epic {
+    box-shadow: 0 0 40px rgba(168, 85, 247, 0.5);
+  }
+
+  .card-glow-legendary {
+    box-shadow: 0 0 45px rgba(250, 204, 21, 0.6);
+  }
+
+  .card-silhouette {
+    filter: grayscale(1);
+  }
+
   @keyframes fireworkExpand {
     0% {
       transform: translate(0, 0) scale(0);

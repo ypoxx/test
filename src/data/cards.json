@@ -1,5 +1,99 @@
 [
   {
+    "id": "msv-crest",
+    "name": "MSV-Wappen",
+    "rarity": "Common",
+    "art": "🛡️",
+    "unlockRule": "Ein Match spielen",
+    "description": "Das klassische Wappen für echte Zebras." 
+  },
+  {
+    "id": "stadium-lights",
+    "name": "Flutlicht",
+    "rarity": "Common",
+    "art": "💡",
+    "unlockRule": "Ein Match gewinnen",
+    "description": "Die Arena erstrahlt im Flutlichtglanz." 
+  },
+  {
+    "id": "matchday-scarf",
+    "name": "Spieltag-Schal",
+    "rarity": "Common",
+    "art": "🧣",
+    "unlockRule": "3 Tore insgesamt",
+    "description": "Warm, weich und immer blau-weiß." 
+  },
+  {
+    "id": "zebra-stripes",
+    "name": "Zebra-Streifen",
+    "rarity": "Common",
+    "art": "🦓",
+    "unlockRule": "5 Fragen korrekt",
+    "description": "Die Legende der Streifen lebt." 
+  },
+  {
+    "id": "captains-band",
+    "name": "Kapitänsbinde",
+    "rarity": "Rare",
+    "art": "🎽",
+    "unlockRule": "Match mit 70% Genauigkeit",
+    "description": "Führung auf und neben dem Platz." 
+  },
+  {
+    "id": "victory-whistle",
+    "name": "Siegespfiff",
+    "rarity": "Rare",
+    "art": "📣",
+    "unlockRule": "2 Siege in Folge",
+    "description": "Der Pfiff, der den Rasen bebt." 
+  },
+  {
+    "id": "keeper-gloves",
+    "name": "Torwart-Handschuhe",
+    "rarity": "Rare",
+    "art": "🧤",
+    "unlockRule": "10 Wörter gemeistert",
+    "description": "Halten, was andere nur hoffen." 
+  },
+  {
+    "id": "tunnel-anthem",
+    "name": "Tunnel-Hymne",
+    "rarity": "Epic",
+    "art": "🎶",
+    "unlockRule": "5 Spiele gespielt",
+    "description": "Der Klang, der die Kurve elektrisiert." 
+  },
+  {
+    "id": "derby-fire",
+    "name": "Derby-Feuer",
+    "rarity": "Epic",
+    "art": "🔥",
+    "unlockRule": "Streak von 5",
+    "description": "Ein Funke, der den Abend entzündet." 
+  },
+  {
+    "id": "goal-machine",
+    "name": "Tor-Maschine",
+    "rarity": "Epic",
+    "art": "⚡",
+    "unlockRule": "15 Tore erzielt",
+    "description": "Wenn der Ball weiß, wohin er muss." 
+  },
+  {
+    "id": "legendary-banner",
+    "name": "Legenden-Banner",
+    "rarity": "Legendary",
+    "art": "🏟️",
+    "unlockRule": "Perfektes Match",
+    "description": "Nur für die Größten der Großen." 
+  },
+  {
+    "id": "immortal-zebra",
+    "name": "Unsterbliches Zebra",
+    "rarity": "Legendary",
+    "art": "👑",
+    "unlockRule": "10 Siege insgesamt",
+    "description": "Die Krone der blau-weißen Geschichte." 
     "id": "card_msv_captain",
     "name": "Zebras Captain",
     "rarity": "common",

@@ -13,6 +13,7 @@ const DEFAULT_PROGRESS = {
   level: 1, // Current level
   lastPlayedDate: null, // For daily streak tracking
   dailyStreak: 0, // Consecutive days played
+  unlockedCards: [] // Array of unlocked card IDs
   unlockedCards: [],
   unlockedFacts: []
 }

@@ -11,6 +11,7 @@ import vocabsData from '../data/vocabs.json'
 function Stadium({ progress, onStartMatch }) {
   const stats = getVocabStats(vocabsData, progress)
   const [showTrophyCase, setShowTrophyCase] = useState(false)
+  const [showAlbum, setShowAlbum] = useState(false)
   const [showCardAlbum, setShowCardAlbum] = useState(false)
 
   const testSound = () => {
@@ -77,6 +78,12 @@ function Stadium({ progress, onStartMatch }) {
           🏆 Meine Trophäen ({progress.achievements?.length || 0})
         </button>
 
+        {/* Card Album Button */}
+        <button
+          onClick={() => setShowAlbum(true)}
+          className="btn-secondary w-full mb-3 text-lg py-3 bg-emerald-600 hover:bg-emerald-700"
+        >
+          📘 Kartenalbum ({progress.unlockedCards?.length || 0})
         <button
           onClick={() => setShowCardAlbum(true)}
           className="btn-secondary w-full mb-3 text-lg py-3"
@@ -177,6 +184,10 @@ function Stadium({ progress, onStartMatch }) {
         />
       )}
 
+      {showAlbum && (
+        <CardAlbum
+          progress={progress}
+          onClose={() => setShowAlbum(false)}
       {showCardAlbum && (
         <CardAlbum
           unlockedCards={progress.unlockedCards || []}
