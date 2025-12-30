@@ -32,7 +32,7 @@ function Welcome({ onStart }) {
             </p>
             <button
               onClick={onStart}
-              className="btn-primary w-full text-2xl py-5 animate-pulse-glow"
+              className="btn-primary btn-primary--hero w-full animate-pulse-glow"
             >
               Los geht's! 🚀
             </button>
@@ -81,7 +81,7 @@ function Welcome({ onStart }) {
               </button>
               <button
                 onClick={() => handleAnswer(false)}
-                className="btn-secondary w-full bg-error hover:bg-red-600"
+                className="btn-secondary btn-secondary--soft w-full bg-error hover:bg-red-600"
               >
                 ✗ Das ist falsch
               </button>

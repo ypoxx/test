@@ -382,7 +382,7 @@ function Match({ progress, onMatchEnd }) {
             {/* Continue Button */}
             <button
               onClick={handleContinue}
-              className="btn-primary w-full"
+              className="btn-primary btn-primary--hero w-full"
             >
               {cardReward ? 'Kartenpack öffnen' : 'Zurück zum Stadion'}
             </button>

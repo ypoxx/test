@@ -74,7 +74,7 @@ function Stadium({ progress, onStartMatch }) {
         {/* Start Match Button */}
         <button
           onClick={onStartMatch}
-          className="btn-primary w-full mb-3 text-xl py-4"
+          className="btn-primary btn-primary--hero w-full mb-4"
         >
           ⚽ Neues Spiel starten
         </button>
@@ -82,7 +82,7 @@ function Stadium({ progress, onStartMatch }) {
         {/* Trophy Case Button */}
         <button
           onClick={() => setShowTrophyCase(true)}
-          className="btn-secondary w-full mb-3 text-lg py-3"
+          className="btn-secondary btn-secondary--soft w-full mb-3 text-lg py-3"
         >
           🏆 Meine Trophäen ({progress.achievements?.length || 0})
         </button>
@@ -90,7 +90,7 @@ function Stadium({ progress, onStartMatch }) {
         {/* Card Album Button */}
         <button
           onClick={() => setShowAlbum(true)}
-          className="btn-secondary w-full mb-3 text-lg py-3 bg-emerald-600 hover:bg-emerald-700"
+          className="btn-secondary btn-secondary--soft w-full mb-3 text-lg py-3 bg-emerald-600 hover:bg-emerald-700"
         >
           📘 Kartenalbum ({progress.unlockedCards?.length || 0})
         </button>
