@@ -806,6 +806,8 @@
       radial-gradient(circle at 85% 20%, rgba(251, 146, 60, 0.28), transparent 45%),
       radial-gradient(circle at 20% 85%, rgba(253, 224, 71, 0.2), transparent 40%),
       linear-gradient(135deg, rgba(161, 98, 7, 0.85), rgba(30, 41, 59, 0.95));
+  }
+
   .share-card--success {
     background-image:
       radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.7), transparent 45%),

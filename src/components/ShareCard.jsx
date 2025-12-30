@@ -214,22 +214,12 @@ function ShareCard({ summary, reward }) {
     <div className="card p-4 mt-6">
       <div className="text-center text-xl font-bold mb-4">📲 Erfolgskarte teilen</div>
 
-      <div className={`share-card ${rarityClass}`}>
       <div className={`share-card ${rarityClass} ${resultClass}`}>
         <div className="share-card-header">
           <div className="share-card-eyebrow">Maurice' Vokabel-Match</div>
           <div className="share-card-title">{summary?.title}</div>
         </div>
         <div className="share-card-body">
-          <div className="text-lg font-semibold share-card-message">{summary?.message}</div>
-          <div className="text-sm text-white/80 mt-2">
-            Genauigkeit: {summary?.accuracy}% · Ergebnis: {summary?.score}
-          </div>
-        </div>
-        <div className="share-card-reward">
-          <div className="text-sm text-white/70">Neue Karte</div>
-          <div className="text-lg font-bold">{reward?.card?.name || '—'}</div>
-          <div className="text-xs text-white/70 share-card-fact">{reward?.fact?.text || 'Weiter so!'}</div>
           <div className="share-card-message">{summary?.message}</div>
           <div className="share-card-meta">
             Vokabel-Erfolg: {summary?.accuracy}% · Ergebnis: {summary?.score}
