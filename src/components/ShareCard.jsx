@@ -171,7 +171,7 @@ function ShareCard({ summary, reward }) {
           <div className="text-lg font-bold">{reward?.card?.name || '—'}</div>
           <div className="text-xs text-white/70 share-card-fact">{reward?.fact?.text || 'Weiter so!'}</div>
         </div>
-        <div className="share-card-footer">MSV Duisburg • Ruhrgebiet • 7. Klasse</div>
+        <div className="share-card-footer">MSV Duisburg • Ruhrgebiet</div>
       </div>
 
       <button className="btn-primary w-full mt-4" onClick={handleShare} disabled={sharing}>

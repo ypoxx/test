@@ -386,6 +386,14 @@ function Match({ progress, onMatchEnd }) {
             >
               {cardReward ? 'Kartenpack öffnen' : 'Zurück zum Stadion'}
             </button>
+            {cardReward && (
+              <button
+                onClick={() => onMatchEnd(matchResult)}
+                className="btn-secondary w-full mt-3"
+              >
+                Direkt zum Stadion
+              </button>
+            )}
           </div>
 
           <ShareCard summary={shareSummary} reward={reward} />

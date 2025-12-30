@@ -4,7 +4,6 @@ import TrophyCase from './TrophyCase'
 import XPBar from './XPBar'
 import CategoryStats from './CategoryStats'
 import CardAlbum from './CardAlbum'
-import soundManager from '../utils/sounds'
 import { getVocabStats } from '../utils/spacedRepetition'
 import vocabsData from '../data/vocabs.json'
 import { getLeagueProgress } from '../utils/localStorage'
@@ -15,19 +14,6 @@ function Stadium({ progress, onStartMatch }) {
   const leagueInfo = getLeagueProgress(progress.totalGoalsScored || 0)
   const { currentLeagueInfo, nextLeagueInfo, goalsNeeded } = leagueInfo
   const [showAlbum, setShowAlbum] = useState(false)
-
-  const testSound = () => {
-    // Initialize if not already
-    if (!soundManager.initialized) {
-      soundManager.init()
-    }
-    // Play test sound
-    soundManager.playGoal()
-    console.log('🔊 Sound test clicked!')
-    console.log('   - Initialized:', soundManager.initialized)
-    console.log('   - Enabled:', soundManager.enabled)
-    console.log('   - AudioContext:', soundManager.audioContext)
-  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 stadium-scene field-pattern relative overflow-hidden">
@@ -107,14 +93,6 @@ function Stadium({ progress, onStartMatch }) {
           className="btn-secondary w-full mb-3 text-lg py-3 bg-emerald-600 hover:bg-emerald-700"
         >
           📘 Kartenalbum ({progress.unlockedCards?.length || 0})
-        </button>
-
-        {/* Sound Test Button */}
-        <button
-          onClick={testSound}
-          className="btn-secondary w-full mb-6 text-base py-3 bg-purple-600 hover:bg-purple-700"
-        >
-          🔊 Sound testen
         </button>
 
         {/* Stats Grid */}
