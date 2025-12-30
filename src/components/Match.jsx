@@ -14,6 +14,9 @@ import { calculateStreakBonus, getStreakMessage, getStreakEmoji, getStreakColor,
 import { checkNewAchievements } from '../utils/achievements'
 import { calculateXPReward } from '../utils/xpSystem'
 import soundManager from '../utils/sounds'
+import { awardMatchRewards } from '../utils/cardRewards'
+import CardReveal from './CardReveal'
+import ShareCard from './ShareCard'
 
 function Match({ progress, onMatchEnd }) {
   const [opponent] = useState(selectRandomOpponent())
@@ -34,6 +37,8 @@ function Match({ progress, onMatchEnd }) {
   const [leveledUpTo, setLeveledUpTo] = useState(null)
   const [showCountdown, setShowCountdown] = useState(true)
   const [matchStarted, setMatchStarted] = useState(false)
+  const [reward, setReward] = useState(null)
+  const [showReward, setShowReward] = useState(false)
 
   useEffect(() => {
     // Initialize sound system on component mount
@@ -154,6 +159,14 @@ function Match({ progress, onMatchEnd }) {
     // Update daily streak
     updateDailyStreak()
 
+    // Award collectible card + fact
+    const rewardResult = awardMatchRewards({
+      wonMatch: result.status === 'win',
+      streak
+    })
+    setReward(rewardResult)
+    setShowReward(true)
+
     // Trigger victory haptic feedback and sounds
     if (result.status === 'win') {
       triggerHapticFeedback('victory')
@@ -169,6 +182,10 @@ function Match({ progress, onMatchEnd }) {
   }
 
   const handleContinue = () => {
+    if (showReward) {
+      setShowReward(false)
+      return
+    }
     // Simplified: Check if we have achievements to show
     if (newAchievements.length > 0 && !showingAchievement) {
       setShowingAchievement(true)
@@ -211,9 +228,19 @@ function Match({ progress, onMatchEnd }) {
 
   if (matchFinished && matchResult) {
     const summary = getMatchSummaryMessage(matchResult, opponent)
+    const shareSummary = {
+      title: summary.title,
+      message: summary.message,
+      accuracy: matchResult.accuracy,
+      score: matchResult.score
+    }
 
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4 stadium-scene field-pattern relative overflow-hidden">
+        <CardReveal
+          reward={reward}
+          onClose={() => setShowReward(false)}
+        />
         {/* Floodlights */}
         <div className="floodlight top-10 left-10" />
         <div className="floodlight top-10 right-10" />
@@ -262,6 +289,8 @@ function Match({ progress, onMatchEnd }) {
               Zurück zum Stadion
             </button>
           </div>
+
+          <ShareCard summary={shareSummary} reward={reward} />
         </div>
       </div>
     )

@@ -422,6 +422,74 @@
     animation: particleBurst 0.8s ease-out forwards;
   }
 
+  /* Collectible card styles */
+  .card-frame {
+    @apply rounded-2xl p-4 border border-white/10 bg-gradient-to-br from-slate-800 to-slate-900 text-center relative overflow-hidden shadow-xl;
+  }
+
+  .card-header {
+    @apply flex items-center justify-between text-white/70 text-xs mb-3;
+  }
+
+  .card-body {
+    @apply flex flex-col items-center gap-1;
+  }
+
+  .card-footer {
+    @apply mt-4 text-[10px] uppercase tracking-wide text-white/60;
+  }
+
+  .card-locked {
+    @apply grayscale opacity-50;
+  }
+
+  .rarity-common {
+    @apply border-white/20;
+  }
+
+  .rarity-rare {
+    @apply border-blue-400/60 shadow-blue-500/30;
+  }
+
+  .rarity-epic {
+    @apply border-purple-400/70 shadow-purple-500/40;
+  }
+
+  .rarity-legendary {
+    @apply border-yellow-300/80 shadow-yellow-500/50;
+  }
+
+  .rarity-legendary::before,
+  .rarity-epic::before,
+  .rarity-rare::before {
+    content: '';
+    position: absolute;
+    inset: -40%;
+    background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+    animation: shine 4s infinite;
+  }
+
+  /* Share card */
+  .share-card {
+    @apply rounded-2xl p-4 bg-gradient-to-br from-blue-900 via-slate-900 to-slate-950 text-white border border-white/10 shadow-xl;
+  }
+
+  .share-card-header {
+    @apply text-center mb-4;
+  }
+
+  .share-card-body {
+    @apply text-center text-white/90 mb-4;
+  }
+
+  .share-card-reward {
+    @apply rounded-xl bg-white/10 p-3 text-center;
+  }
+
+  .share-card-footer {
+    @apply mt-4 text-center text-[10px] uppercase tracking-wide text-white/50;
+  }
+
   @keyframes particleBurst {
     0% {
       transform: translate(0, 0) scale(1);
