@@ -12,8 +12,15 @@ const DEFAULT_PROGRESS = {
   xp: 0, // Total XP earned
   level: 1, // Current level
   lastPlayedDate: null, // For daily streak tracking
-  dailyStreak: 0 // Consecutive days played
+  dailyStreak: 0, // Consecutive days played
+  seasonProgress: {
+    matchday: 1,
+    wins: 0,
+    losses: 0
+  }
 }
+
+const SEASON_MATCHDAYS = 34
 
 /**
  * Save progress to localStorage
@@ -153,6 +160,34 @@ export const updateGoalsAndLeague = (goalsToAdd) => {
   } else {
     progress.currentLeague = 'kreisliga'
   }
+
+  saveProgress(progress)
+  return progress
+}
+
+/**
+ * Update season progress (matchday, wins, losses)
+ * @param {string} matchStatus - 'win', 'lose', or 'draw'
+ */
+export const updateSeasonProgress = (matchStatus) => {
+  const progress = loadProgress()
+
+  if (!progress.seasonProgress) {
+    progress.seasonProgress = {
+      matchday: 1,
+      wins: 0,
+      losses: 0
+    }
+  }
+
+  if (matchStatus === 'win') {
+    progress.seasonProgress.wins += 1
+  } else if (matchStatus === 'lose') {
+    progress.seasonProgress.losses += 1
+  }
+
+  const currentMatchday = progress.seasonProgress.matchday || 1
+  progress.seasonProgress.matchday = Math.min(currentMatchday + 1, SEASON_MATCHDAYS)
 
   saveProgress(progress)
   return progress

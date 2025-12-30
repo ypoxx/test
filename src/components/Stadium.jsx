@@ -6,10 +6,20 @@ import CategoryStats from './CategoryStats'
 import soundManager from '../utils/sounds'
 import { getVocabStats } from '../utils/spacedRepetition'
 import vocabsData from '../data/vocabs.json'
+import seasonSchedule from '../data/seasonSchedule.json'
 
 function Stadium({ progress, onStartMatch }) {
   const stats = getVocabStats(vocabsData, progress)
   const [showTrophyCase, setShowTrophyCase] = useState(false)
+  const seasonProgress = progress.seasonProgress || { matchday: 1, wins: 0, losses: 0 }
+  const totalMatchdays = seasonSchedule.length
+  const currentMatchday = Math.min(seasonProgress.matchday || 1, totalMatchdays)
+  const nextMatch = seasonSchedule[currentMatchday - 1]
+  const seasonGoal = 'Saisonziel: Aufstieg in die 2. Bundesliga'
+
+  const nextOpponentLabel = nextMatch
+    ? `${nextMatch.location === 'home' ? 'Heimspiel' : 'Auswärtsspiel'} vs ${nextMatch.opponent}`
+    : 'Saison abgeschlossen'
 
   const testSound = () => {
     // Initialize if not already
@@ -57,6 +67,33 @@ function Stadium({ progress, onStartMatch }) {
         {/* League Progress */}
         <div className="mb-6">
           <LeagueProgress totalGoals={progress.totalGoalsScored} />
+        </div>
+
+        {/* Season Overview */}
+        <div className="card p-6 mb-6">
+          <h3 className="text-xl font-bold text-white mb-4">
+            🗓️ Saisonübersicht
+          </h3>
+          <div className="grid gap-3 text-white/80">
+            <div className="flex items-center justify-between">
+              <span>Aktueller Spieltag</span>
+              <span className="text-white font-semibold">
+                {currentMatchday}/{totalMatchdays}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>Nächster Gegner</span>
+              <span className="text-white font-semibold text-right">
+                {nextOpponentLabel}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>{seasonGoal}</span>
+              <span className="text-white font-semibold">
+                {seasonProgress.wins}S / {seasonProgress.losses}N
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Start Match Button */}

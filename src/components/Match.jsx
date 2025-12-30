@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import VocabCard from './VocabCard'
 import ScoreDisplay from './ScoreDisplay'
 import AchievementUnlocked from './AchievementUnlocked'
@@ -7,16 +7,29 @@ import LevelUpNotification from './LevelUpNotification'
 import MatchCountdown from './MatchCountdown'
 import vocabsData from '../data/vocabs.json'
 import { selectVocabsForMatch } from '../utils/spacedRepetition'
-import { selectRandomOpponent, checkAnswer, calculateMatchResult, getMatchSummaryMessage } from '../utils/matchLogic'
-import { updateVocabProgress, updateGoalsAndLeague, addMatchToHistory, loadProgress, unlockAchievement, addXP, updateDailyStreak } from '../utils/localStorage'
+import { selectRandomOpponent, checkAnswer, calculateMatchResult, getMatchSummaryMessage, OPPONENTS } from '../utils/matchLogic'
+import { updateVocabProgress, updateGoalsAndLeague, addMatchToHistory, loadProgress, unlockAchievement, addXP, updateDailyStreak, updateSeasonProgress } from '../utils/localStorage'
 import { generateMultipleChoiceOptions } from '../utils/multipleChoice'
 import { calculateStreakBonus, getStreakMessage, getStreakEmoji, getStreakColor, triggerHapticFeedback } from '../utils/gameEffects'
 import { checkNewAchievements } from '../utils/achievements'
 import { calculateXPReward } from '../utils/xpSystem'
 import soundManager from '../utils/sounds'
+import seasonSchedule from '../data/seasonSchedule.json'
 
 function Match({ progress, onMatchEnd }) {
-  const [opponent] = useState(selectRandomOpponent())
+  const currentMatchday = progress.seasonProgress?.matchday || 1
+  const scheduleEntry = useMemo(() => (
+    seasonSchedule.find(entry => entry.matchday === currentMatchday) || seasonSchedule[0]
+  ), [currentMatchday])
+  const opponent = useMemo(() => {
+    const opponentProfile = OPPONENTS.find(team => team.name === scheduleEntry?.opponent) || selectRandomOpponent()
+    return {
+      ...opponentProfile,
+      name: scheduleEntry?.opponent || opponentProfile.name,
+      location: scheduleEntry?.location || 'home',
+      city: scheduleEntry?.city || 'Duisburg'
+    }
+  }, [scheduleEntry])
   const [vocabs, setVocabs] = useState([])
   const [currentVocabIndex, setCurrentVocabIndex] = useState(0)
   const [msvGoals, setMsvGoals] = useState(0)
@@ -34,6 +47,13 @@ function Match({ progress, onMatchEnd }) {
   const [leveledUpTo, setLeveledUpTo] = useState(null)
   const [showCountdown, setShowCountdown] = useState(true)
   const [matchStarted, setMatchStarted] = useState(false)
+  const [showStoryIntro, setShowStoryIntro] = useState(false)
+
+  const storyIntro = scheduleEntry?.storyBeats?.intro
+    || (opponent.location === 'away'
+      ? `Heute Auswärtsspiel in ${opponent.city}.`
+      : `Heimspiel gegen ${opponent.name}.`)
+  const storyOutro = scheduleEntry?.storyBeats?.outro || 'Presse lobt Maurice.'
 
   useEffect(() => {
     // Initialize sound system on component mount
@@ -50,6 +70,15 @@ function Match({ progress, onMatchEnd }) {
 
     setVocabs(vocabsWithOptions)
   }, [progress])
+
+  useEffect(() => {
+    if (!matchStarted) return
+
+    setShowStoryIntro(true)
+    const timer = setTimeout(() => setShowStoryIntro(false), 3500)
+
+    return () => clearTimeout(timer)
+  }, [matchStarted, currentMatchday])
 
   const handleAnswer = (userAnswer) => {
     const currentVocab = vocabs[currentVocabIndex]
@@ -132,6 +161,7 @@ function Match({ progress, onMatchEnd }) {
       vocabsReviewed: vocabs.length,
       goalsScored: finalMsvGoals
     })
+    updateSeasonProgress(result.status)
 
     // Check for new achievements
     const newProgress = loadProgress()
@@ -262,6 +292,15 @@ function Match({ progress, onMatchEnd }) {
               Zurück zum Stadion
             </button>
           </div>
+
+          {storyOutro && (
+            <div className="card p-6 text-center">
+              <h3 className="text-lg font-bold text-white mb-2">
+                📣 Story-Sequenz
+              </h3>
+              <p className="text-white/80">{storyOutro}</p>
+            </div>
+          )}
         </div>
       </div>
     )
@@ -276,6 +315,15 @@ function Match({ progress, onMatchEnd }) {
           opponentGoals={opponentGoals}
           opponent={opponent}
         />
+
+        {showStoryIntro && storyIntro && (
+          <div className="mt-3 text-center animate-fade-in">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white/90 text-sm">
+              <span>📝</span>
+              <span>{storyIntro}</span>
+            </div>
+          </div>
+        )}
 
         {/* Streak Display */}
         {streak > 0 && (

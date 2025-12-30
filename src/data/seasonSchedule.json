@@ -1,0 +1,234 @@
+[
+  {
+    "matchday": 1,
+    "opponent": "Bayern München",
+    "location": "home",
+    "city": "Duisburg",
+    "storyBeats": {
+      "intro": "Saisonauftakt in Duisburg – die Tribünen beben!",
+      "outro": "Der Trainer ist zufrieden mit dem Auftakt."
+    }
+  },
+  {
+    "matchday": 2,
+    "opponent": "Borussia Dortmund",
+    "location": "away",
+    "city": "Dortmund",
+    "storyBeats": {
+      "intro": "Heute Auswärtsspiel in Dortmund.",
+      "outro": "Presse lobt Maurice nach dem Klassiker."
+    }
+  },
+  {
+    "matchday": 3,
+    "opponent": "RB Leipzig",
+    "location": "home",
+    "city": "Duisburg"
+  },
+  {
+    "matchday": 4,
+    "opponent": "Bayer Leverkusen",
+    "location": "away",
+    "city": "Leverkusen"
+  },
+  {
+    "matchday": 5,
+    "opponent": "VfB Stuttgart",
+    "location": "home",
+    "city": "Duisburg",
+    "storyBeats": {
+      "intro": "Heimspiel-Flutlicht, die Fans singen deinen Namen.",
+      "outro": "Die Mannschaft feiert dich in der Kabine."
+    }
+  },
+  {
+    "matchday": 6,
+    "opponent": "Eintracht Frankfurt",
+    "location": "away",
+    "city": "Frankfurt"
+  },
+  {
+    "matchday": 7,
+    "opponent": "FC Köln",
+    "location": "home",
+    "city": "Duisburg"
+  },
+  {
+    "matchday": 8,
+    "opponent": "Schalke 04",
+    "location": "away",
+    "city": "Gelsenkirchen"
+  },
+  {
+    "matchday": 9,
+    "opponent": "Werder Bremen",
+    "location": "home",
+    "city": "Duisburg",
+    "storyBeats": {
+      "intro": "Der Co-Trainer erinnert an die Taktik: Druck machen!",
+      "outro": "Die Fans feiern die aggressive Spielweise."
+    }
+  },
+  {
+    "matchday": 10,
+    "opponent": "Hamburger SV",
+    "location": "away",
+    "city": "Hamburg"
+  },
+  {
+    "matchday": 11,
+    "opponent": "VfL Bochum",
+    "location": "home",
+    "city": "Duisburg"
+  },
+  {
+    "matchday": 12,
+    "opponent": "Fortuna Düsseldorf",
+    "location": "away",
+    "city": "Düsseldorf"
+  },
+  {
+    "matchday": 13,
+    "opponent": "FC St. Pauli",
+    "location": "home",
+    "city": "Duisburg"
+  },
+  {
+    "matchday": 14,
+    "opponent": "Hertha BSC",
+    "location": "away",
+    "city": "Berlin"
+  },
+  {
+    "matchday": 15,
+    "opponent": "Bayern München",
+    "location": "away",
+    "city": "München"
+  },
+  {
+    "matchday": 16,
+    "opponent": "Borussia Dortmund",
+    "location": "home",
+    "city": "Duisburg"
+  },
+  {
+    "matchday": 17,
+    "opponent": "RB Leipzig",
+    "location": "away",
+    "city": "Leipzig",
+    "storyBeats": {
+      "intro": "Halbzeit der Saison – Fokus auf die Punkte!",
+      "outro": "Die Tabelle sieht plötzlich freundlicher aus."
+    }
+  },
+  {
+    "matchday": 18,
+    "opponent": "Bayer Leverkusen",
+    "location": "home",
+    "city": "Duisburg"
+  },
+  {
+    "matchday": 19,
+    "opponent": "VfB Stuttgart",
+    "location": "away",
+    "city": "Stuttgart"
+  },
+  {
+    "matchday": 20,
+    "opponent": "Eintracht Frankfurt",
+    "location": "home",
+    "city": "Duisburg"
+  },
+  {
+    "matchday": 21,
+    "opponent": "FC Köln",
+    "location": "away",
+    "city": "Köln"
+  },
+  {
+    "matchday": 22,
+    "opponent": "Schalke 04",
+    "location": "home",
+    "city": "Duisburg"
+  },
+  {
+    "matchday": 23,
+    "opponent": "Werder Bremen",
+    "location": "away",
+    "city": "Bremen"
+  },
+  {
+    "matchday": 24,
+    "opponent": "Hamburger SV",
+    "location": "home",
+    "city": "Duisburg"
+  },
+  {
+    "matchday": 25,
+    "opponent": "VfL Bochum",
+    "location": "away",
+    "city": "Bochum",
+    "storyBeats": {
+      "intro": "Derbysieg liegt in der Luft – volle Konzentration.",
+      "outro": "Die Lokalpresse schreibt vom Teamspirit."
+    }
+  },
+  {
+    "matchday": 26,
+    "opponent": "Fortuna Düsseldorf",
+    "location": "home",
+    "city": "Duisburg"
+  },
+  {
+    "matchday": 27,
+    "opponent": "FC St. Pauli",
+    "location": "away",
+    "city": "Hamburg"
+  },
+  {
+    "matchday": 28,
+    "opponent": "Hertha BSC",
+    "location": "home",
+    "city": "Duisburg"
+  },
+  {
+    "matchday": 29,
+    "opponent": "Bayern München",
+    "location": "home",
+    "city": "Duisburg"
+  },
+  {
+    "matchday": 30,
+    "opponent": "Borussia Dortmund",
+    "location": "away",
+    "city": "Dortmund"
+  },
+  {
+    "matchday": 31,
+    "opponent": "RB Leipzig",
+    "location": "home",
+    "city": "Duisburg"
+  },
+  {
+    "matchday": 32,
+    "opponent": "Bayer Leverkusen",
+    "location": "away",
+    "city": "Leverkusen"
+  },
+  {
+    "matchday": 33,
+    "opponent": "VfB Stuttgart",
+    "location": "home",
+    "city": "Duisburg"
+  },
+  {
+    "matchday": 34,
+    "opponent": "Eintracht Frankfurt",
+    "location": "away",
+    "city": "Frankfurt",
+    "storyBeats": {
+      "intro": "Letzter Spieltag – alles ist möglich!",
+      "outro": "Die Saison endet, aber die Geschichte geht weiter."
+    }
+  }
+]
