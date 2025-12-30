@@ -62,13 +62,13 @@ export const checkAnswer = (userAnswer, correctAnswer) => {
 
 /**
  * Calculate match result
+ * @param {number} msvGoals - Goals scored by MSV (including bonuses)
  * @param {number} correctCount - Number of correct answers
  * @param {number} totalCount - Total number of questions
  * @returns {Object} - Match result with status and score
  */
-export const calculateMatchResult = (correctCount, totalCount) => {
+export const calculateMatchResult = (msvGoals, correctCount, totalCount) => {
   const opponentGoals = totalCount - correctCount
-  const msvGoals = correctCount
 
   let status = 'draw'
   if (msvGoals > opponentGoals) {
