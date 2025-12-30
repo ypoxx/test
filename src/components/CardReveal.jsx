@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const RARITY_STYLES = {
   Common: {
@@ -23,8 +23,66 @@ const RARITY_STYLES = {
   }
 }
 
-function CardReveal({ card, isNew, onClose }) {
+function CardReveal({ card, isNew, reward, onClose }) {
   const [stage, setStage] = useState('closed')
+  const [showReward, setShowReward] = useState(false)
+
+  useEffect(() => {
+    if (reward?.card) {
+      setShowReward(true)
+      return
+    }
+    setShowReward(false)
+  }, [reward])
+
+  if (reward?.card) {
+    if (!showReward) return null
+    const { card: rewardCard, fact } = reward
+
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+        <div className="max-w-sm w-full rounded-2xl bg-gradient-to-b from-slate-900 to-slate-800 border border-white/10 shadow-2xl p-5 relative">
+          <div className="text-center text-white text-lg font-bold mb-3">
+            Neue Sammelkarte!
+          </div>
+
+          <div className={`card-frame rarity-${rewardCard.rarity}`}>
+            <div className="card-header">
+              <span className="text-xs uppercase tracking-wide text-white/80">
+                {rewardCard.title || rewardCard.name}
+              </span>
+              <span className="text-xs font-bold text-white/80">{rewardCard.rarity}</span>
+            </div>
+            <div className="card-body">
+              <div className="text-5xl">{rewardCard.art || '⚽'}</div>
+              <div className="text-xl font-bold text-white mt-2">{rewardCard.name}</div>
+              <div className="text-sm text-white/80 mt-1">{rewardCard.description}</div>
+            </div>
+            <div className="card-footer">MSV Duisburg • Maurice Edition</div>
+          </div>
+
+          {fact && (
+            <div className="mt-4 text-sm text-white/80 bg-white/5 rounded-lg p-3">
+              <div className="font-semibold mb-1">⚡ Fußball-Fact</div>
+              <div>{fact.text}</div>
+            </div>
+          )}
+
+          <button
+            className="btn-primary w-full mt-4"
+            onClick={() => {
+              setShowReward(false)
+              onClose()
+            }}
+          >
+            Weiter
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  if (!card) return null
 
   const styles = RARITY_STYLES[card.rarity] || RARITY_STYLES.Common
 
@@ -72,7 +130,7 @@ function CardReveal({ card, isNew, onClose }) {
                 </span>
               )}
             </div>
-            <div className="text-7xl mb-4">{card.art}</div>
+            <div className="text-7xl mb-4">{card.art || '🎴'}</div>
             <h3 className="text-2xl font-bold mb-2">{card.name}</h3>
             <p className="text-white/80 mb-4">{card.description}</p>
             <div className="text-xs uppercase tracking-widest text-white/60">

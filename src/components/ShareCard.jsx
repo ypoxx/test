@@ -1,59 +1,216 @@
-import { getStreakEmoji } from '../utils/gameEffects'
+import { useMemo, useState } from 'react'
 
-function ShareCard({ summary, matchResult, opponent, streak, achievement, xpGained, level }) {
-  const streakLabel = streak > 1 ? `${streak} in Folge` : 'Neue Runde'
-  const highlightLabel = achievement ? 'Neuer Erfolg' : 'Neuer Boost'
-  const highlightValue = achievement
-    ? `${achievement.emoji} ${achievement.name}`
-    : `+${xpGained} XP`
+const escapeXml = (value) => (
+  String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
+)
+
+const wrapText = (value, maxChars, maxLines = 2) => {
+  const words = String(value).split(' ')
+  const lines = []
+  let line = ''
+
+  words.forEach(word => {
+    const nextLine = line ? `${line} ${word}` : word
+    if (nextLine.length <= maxChars) {
+      line = nextLine
+    } else {
+      if (line) lines.push(line)
+      line = word
+    }
+  })
+
+  if (line) lines.push(line)
+
+  if (lines.length > maxLines) {
+    const truncated = lines.slice(0, maxLines)
+    const lastIndex = truncated.length - 1
+    truncated[lastIndex] = `${truncated[lastIndex].replace(/\.$/, '')}…`
+    return truncated
+  }
+
+  return lines
+}
+
+const getAccentColors = (rarity) => {
+  switch (rarity) {
+    case 'legendary':
+      return ['#fbbf24', '#fb7185']
+    case 'epic':
+      return ['#a855f7', '#ec4899']
+    case 'rare':
+      return ['#38bdf8', '#6366f1']
+    default:
+      return ['#3b82f6', '#22d3ee']
+  }
+}
+
+const getResultTheme = (summaryTitle = '') => {
+  if (summaryTitle.includes('Sieg')) {
+    return {
+      bgStops: ['#60a5fa', '#34d399', '#fcd34d'],
+      titleColor: '#0f172a',
+      messageColor: '#1f2937',
+      metaColor: '#0f172a',
+      footerColor: '#334155'
+    }
+  }
+  if (summaryTitle.includes('Niederlage')) {
+    return {
+      bgStops: ['#f87171', '#fb7185', '#fda4af'],
+      titleColor: '#111827',
+      messageColor: '#1f2937',
+      metaColor: '#111827',
+      footerColor: '#475569'
+    }
+  }
+  return {
+    bgStops: ['#38bdf8', '#a5b4fc', '#c7d2fe'],
+    titleColor: '#0f172a',
+    messageColor: '#1f2937',
+    metaColor: '#0f172a',
+    footerColor: '#334155'
+  }
+}
+
+const buildShareSvg = ({ summary, reward }) => {
+  const title = summary?.title || 'Maurices Spiel'
+  const message = summary?.message || 'Stark gespielt!'
+  const accuracy = summary?.accuracy ?? '0'
+  const score = summary?.score || '0:0'
+  const cardName = reward?.card?.name || 'Neue Sammelkarte'
+  const fact = reward?.fact?.text || 'Weiter so, Maurice!'
+  const rarity = reward?.card?.rarity?.toLowerCase() || 'common'
+  const [accentStart, accentEnd] = getAccentColors(rarity)
+  const theme = getResultTheme(title)
+  const titleLines = wrapText(title, 18, 2)
+  const messageLines = wrapText(message, 34, 2)
+  const cardLines = wrapText(cardName, 22, 2)
+  const factLines = wrapText(fact, 40, 3)
+
+  return `
+    <svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="${theme.bgStops[0]}"/>
+          <stop offset="55%" stop-color="${theme.bgStops[1]}"/>
+          <stop offset="100%" stop-color="${theme.bgStops[2]}"/>
+        </linearGradient>
+        <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="${accentStart}"/>
+          <stop offset="100%" stop-color="${accentEnd}"/>
+        </linearGradient>
+      </defs>
+      <rect width="1080" height="1350" fill="url(#bg)"/>
+      <circle cx="140" cy="180" r="90" fill="rgba(255,255,255,0.3)"/>
+      <circle cx="980" cy="280" r="140" fill="rgba(255,255,255,0.2)"/>
+      <circle cx="960" cy="1120" r="180" fill="rgba(255,255,255,0.18)"/>
+      <circle cx="160" cy="1030" r="120" fill="rgba(255,255,255,0.18)"/>
+      <rect x="60" y="60" width="960" height="1230" rx="48" fill="rgba(255,255,255,0.25)" stroke="rgba(255,255,255,0.5)" stroke-width="4"/>
+      <text x="540" y="150" font-family="Arial, sans-serif" font-size="40" fill="${theme.footerColor}" text-anchor="middle">Maurice' Vokabel-Match</text>
+      <text x="540" y="240" font-family="Arial, sans-serif" font-size="68" fill="${theme.titleColor}" text-anchor="middle">
+        ${titleLines.map((line, index) => `<tspan x="540" dy="${index === 0 ? 0 : 70}">${escapeXml(line)}</tspan>`).join('')}
+      </text>
+      <text x="540" y="360" font-family="Arial, sans-serif" font-size="34" fill="${theme.messageColor}" text-anchor="middle">
+        ${messageLines.map((line, index) => `<tspan x="540" dy="${index === 0 ? 0 : 48}">${escapeXml(line)}</tspan>`).join('')}
+      </text>
+      <rect x="180" y="380" width="720" height="160" rx="28" fill="rgba(15,23,42,0.12)" />
+      <text x="540" y="460" font-family="Arial, sans-serif" font-size="38" fill="${theme.metaColor}" text-anchor="middle">Vokabel-Erfolg: ${accuracy}% · Ergebnis: ${score}</text>
+      <rect x="140" y="590" width="800" height="360" rx="32" fill="url(#accent)" opacity="0.25"/>
+      <text x="540" y="660" font-family="Arial, sans-serif" font-size="32" fill="${theme.messageColor}" text-anchor="middle">Neue Sammelkarte</text>
+      <text x="540" y="740" font-family="Arial, sans-serif" font-size="52" fill="${theme.titleColor}" text-anchor="middle">
+        ${cardLines.map((line, index) => `<tspan x="540" dy="${index === 0 ? 0 : 62}">${escapeXml(line)}</tspan>`).join('')}
+      </text>
+      <text x="540" y="830" font-family="Arial, sans-serif" font-size="30" fill="${theme.messageColor}" text-anchor="middle">⚽ ✨ ⚽</text>
+      <rect x="160" y="940" width="760" height="230" rx="28" fill="rgba(15,23,42,0.12)"/>
+      <text x="540" y="1020" font-family="Arial, sans-serif" font-size="28" fill="${theme.messageColor}" text-anchor="middle">
+        ${factLines.map((line, index) => `<tspan x="540" dy="${index === 0 ? 0 : 40}">${escapeXml(line)}</tspan>`).join('')}
+      </text>
+      <text x="540" y="1240" font-family="Arial, sans-serif" font-size="26" fill="${theme.footerColor}" text-anchor="middle">MSV Duisburg • Ruhrgebiet</text>
+    </svg>
+  `.trim()
+}
+
+function ShareCard({ summary, reward }) {
+  const [sharing, setSharing] = useState(false)
+  const svg = useMemo(() => buildShareSvg({ summary, reward }), [summary, reward])
+  const rarityClass = reward?.card?.rarity ? `share-card--${reward.card.rarity.toLowerCase()}` : 'share-card--common'
+  const resultClass = summary?.title?.includes('Sieg')
+    ? 'share-card--success'
+    : summary?.title?.includes('Niederlage')
+      ? 'share-card--loss'
+      : 'share-card--draw'
+
+  const handleShare = async () => {
+    setSharing(true)
+
+    try {
+      const svgBlob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' })
+      const url = URL.createObjectURL(svgBlob)
+      const image = new Image()
+      const blob = await new Promise(resolve => {
+        image.onload = () => {
+          const canvas = document.createElement('canvas')
+          canvas.width = 1080
+          canvas.height = 1350
+          const ctx = canvas.getContext('2d')
+          ctx.drawImage(image, 0, 0)
+          canvas.toBlob(resolve, 'image/png')
+          URL.revokeObjectURL(url)
+        }
+        image.src = url
+      })
+      const file = new File([blob], 'maurice-erfolg.png', { type: 'image/png' })
+
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({
+          title: 'Maurices Erfolgskarte',
+          text: 'Maurice hat wieder Vokabeln gespielt! ⚽',
+          files: [file]
+        })
+      } else {
+        const downloadUrl = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = downloadUrl
+        link.download = 'maurice-erfolg.png'
+        link.click()
+        URL.revokeObjectURL(downloadUrl)
+      }
+    } finally {
+      setSharing(false)
+    }
+  }
 
   return (
-    <div className="w-full max-w-xl mx-auto">
-      <div className="rounded-2xl border border-white/15 bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 p-6 shadow-xl">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="text-xs uppercase tracking-[0.3em] text-blue-200/70">MSV Duisburg</div>
-            <div className="text-2xl font-bold">Zebra Match</div>
-          </div>
-          <div className="flex items-center gap-2 text-xl font-bold">
-            <span>🔵⚪</span>
-            <span className="text-white/70">vs</span>
-            <span>{opponent.logo}</span>
+    <div className="card p-4 mt-6">
+      <div className="text-center text-xl font-bold mb-4">📲 Erfolgskarte teilen</div>
+
+      <div className={`share-card ${rarityClass} ${resultClass}`}>
+        <div className="share-card-header">
+          <div className="share-card-eyebrow">Maurice' Vokabel-Match</div>
+          <div className="share-card-title">{summary?.title}</div>
+        </div>
+        <div className="share-card-body">
+          <div className="share-card-message">{summary?.message}</div>
+          <div className="share-card-meta">
+            Vokabel-Erfolg: {summary?.accuracy}% · Ergebnis: {summary?.score}
           </div>
         </div>
-
-        <div className="mt-6 rounded-xl bg-white/10 p-4">
-          <div className="text-sm text-white/70">Endstand</div>
-          <div className="mt-2 flex items-center justify-between">
-            <div className="text-4xl font-bold text-white">{matchResult.msvGoals}</div>
-            <div className="text-xl text-white/60">:</div>
-            <div className="text-4xl font-bold text-white">{matchResult.opponentGoals}</div>
-          </div>
-          <div className="mt-2 text-sm text-white/70">{summary.title}</div>
+        <div className="share-card-reward">
+          <div className="share-card-reward-label">Neue Karte</div>
+          <div className="share-card-reward-title">{reward?.card?.name || '—'}</div>
+          <div className="share-card-fact">{reward?.fact?.text || 'Weiter so!'}</div>
         </div>
-
-        <div className="mt-4 grid grid-cols-3 gap-3 text-sm">
-          <div className="rounded-lg bg-white/5 p-3 text-center">
-            <div className="text-2xl font-bold text-goal">{matchResult.accuracy}%</div>
-            <div className="text-xs text-white/60">Trefferquote</div>
-          </div>
-          <div className="rounded-lg bg-white/5 p-3 text-center">
-            <div className="text-2xl font-bold">{getStreakEmoji(streak)}</div>
-            <div className="text-xs text-white/60">{streakLabel}</div>
-          </div>
-          <div className="rounded-lg bg-white/5 p-3 text-center">
-            <div className="text-2xl font-bold text-yellow-300">Lvl {level}</div>
-            <div className="text-xs text-white/60">Dein Level</div>
-          </div>
-        </div>
-
-        <div className="mt-4 rounded-xl border border-blue-400/40 bg-blue-500/20 p-4">
-          <div className="text-xs uppercase tracking-[0.2em] text-blue-100/80">{highlightLabel}</div>
-          <div className="mt-1 text-lg font-semibold text-white">{highlightValue}</div>
-        </div>
-
-        <div className="mt-4 text-xs text-white/60">maurice-vocab-trainer.de</div>
+        <div className="share-card-footer">MSV Duisburg • Ruhrgebiet</div>
       </div>
+
+      <button className="btn-primary w-full mt-4" onClick={handleShare} disabled={sharing}>
+        {sharing ? 'Teilen läuft...' : 'Jetzt teilen'}
+      </button>
     </div>
   )
 }

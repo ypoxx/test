@@ -1,23 +1,24 @@
 import { getRarityColor, getRarityLabel } from '../utils/achievements'
 import { triggerHapticFeedback } from '../utils/gameEffects'
-import soundManager from '../utils/sounds'
 import { useEffect } from 'react'
+import CardReveal from './CardReveal'
 
 function AchievementUnlocked({ achievement, onClose }) {
   useEffect(() => {
     // Trigger haptic feedback when achievement is shown
     triggerHapticFeedback('victory')
-
-    // Play achievement sound based on rarity
-    soundManager.playAchievement(achievement.rarity)
   }, [achievement.rarity])
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
       <div className="w-full max-w-md animate-bounce-in">
         {/* Achievement Card (Sammelkarten-Optik) */}
-        <div className={`relative rounded-2xl p-1 ${getRarityColor(achievement.rarity)} shadow-2xl`}>
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6">
+        <CardReveal
+          rarity={achievement.rarity}
+          playSound
+          sound={achievement.rarity === 'legendary' ? 'legendary' : 'achievement'}
+          className="shadow-2xl"
+        >
             {/* Header */}
             <div className="text-center mb-4">
               <div className="text-sm font-bold uppercase tracking-wider text-white/60 mb-2">
@@ -59,8 +60,7 @@ function AchievementUnlocked({ achievement, onClose }) {
             >
               Weiter
             </button>
-          </div>
-        </div>
+        </CardReveal>
 
         {/* Sparkles */}
         <div className="absolute inset-0 pointer-events-none">

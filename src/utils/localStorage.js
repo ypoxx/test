@@ -1,4 +1,7 @@
+import { calculateLevel } from './xpSystem'
+
 const STORAGE_KEY = 'maurice_vocab_trainer_progress'
+const LAST_OPPONENT_KEY = 'maurice_vocab_trainer_last_opponent'
 
 // Initial default progress
 const DEFAULT_PROGRESS = {
@@ -13,7 +16,8 @@ const DEFAULT_PROGRESS = {
   level: 1, // Current level
   lastPlayedDate: null, // For daily streak tracking
   dailyStreak: 0, // Consecutive days played
-  unlockedCards: [] // Array of unlocked card IDs
+  unlockedCards: [], // Array of unlocked card IDs
+  unlockedFacts: []
 }
 
 /**
@@ -30,6 +34,42 @@ export const saveProgress = (progressData) => {
     return true
   } catch (error) {
     console.error('Error saving progress:', error)
+    return false
+  }
+}
+
+export const exportProgressData = () => {
+  try {
+    const savedData = localStorage.getItem(STORAGE_KEY)
+    if (savedData) {
+      return savedData
+    }
+    const fallback = JSON.stringify({
+      ...DEFAULT_PROGRESS,
+      lastSaved: new Date().toISOString()
+    })
+    return fallback
+  } catch (error) {
+    console.error('Error exporting progress:', error)
+    return null
+  }
+}
+
+export const importProgressData = (progressData) => {
+  try {
+    const data = typeof progressData === 'string' ? JSON.parse(progressData) : progressData
+    if (!data || typeof data !== 'object' || !data.vocabProgress) {
+      return false
+    }
+    const merged = {
+      ...DEFAULT_PROGRESS,
+      ...data,
+      lastSaved: new Date().toISOString()
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(merged))
+    return true
+  } catch (error) {
+    console.error('Error importing progress:', error)
     return false
   }
 }
@@ -68,6 +108,7 @@ export const loadProgress = () => {
 export const resetProgress = () => {
   try {
     localStorage.removeItem(STORAGE_KEY)
+    localStorage.removeItem(LAST_OPPONENT_KEY)
     saveProgress(DEFAULT_PROGRESS)
     return DEFAULT_PROGRESS
   } catch (error) {
@@ -225,6 +266,32 @@ export const unlockAchievement = (achievementId) => {
 }
 
 /**
+ * Unlock a collectible card
+ * @param {string} cardId - ID of the card to unlock
+ */
+export const unlockCard = (cardId) => {
+  const progress = loadProgress()
+  if (!progress.unlockedCards.includes(cardId)) {
+    progress.unlockedCards.push(cardId)
+    saveProgress(progress)
+  }
+  return progress
+}
+
+/**
+ * Unlock a football fact
+ * @param {string} factId - ID of the fact to unlock
+ */
+export const unlockFact = (factId) => {
+  const progress = loadProgress()
+  if (!progress.unlockedFacts.includes(factId)) {
+    progress.unlockedFacts.push(factId)
+    saveProgress(progress)
+  }
+  return progress
+}
+
+/**
  * Clear new achievements notifications
  */
 export const clearNewAchievements = () => {
@@ -248,7 +315,6 @@ export const addXP = (xpToAdd) => {
   progress.xp = oldXP + xpToAdd
 
   // Calculate new level based on total XP
-  const { calculateLevel } = require('./xpSystem')
   const newLevel = calculateLevel(progress.xp)
 
   const leveledUp = newLevel > oldLevel
@@ -308,6 +374,26 @@ export const updateDailyStreak = () => {
     streakIncreased,
     currentStreak: progress.dailyStreak,
     progress
+  }
+}
+
+export const loadLastOpponentName = () => {
+  try {
+    return localStorage.getItem(LAST_OPPONENT_KEY)
+  } catch (error) {
+    console.error('Error loading last opponent:', error)
+    return null
+  }
+}
+
+export const saveLastOpponentName = (opponentName) => {
+  try {
+    if (!opponentName) return null
+    localStorage.setItem(LAST_OPPONENT_KEY, opponentName)
+    return opponentName
+  } catch (error) {
+    console.error('Error saving last opponent:', error)
+    return null
   }
 }
 

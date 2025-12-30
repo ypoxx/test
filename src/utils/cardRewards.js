@@ -1,5 +1,6 @@
 import cardsData from '../data/cards.json'
-import { loadProgress, saveProgress } from './localStorage'
+import factsData from '../data/facts.json'
+import { loadProgress, unlockCard, unlockFact } from './localStorage'
 
 export const CARD_RARITIES = ['Common', 'Rare', 'Epic', 'Legendary']
 
@@ -17,7 +18,10 @@ const getAvailableRarities = (cards) => {
 
 const rollRarity = (cards) => {
   const availableRarities = getAvailableRarities(cards)
-  const totalWeight = availableRarities.reduce((sum, rarity) => sum + RARITY_WEIGHTS[rarity], 0)
+  const totalWeight = availableRarities.reduce(
+    (sum, rarity) => sum + (RARITY_WEIGHTS[rarity] || 0),
+    0
+  )
   let roll = Math.random() * totalWeight
 
   for (const rarity of availableRarities) {
@@ -34,6 +38,23 @@ const pickRandomCard = (cards) => {
   const rarity = rollRarity(cards)
   const candidates = cards.filter(card => card.rarity === rarity)
   const pool = candidates.length > 0 ? candidates : cards
+  return pool[Math.floor(Math.random() * pool.length)]
+}
+
+const pickRarity = () => rollRarity(cardsData)
+
+const pickCardForRarity = (rarity, unlockedCards) => {
+  const available = cardsData.filter(card => card.rarity === rarity)
+  const locked = available.filter(card => !unlockedCards.includes(card.id))
+  const pool = locked.length > 0 ? locked : available
+  if (pool.length === 0) return null
+  return pool[Math.floor(Math.random() * pool.length)]
+}
+
+const pickFact = (unlockedFacts) => {
+  const lockedFacts = factsData.filter(fact => !unlockedFacts.includes(fact.id))
+  const pool = lockedFacts.length > 0 ? lockedFacts : factsData
+  if (pool.length === 0) return null
   return pool[Math.floor(Math.random() * pool.length)]
 }
 
@@ -55,8 +76,7 @@ export const rollCardReward = ({ resultStatus, streak }) => {
   const isNew = !unlockedCards.includes(card.id)
 
   if (isNew) {
-    progress.unlockedCards = [...unlockedCards, card.id]
-    saveProgress(progress)
+    unlockCard(card.id)
   }
 
   return { card, isNew }
@@ -67,5 +87,26 @@ export const getCardCompletion = (progress) => {
   return {
     unlockedCount: unlockedCards.length,
     totalCount: cardsData.length
+  }
+}
+
+export const awardMatchRewards = ({ wonMatch, streak }) => {
+  const progress = loadProgress()
+  const rarity = streak >= 5 ? 'Epic' : wonMatch ? pickRarity() : 'Common'
+  const card = pickCardForRarity(rarity, progress.unlockedCards || [])
+  const fact = pickFact(progress.unlockedFacts || [])
+
+  if (card) {
+    unlockCard(card.id)
+  }
+
+  if (fact) {
+    unlockFact(fact.id)
+  }
+
+  return {
+    card,
+    fact,
+    rarity
   }
 }

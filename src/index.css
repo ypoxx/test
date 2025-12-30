@@ -34,10 +34,12 @@
 /* Custom Utilities */
 @layer utilities {
   .btn-primary {
-    @apply bg-msv-blue text-white font-bold py-3 px-6 rounded-lg shadow-lg
-           hover:bg-blue-700 hover:shadow-xl hover:scale-105
-           active:scale-95 transition-all duration-150
+    @apply text-white font-bold py-3 px-6 rounded-2xl shadow-lg
+           hover:shadow-2xl hover:scale-[1.02]
+           active:scale-[0.98] transition-all duration-200
            text-lg min-h-[44px] relative overflow-hidden;
+    background-image: linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(56, 189, 248, 0.95));
+    border: 1px solid rgba(191, 219, 254, 0.4);
   }
 
   .btn-primary::before {
@@ -53,20 +55,56 @@
     transition: width 0.6s, height 0.6s;
   }
 
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top, rgba(255, 255, 255, 0.35), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .btn-primary:hover::after {
+    opacity: 0.8;
+  }
+
   .btn-primary:active::before {
     width: 300px;
     height: 300px;
   }
 
+  .btn-primary--hero {
+    @apply text-2xl py-5 rounded-3xl shadow-2xl;
+    letter-spacing: 0.01em;
+  }
+
   .btn-secondary {
-    @apply bg-gray-700 text-white font-semibold py-2 px-5 rounded-lg
-           hover:bg-gray-600 hover:shadow-lg hover:scale-105
-           active:scale-95 transition-all duration-150
+    @apply text-white font-semibold py-2 px-5 rounded-xl
+           hover:shadow-lg hover:scale-[1.01]
+           active:scale-[0.98] transition-all duration-200
            min-h-[44px] relative overflow-hidden;
+    background-image: linear-gradient(135deg, rgba(55, 65, 81, 0.9), rgba(71, 85, 105, 0.9));
+    border: 1px solid rgba(148, 163, 184, 0.2);
+  }
+
+  .btn-secondary--soft {
+    @apply rounded-2xl;
+    background-image: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(51, 65, 85, 0.9));
   }
 
   .card {
-    @apply bg-white/10 backdrop-blur-sm rounded-xl p-4 shadow-xl border border-white/20;
+    @apply rounded-2xl p-4 shadow-xl border border-white/10 relative overflow-hidden;
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04));
+    backdrop-filter: blur(10px);
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top, rgba(255, 255, 255, 0.25), transparent 55%);
+    opacity: 0.6;
+    pointer-events: none;
   }
 
   .stadium-bg {
@@ -664,6 +702,182 @@
     animation: particleBurst 0.8s ease-out forwards;
   }
 
+  /* Collectible card styles */
+  .card-frame {
+    @apply rounded-2xl p-4 border border-white/10 bg-gradient-to-br from-slate-800 to-slate-900 text-center relative overflow-hidden shadow-xl;
+  }
+
+  .card-header {
+    @apply flex items-center justify-between text-white/70 text-xs mb-3;
+  }
+
+  .card-body {
+    @apply flex flex-col items-center gap-1;
+  }
+
+  .card-footer {
+    @apply mt-4 text-[10px] uppercase tracking-wide text-white/60;
+  }
+
+  .card-locked {
+    @apply grayscale opacity-50;
+  }
+
+  .rarity-common {
+    @apply border-white/20;
+  }
+
+  .rarity-rare {
+    @apply border-blue-400/60 shadow-blue-500/30;
+  }
+
+  .rarity-epic {
+    @apply border-purple-400/70 shadow-purple-500/40;
+  }
+
+  .rarity-legendary {
+    @apply border-yellow-300/80 shadow-yellow-500/50;
+  }
+
+  .rarity-legendary::before,
+  .rarity-epic::before,
+  .rarity-rare::before {
+    content: '';
+    position: absolute;
+    inset: -40%;
+    background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+    animation: shine 4s infinite;
+  }
+
+  /* Share card */
+  .share-card {
+    @apply rounded-2xl p-4 border border-white/10 shadow-xl relative overflow-hidden;
+    color: #0f172a;
+  }
+
+  .share-card::before,
+  .share-card::after {
+    content: '';
+    position: absolute;
+    inset: -20%;
+    pointer-events: none;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 60%);
+    opacity: 0.5;
+  }
+
+  .share-card::after {
+    inset: -30% 20%;
+    opacity: 0.35;
+  }
+
+  .share-card--success {
+    background-image:
+      radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.7), transparent 45%),
+      radial-gradient(circle at 90% 20%, rgba(255, 255, 255, 0.5), transparent 45%),
+      radial-gradient(circle at 20% 85%, rgba(255, 255, 255, 0.4), transparent 40%),
+      linear-gradient(135deg, rgba(96, 165, 250, 0.9), rgba(52, 211, 153, 0.9), rgba(252, 211, 77, 0.95));
+  }
+
+  .share-card--draw {
+    background-image:
+      radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.6), transparent 45%),
+      radial-gradient(circle at 90% 20%, rgba(255, 255, 255, 0.4), transparent 45%),
+      radial-gradient(circle at 20% 85%, rgba(255, 255, 255, 0.35), transparent 40%),
+      linear-gradient(135deg, rgba(56, 189, 248, 0.85), rgba(165, 180, 252, 0.9), rgba(199, 210, 254, 0.95));
+  }
+
+  .share-card--loss {
+    background-image:
+      radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.6), transparent 45%),
+      radial-gradient(circle at 90% 20%, rgba(255, 255, 255, 0.4), transparent 45%),
+      radial-gradient(circle at 20% 85%, rgba(255, 255, 255, 0.35), transparent 40%),
+      linear-gradient(135deg, rgba(248, 113, 113, 0.9), rgba(251, 113, 133, 0.9), rgba(253, 164, 175, 0.95));
+  }
+
+  .share-card--common {
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+
+  .share-card--rare {
+    border-color: rgba(56, 189, 248, 0.6);
+  }
+
+  .share-card--epic {
+    border-color: rgba(168, 85, 247, 0.6);
+  }
+
+  .share-card--legendary {
+    border-color: rgba(250, 204, 21, 0.7);
+  }
+
+  .share-card-header {
+    @apply text-center mb-4;
+  }
+
+  .share-card-body {
+    @apply text-center mb-4;
+  }
+
+  .share-card-reward {
+    @apply rounded-xl p-3 text-center;
+    background: rgba(255, 255, 255, 0.6);
+  }
+
+  .share-card-eyebrow {
+    @apply text-sm uppercase tracking-wide;
+    color: rgba(15, 23, 42, 0.7);
+  }
+
+  .share-card-title {
+    @apply text-3xl font-bold;
+  }
+
+  .share-card-message {
+    @apply text-lg font-semibold;
+  }
+
+  .share-card-meta {
+    @apply text-sm mt-2;
+    color: rgba(15, 23, 42, 0.7);
+  }
+
+  .share-card-reward-label {
+    @apply text-sm;
+    color: rgba(15, 23, 42, 0.7);
+  }
+
+  .share-card-reward-title {
+    @apply text-lg font-bold;
+  }
+
+  .share-card-message,
+  .share-card-fact {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .share-card-fact {
+    -webkit-line-clamp: 3;
+    color: rgba(15, 23, 42, 0.7);
+  }
+
+  .share-card-footer {
+    @apply mt-4 text-center text-[10px] uppercase tracking-wide;
+    color: rgba(15, 23, 42, 0.6);
+  }
+
+  .progress-hatched {
+    background-image: repeating-linear-gradient(
+      45deg,
+      rgba(148, 163, 184, 0.25),
+      rgba(148, 163, 184, 0.25) 6px,
+      rgba(148, 163, 184, 0.1) 6px,
+      rgba(148, 163, 184, 0.1) 12px
+    );
+  }
+
   @keyframes particleBurst {
     0% {
       transform: translate(0, 0) scale(1);
@@ -672,6 +886,108 @@
     100% {
       transform: translate(var(--x, 50px), var(--y, -50px)) scale(0);
       opacity: 0;
+    }
+  }
+
+  /* Rarity card styles */
+  .rarity-common {
+    background: linear-gradient(135deg, rgba(148, 163, 184, 0.4), rgba(71, 85, 105, 0.4));
+    border: 1px solid rgba(148, 163, 184, 0.4);
+    box-shadow: 0 0 20px rgba(148, 163, 184, 0.25);
+  }
+
+  .rarity-rare {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(14, 116, 144, 0.4));
+    border: 1px solid rgba(96, 165, 250, 0.6);
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.35);
+    animation: rarityGlow 3s ease-in-out infinite;
+  }
+
+  .rarity-epic {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.45), rgba(88, 28, 135, 0.5));
+    border: 1px solid rgba(192, 132, 252, 0.7);
+    box-shadow: 0 0 40px rgba(168, 85, 247, 0.45);
+    animation: rarityGlow 2.5s ease-in-out infinite;
+  }
+
+  .rarity-legendary {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(250, 204, 21, 0.55), rgba(245, 158, 11, 0.6));
+    border: 1px solid rgba(253, 224, 71, 0.8);
+    box-shadow: 0 0 45px rgba(251, 191, 36, 0.6);
+    animation: legendaryGlow 2.2s ease-in-out infinite;
+  }
+
+  .rarity-legendary::before {
+    content: '';
+    position: absolute;
+    inset: -60% -30%;
+    background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
+    transform: translateX(-100%);
+    animation: legendaryShimmer 3s linear infinite;
+    pointer-events: none;
+  }
+
+  .rarity-particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .rarity-particle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.95), rgba(250, 204, 21, 0.5));
+    box-shadow: 0 0 8px rgba(251, 191, 36, 0.9);
+    animation: sparkleFloat 2.8s ease-in-out infinite;
+  }
+
+  .rarity-particle:nth-child(1) { top: 20%; left: 15%; animation-delay: 0s; }
+  .rarity-particle:nth-child(2) { top: 30%; right: 20%; animation-delay: 0.4s; }
+  .rarity-particle:nth-child(3) { bottom: 25%; left: 30%; animation-delay: 0.8s; }
+  .rarity-particle:nth-child(4) { bottom: 20%; right: 25%; animation-delay: 1.2s; }
+  .rarity-particle:nth-child(5) { top: 55%; left: 50%; animation-delay: 1.6s; }
+
+  @keyframes rarityGlow {
+    0%, 100% {
+      box-shadow: 0 0 25px rgba(59, 130, 246, 0.35);
+    }
+    50% {
+      box-shadow: 0 0 45px rgba(59, 130, 246, 0.6);
+    }
+  }
+
+  @keyframes legendaryGlow {
+    0%, 100% {
+      box-shadow: 0 0 35px rgba(251, 191, 36, 0.5);
+    }
+    50% {
+      box-shadow: 0 0 60px rgba(251, 191, 36, 0.8);
+    }
+  }
+
+  @keyframes legendaryShimmer {
+    0% {
+      transform: translateX(-100%) rotate(15deg);
+      opacity: 0.6;
+    }
+    100% {
+      transform: translateX(120%) rotate(15deg);
+      opacity: 0;
+    }
+  }
+
+  @keyframes sparkleFloat {
+    0%, 100% {
+      transform: translateY(0) scale(1);
+      opacity: 0.8;
+    }
+    50% {
+      transform: translateY(-12px) scale(1.3);
+      opacity: 1;
     }
   }
 }

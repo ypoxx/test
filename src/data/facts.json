@@ -1,0 +1,77 @@
+[
+  {
+    "id": "fact_msv_zebra",
+    "text": "Die Zebras stehen für Mut und Zusammenhalt — perfekte Lernpower.",
+    "topic": "msv"
+  },
+  {
+    "id": "fact_msv_ruhrgebiet",
+    "text": "Der MSV kommt aus dem Ruhrgebiet — hier zählen Herz und Einsatz.",
+    "topic": "msv"
+  },
+  {
+    "id": "fact_ruhr_rivalry",
+    "text": "Derbys im Revier zeigen: Respekt, Tempo, Leidenschaft.",
+    "topic": "ruhrgebiet"
+  },
+  {
+    "id": "fact_muelheim_ruhr",
+    "text": "Mülheim liegt im Herzen des Reviers — kurze Wege, große Träume.",
+    "topic": "local"
+  },
+  {
+    "id": "fact_msv_home",
+    "text": "Heimspiele geben Energie — wie ein Lautstärke-Boost fürs Lernen.",
+    "topic": "msv"
+  },
+  {
+    "id": "fact_striker_memory",
+    "text": "Stürmer merken jede Chance — genauso kannst du Wörter sammeln.",
+    "topic": "motivation"
+  },
+  {
+    "id": "fact_ruhr_cities",
+    "text": "Die Städte liegen nah — Teamgeist verbindet überall.",
+    "topic": "ruhrgebiet"
+  },
+  {
+    "id": "fact_club_identity",
+    "text": "MSV-Identität: kämpfen, füreinander da sein, nie aufgeben.",
+    "topic": "msv"
+  },
+  {
+    "id": "fact_panini_story",
+    "text": "Seltene Karten sind wie seltene Wörter: umso stolzer sammelt man sie.",
+    "topic": "cards"
+  },
+  {
+    "id": "fact_matchday_focus",
+    "text": "Matchday-Fokus heißt: kurz, klar, konzentriert.",
+    "topic": "motivation"
+  },
+  {
+    "id": "fact_quick_pass",
+    "text": "Schnelle Pässe = schnelle Worte im Kopf — Tempo bringt Spaß.",
+    "topic": "motivation"
+  },
+  {
+    "id": "fact_crowd_energy",
+    "text": "Die Kurve pusht dich — jede richtige Antwort fühlt sich lauter an.",
+    "topic": "msv"
+  },
+  {
+    "id": "fact_goal_memory",
+    "text": "Jedes richtige Wort ist ein Tor — zähl sie mit Stolz.",
+    "topic": "motivation"
+  },
+  {
+    "id": "fact_ruhr_football",
+    "text": "Im Revier gehört Fußball zum Alltag — Lernen kann genauso feiern.",
+    "topic": "ruhrgebiet"
+  },
+  {
+    "id": "fact_msv_colors",
+    "text": "Blau und Weiß erinnern: ruhig bleiben, dranbleiben, zusammenstehen.",
+    "topic": "msv"
+  }
+]

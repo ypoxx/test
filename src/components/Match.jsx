@@ -5,22 +5,30 @@ import AchievementUnlocked from './AchievementUnlocked'
 import ConfettiExplosion from './ConfettiExplosion'
 import LevelUpNotification from './LevelUpNotification'
 import MatchCountdown from './MatchCountdown'
-import CardReveal from './CardReveal'
 import vocabsData from '../data/vocabs.json'
 import { selectVocabsForMatch } from '../utils/spacedRepetition'
-import { selectRandomOpponent, checkAnswer, calculateMatchResult, getMatchSummaryMessage } from '../utils/matchLogic'
-import { updateVocabProgress, updateGoalsAndLeague, addMatchToHistory, loadProgress, unlockAchievement, addXP, updateDailyStreak } from '../utils/localStorage'
+import { selectRandomOpponent, getDerbyOpponents, checkAnswer, calculateMatchResult, getMatchSummaryMessage } from '../utils/matchLogic'
+import { updateVocabProgress, updateGoalsAndLeague, addMatchToHistory, loadProgress, unlockAchievement, addXP, updateDailyStreak, loadLastOpponentName, saveLastOpponentName } from '../utils/localStorage'
 import { generateMultipleChoiceOptions } from '../utils/multipleChoice'
 import { calculateStreakBonus, getStreakMessage, getStreakEmoji, getStreakColor, triggerHapticFeedback } from '../utils/gameEffects'
 import { checkNewAchievements } from '../utils/achievements'
 import { calculateXPReward } from '../utils/xpSystem'
-import { rollCardReward } from '../utils/cardRewards'
+import CardReveal from './CardReveal'
+import { awardMatchRewards, rollCardReward } from '../utils/cardRewards'
 import soundManager from '../utils/sounds'
-import { createShareCardBlob } from '../utils/shareCard'
-import { downloadImage, shareImage } from '../utils/share'
+import ShareCard from './ShareCard'
 
 function Match({ progress, onMatchEnd }) {
-  const [opponent] = useState(selectRandomOpponent())
+  const [specialMatch] = useState(() => Math.random() < 0.2)
+  const [opponent] = useState(() => {
+    const lastOpponent = loadLastOpponentName()
+    const derbyPool = getDerbyOpponents()
+    const nextOpponent = specialMatch && derbyPool.length > 0
+      ? selectRandomOpponent(lastOpponent, opponent => opponent.isDerby)
+      : selectRandomOpponent(lastOpponent)
+    saveLastOpponentName(nextOpponent.name)
+    return nextOpponent
+  })
   const [vocabs, setVocabs] = useState([])
   const [currentVocabIndex, setCurrentVocabIndex] = useState(0)
   const [msvGoals, setMsvGoals] = useState(0)
@@ -45,6 +53,8 @@ function Match({ progress, onMatchEnd }) {
   const [crowdAnimationKey, setCrowdAnimationKey] = useState(0)
   const [cardReward, setCardReward] = useState(null)
   const [showCardReveal, setShowCardReveal] = useState(false)
+  const [reward, setReward] = useState(null)
+  const [showReward, setShowReward] = useState(false)
 
   useEffect(() => {
     // Initialize sound system on component mount
@@ -69,11 +79,18 @@ function Match({ progress, onMatchEnd }) {
     // Update vocab progress
     updateVocabProgress(currentVocab.id, isCorrect)
 
+    let nextStreak = streak
+    let nextMsvGoals = msvGoals
+    let nextOpponentGoals = opponentGoals
+    let nextCorrectAnswers = correctAnswers
+    let nextWasDownThree = wasDownThree
+    let nextXPGained = xpGained
+    let streakBonus = 0
+
     // Update streak
-    let newStreak = streak
     if (isCorrect) {
-      newStreak = streak + 1
-      setStreak(newStreak)
+      nextStreak = streak + 1
+      setStreak(nextStreak)
       setMatchFeedback('success')
       setGoalAnimationKey(prev => prev + 1)
       setCrowdAnimationKey(prev => prev + 1)
@@ -85,34 +102,36 @@ function Match({ progress, onMatchEnd }) {
       soundManager.playGoal()
 
       // Calculate and add XP
-      const xpReward = calculateXPReward(newStreak, currentVocab.difficulty)
-      setXPGained(prev => prev + xpReward)
+      const xpReward = calculateXPReward(nextStreak, currentVocab.difficulty)
+      nextXPGained += xpReward
+      setXPGained(nextXPGained)
 
       // Check for streak bonus
-      const streakBonus = calculateStreakBonus(newStreak)
-      const message = getStreakMessage(newStreak)
+      streakBonus = calculateStreakBonus(nextStreak)
+      const message = getStreakMessage(nextStreak)
 
       if (message) {
         setStreakMessage(message)
         if (streakBonus > 0) {
           triggerHapticFeedback('streak')
           // Play streak sound with level
-          soundManager.playStreak(newStreak >= 5 ? 2 : 1)
+          soundManager.playStreak(nextStreak >= 5 ? 2 : 1)
         }
       }
 
       // Update score (including streak bonus)
-      setMsvGoals(prev => prev + 1 + streakBonus)
-      setCorrectAnswers(prev => prev + 1)
+      nextMsvGoals += 1 + streakBonus
+      nextCorrectAnswers += 1
+      setMsvGoals(nextMsvGoals)
+      setCorrectAnswers(nextCorrectAnswers)
     } else {
+      nextStreak = 0
       setStreak(0)
       setStreakMessage(null)
-      setOpponentGoals(prev => prev + 1)
-      setMatchFeedback('miss')
-      setCrowdAnimationKey(prev => prev + 1)
-      const nextOpponentGoals = opponentGoals + 1
+      nextOpponentGoals += 1
       setOpponentGoals(nextOpponentGoals)
-      if (msvGoals === 0 && nextOpponentGoals >= 3) {
+      if (nextMsvGoals === 0 && nextOpponentGoals >= 3) {
+        nextWasDownThree = true
         setWasDownThree(true)
       }
 
@@ -129,7 +148,14 @@ function Match({ progress, onMatchEnd }) {
         setCurrentVocabIndex(prev => prev + 1)
       } else {
         // Match finished
-        finishMatch()
+        finishMatch({
+          finalMsvGoals: nextMsvGoals,
+          finalCorrectAnswers: nextCorrectAnswers,
+          finalOpponentGoals: nextOpponentGoals,
+          finalStreak: nextStreak,
+          finalWasDownThree: nextWasDownThree,
+          finalXpGained: nextXPGained
+        })
       }
     }, 2000)
 
@@ -140,11 +166,17 @@ function Match({ progress, onMatchEnd }) {
     return isCorrect
   }
 
-  const finishMatch = () => {
-    // Use current scores - they're already updated in handleAnswer!
-    const finalMsvGoals = msvGoals
-
-    const result = calculateMatchResult(finalMsvGoals, correctAnswers, vocabs.length)
+  const finishMatch = ({
+    finalMsvGoals = msvGoals,
+    finalCorrectAnswers = correctAnswers,
+    finalOpponentGoals = opponentGoals,
+    finalStreak = streak,
+    finalWasDownThree = wasDownThree,
+    finalXpGained = xpGained
+  } = {}) => {
+    const result = calculateMatchResult(finalMsvGoals, finalCorrectAnswers, vocabs.length)
+    const bonusXp = specialMatch ? 30 : 0
+    const totalXpGained = finalXpGained + bonusXp
 
     // Save old progress for achievement comparison
     const oldProgress = loadProgress()
@@ -156,7 +188,7 @@ function Match({ progress, onMatchEnd }) {
       score: result.score,
       vocabsReviewed: vocabs.length,
       goalsScored: finalMsvGoals,
-      comebackWin: wasDownThree && result.status === 'win'
+      comebackWin: finalWasDownThree && result.status === 'win'
     })
 
     // Check for new achievements
@@ -171,7 +203,8 @@ function Match({ progress, onMatchEnd }) {
     setNewAchievements(unlockedAchievements)
 
     // Add XP and check for level up
-    const xpResult = addXP(xpGained)
+    setXPGained(totalXpGained)
+    const xpResult = addXP(totalXpGained)
     if (xpResult.leveledUp) {
       setLeveledUpTo(xpResult.newLevel)
       setShowLevelUp(true)
@@ -180,8 +213,15 @@ function Match({ progress, onMatchEnd }) {
     // Update daily streak
     updateDailyStreak()
 
-    const reward = rollCardReward({ resultStatus: result.status, streak })
+    const reward = rollCardReward({ resultStatus: result.status, streak: finalStreak })
     setCardReward(reward)
+    // Award collectible card + fact
+    const rewardResult = awardMatchRewards({
+      wonMatch: result.status === 'win',
+      streak: finalStreak
+    })
+    setReward(rewardResult)
+    setShowReward(true)
 
     // Trigger victory haptic feedback and sounds
     if (result.status === 'win') {
@@ -198,6 +238,10 @@ function Match({ progress, onMatchEnd }) {
   }
 
   const handleContinue = () => {
+    if (showReward) {
+      setShowReward(false)
+      return
+    }
     // Simplified: Check if we have achievements to show
     if (newAchievements.length > 0 && !showingAchievement) {
       setShowingAchievement(true)
@@ -279,6 +323,12 @@ function Match({ progress, onMatchEnd }) {
 
   if (matchFinished && matchResult) {
     const summary = getMatchSummaryMessage(matchResult, opponent)
+    const shareSummary = {
+      title: summary.title,
+      message: summary.message,
+      accuracy: matchResult.accuracy,
+      score: matchResult.score
+    }
 
     if (showCardReveal && cardReward) {
       return (
@@ -292,6 +342,10 @@ function Match({ progress, onMatchEnd }) {
 
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4 stadium-scene field-pattern relative overflow-hidden">
+        <CardReveal
+          reward={reward}
+          onClose={() => setShowReward(false)}
+        />
         {/* Floodlights */}
         <div className="floodlight top-10 left-10" />
         <div className="floodlight top-10 right-10" />
@@ -335,11 +389,21 @@ function Match({ progress, onMatchEnd }) {
             {/* Continue Button */}
             <button
               onClick={handleContinue}
-              className="btn-primary w-full"
+              className="btn-primary btn-primary--hero w-full"
             >
               {cardReward ? 'Kartenpack öffnen' : 'Zurück zum Stadion'}
             </button>
+            {cardReward && (
+              <button
+                onClick={() => onMatchEnd(matchResult)}
+                className="btn-secondary btn-secondary--soft w-full mt-3"
+              >
+                Direkt zum Stadion
+              </button>
+            )}
           </div>
+
+          <ShareCard summary={shareSummary} reward={reward} />
         </div>
       </div>
     )
@@ -371,6 +435,13 @@ function Match({ progress, onMatchEnd }) {
           opponentGoals={opponentGoals}
           opponent={opponent}
         />
+        {specialMatch && (
+          <div className="mt-2 text-center animate-bounce-in">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-400/20 text-yellow-100 border border-yellow-300/40 font-semibold text-sm">
+              ⚡ Überraschungs-Derby · +30 XP Bonus
+            </div>
+          </div>
+        )}
 
         {/* Streak Display */}
         {streak > 0 && (
