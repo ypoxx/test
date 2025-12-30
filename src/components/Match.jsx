@@ -5,6 +5,7 @@ import AchievementUnlocked from './AchievementUnlocked'
 import ConfettiExplosion from './ConfettiExplosion'
 import LevelUpNotification from './LevelUpNotification'
 import MatchCountdown from './MatchCountdown'
+import ShareCard from './ShareCard'
 import vocabsData from '../data/vocabs.json'
 import { selectVocabsForMatch } from '../utils/spacedRepetition'
 import { selectRandomOpponent, checkAnswer, calculateMatchResult, getMatchSummaryMessage } from '../utils/matchLogic'
@@ -14,6 +15,8 @@ import { calculateStreakBonus, getStreakMessage, getStreakEmoji, getStreakColor,
 import { checkNewAchievements } from '../utils/achievements'
 import { calculateXPReward } from '../utils/xpSystem'
 import soundManager from '../utils/sounds'
+import { createShareCardBlob } from '../utils/shareCard'
+import { downloadImage, shareImage } from '../utils/share'
 
 function Match({ progress, onMatchEnd }) {
   const [opponent] = useState(selectRandomOpponent())
@@ -34,6 +37,8 @@ function Match({ progress, onMatchEnd }) {
   const [leveledUpTo, setLeveledUpTo] = useState(null)
   const [showCountdown, setShowCountdown] = useState(true)
   const [matchStarted, setMatchStarted] = useState(false)
+  const [shareStatus, setShareStatus] = useState('idle')
+  const shareBusy = shareStatus === 'loading'
 
   useEffect(() => {
     // Initialize sound system on component mount
@@ -188,6 +193,43 @@ function Match({ progress, onMatchEnd }) {
     }
   }
 
+  const handleShare = async () => {
+    if (shareBusy || !matchResult) return
+
+    setShareStatus('loading')
+
+    try {
+      const summary = getMatchSummaryMessage(matchResult, opponent)
+      const shareBlob = await createShareCardBlob({
+        summary,
+        matchResult,
+        opponent,
+        streak,
+        achievement: newAchievements[0],
+        xpGained,
+        level: progress.level || 1
+      })
+
+      const filename = `msv-match-${Date.now()}.png`
+      const { shared } = await shareImage({
+        title: 'Mein MSV Match',
+        text: `${summary.title} – ${matchResult.score}`,
+        blob: shareBlob,
+        filename
+      })
+
+      if (!shared) {
+        downloadImage(shareBlob, filename)
+      }
+
+      setShareStatus('success')
+      setTimeout(() => setShareStatus('idle'), 1500)
+    } catch (error) {
+      setShareStatus('error')
+      setTimeout(() => setShareStatus('idle'), 2000)
+    }
+  }
+
   // Show countdown before match starts
   if (showCountdown && vocabs.length > 0) {
     return (
@@ -254,13 +296,40 @@ function Match({ progress, onMatchEnd }) {
               </div>
             </div>
 
-            {/* Continue Button */}
-            <button
-              onClick={handleContinue}
-              className="btn-primary w-full"
-            >
-              Zurück zum Stadion
-            </button>
+            <div className="mb-6">
+              <ShareCard
+                summary={summary}
+                matchResult={matchResult}
+                opponent={opponent}
+                streak={streak}
+                achievement={newAchievements[0]}
+                xpGained={xpGained}
+                level={progress.level || 1}
+              />
+            </div>
+
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <button
+                onClick={handleShare}
+                className="btn-primary w-full sm:w-auto"
+                disabled={shareBusy}
+              >
+                {shareBusy ? 'Karte wird erstellt…' : 'Teilen'}
+              </button>
+              <button
+                onClick={handleContinue}
+                className="btn-secondary w-full sm:w-auto"
+              >
+                Zurück zum Stadion
+              </button>
+            </div>
+
+            {shareStatus === 'success' && (
+              <div className="mt-3 text-sm text-green-300">📸 Deine Karte ist bereit!</div>
+            )}
+            {shareStatus === 'error' && (
+              <div className="mt-3 text-sm text-red-300">Leider konnte die Karte nicht geteilt werden.</div>
+            )}
           </div>
         </div>
       </div>
