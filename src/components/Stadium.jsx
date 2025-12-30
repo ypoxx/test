@@ -15,7 +15,6 @@ function Stadium({ progress, onStartMatch }) {
   const leagueInfo = getLeagueProgress(progress.totalGoalsScored || 0)
   const { currentLeagueInfo, nextLeagueInfo, goalsNeeded } = leagueInfo
   const [showAlbum, setShowAlbum] = useState(false)
-  const [showCardAlbum, setShowCardAlbum] = useState(false)
 
   const testSound = () => {
     // Initialize if not already
@@ -108,11 +107,6 @@ function Stadium({ progress, onStartMatch }) {
           className="btn-secondary w-full mb-3 text-lg py-3 bg-emerald-600 hover:bg-emerald-700"
         >
           📘 Kartenalbum ({progress.unlockedCards?.length || 0})
-        <button
-          onClick={() => setShowCardAlbum(true)}
-          className="btn-secondary w-full mb-3 text-lg py-3"
-        >
-          🎴 Sammelalbum ({progress.unlockedCards?.length || 0})
         </button>
 
         {/* Sound Test Button */}
@@ -212,10 +206,6 @@ function Stadium({ progress, onStartMatch }) {
         <CardAlbum
           progress={progress}
           onClose={() => setShowAlbum(false)}
-      {showCardAlbum && (
-        <CardAlbum
-          unlockedCards={progress.unlockedCards || []}
-          onClose={() => setShowCardAlbum(false)}
         />
       )}
     </div>
