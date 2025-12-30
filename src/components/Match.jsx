@@ -34,6 +34,7 @@ function Match({ progress, onMatchEnd }) {
   const [leveledUpTo, setLeveledUpTo] = useState(null)
   const [showCountdown, setShowCountdown] = useState(true)
   const [matchStarted, setMatchStarted] = useState(false)
+  const [isPaused, setIsPaused] = useState(false)
 
   useEffect(() => {
     // Initialize sound system on component mount
@@ -52,6 +53,7 @@ function Match({ progress, onMatchEnd }) {
   }, [progress])
 
   const handleAnswer = (userAnswer) => {
+    if (isPaused) return false
     const currentVocab = vocabs[currentVocabIndex]
     const isCorrect = checkAnswer(userAnswer, currentVocab.german)
 
@@ -271,11 +273,19 @@ function Match({ progress, onMatchEnd }) {
     <div className="min-h-screen flex flex-col p-4 pt-28 stadium-scene field-pattern relative">
       {/* Header with Score */}
       <div className="fixed top-0 left-0 right-0 bg-field-green/95 backdrop-blur-sm p-4 z-10 border-b border-white/10">
-        <ScoreDisplay
-          msvGoals={msvGoals}
-          opponentGoals={opponentGoals}
-          opponent={opponent}
-        />
+        <div className="flex items-center justify-between gap-4">
+          <ScoreDisplay
+            msvGoals={msvGoals}
+            opponentGoals={opponentGoals}
+            opponent={opponent}
+          />
+          <button
+            onClick={() => setIsPaused(true)}
+            className="btn-secondary px-4 py-2 text-sm"
+          >
+            ⏸️ Pause
+          </button>
+        </div>
 
         {/* Streak Display */}
         {streak > 0 && (
@@ -300,7 +310,7 @@ function Match({ progress, onMatchEnd }) {
       </div>
 
       {/* Vocab Card */}
-      <div className="flex-1 flex items-center justify-center">
+      <div className={`flex-1 flex items-center justify-center ${isPaused ? 'pointer-events-none opacity-60' : ''}`}>
         <VocabCard
           vocab={vocabs[currentVocabIndex]}
           options={vocabs[currentVocabIndex].options}
@@ -309,6 +319,25 @@ function Match({ progress, onMatchEnd }) {
           total={vocabs.length}
         />
       </div>
+
+      {/* Pause Overlay */}
+      {isPaused && (
+        <div className="fixed inset-0 z-20 flex items-center justify-center bg-black/70 p-4">
+          <div className="card w-full max-w-md p-6 text-center">
+            <div className="text-5xl mb-4">⏸️</div>
+            <h2 className="text-2xl font-bold text-white mb-2">Spiel pausiert</h2>
+            <p className="text-white/70 mb-6">
+              Tippe auf „Weiter“, um das Match fortzusetzen.
+            </p>
+            <button
+              onClick={() => setIsPaused(false)}
+              className="btn-primary w-full"
+            >
+              Weiter spielen
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Achievement Unlocked Modal */}
       {showingAchievement && newAchievements[showAchievementIndex] && (

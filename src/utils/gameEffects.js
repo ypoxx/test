@@ -1,6 +1,7 @@
 /**
  * Streak and Combo System for Match
  */
+import { loadSettings } from './localStorage'
 
 /**
  * Calculate bonus goals based on streak
@@ -64,6 +65,8 @@ export const getStreakColor = (streak) => {
  */
 export const triggerHapticFeedback = (pattern) => {
   if (!navigator.vibrate) return
+  const settings = loadSettings()
+  if (!settings.vibrationEnabled) return
 
   switch (pattern) {
     case 'success':

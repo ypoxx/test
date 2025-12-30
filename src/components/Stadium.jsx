@@ -1,15 +1,17 @@
 import { useState } from 'react'
 import LeagueProgress from './LeagueProgress'
 import TrophyCase from './TrophyCase'
+import SettingsModal from './SettingsModal'
 import XPBar from './XPBar'
 import CategoryStats from './CategoryStats'
 import soundManager from '../utils/sounds'
 import { getVocabStats } from '../utils/spacedRepetition'
 import vocabsData from '../data/vocabs.json'
 
-function Stadium({ progress, onStartMatch }) {
+function Stadium({ progress, settings, onStartMatch, onUpdateSettings, onResetProgress }) {
   const stats = getVocabStats(vocabsData, progress)
   const [showTrophyCase, setShowTrophyCase] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
 
   const testSound = () => {
     // Initialize if not already
@@ -81,6 +83,14 @@ function Stadium({ progress, onStartMatch }) {
           className="btn-secondary w-full mb-6 text-base py-3 bg-purple-600 hover:bg-purple-700"
         >
           🔊 Sound testen
+        </button>
+
+        {/* Settings Button */}
+        <button
+          onClick={() => setShowSettings(true)}
+          className="btn-secondary w-full mb-6 text-base py-3"
+        >
+          ⚙️ Einstellungen
         </button>
 
         {/* Stats Grid */}
@@ -165,6 +175,16 @@ function Stadium({ progress, onStartMatch }) {
         <TrophyCase
           unlockedAchievementIds={progress.achievements || []}
           onClose={() => setShowTrophyCase(false)}
+        />
+      )}
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <SettingsModal
+          settings={settings}
+          onClose={() => setShowSettings(false)}
+          onUpdateSettings={onUpdateSettings}
+          onResetProgress={onResetProgress}
         />
       )}
     </div>

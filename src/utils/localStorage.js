@@ -1,4 +1,5 @@
 const STORAGE_KEY = 'maurice_vocab_trainer_progress'
+const SETTINGS_KEY = 'maurice_vocab_trainer_settings'
 
 // Initial default progress
 const DEFAULT_PROGRESS = {
@@ -13,6 +14,11 @@ const DEFAULT_PROGRESS = {
   level: 1, // Current level
   lastPlayedDate: null, // For daily streak tracking
   dailyStreak: 0 // Consecutive days played
+}
+
+const DEFAULT_SETTINGS = {
+  soundEnabled: true,
+  vibrationEnabled: true
 }
 
 /**
@@ -72,6 +78,63 @@ export const resetProgress = () => {
   } catch (error) {
     console.error('Error resetting progress:', error)
     return DEFAULT_PROGRESS
+  }
+}
+
+/**
+ * Save settings to localStorage
+ * @param {Object} settings - The settings data to save
+ */
+export const saveSettings = (settings) => {
+  try {
+    const dataToSave = {
+      ...DEFAULT_SETTINGS,
+      ...settings
+    }
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(dataToSave))
+    return dataToSave
+  } catch (error) {
+    console.error('Error saving settings:', error)
+    return DEFAULT_SETTINGS
+  }
+}
+
+/**
+ * Load settings from localStorage
+ * @returns {Object} - The loaded settings or default settings if none exists
+ */
+export const loadSettings = () => {
+  try {
+    const savedData = localStorage.getItem(SETTINGS_KEY)
+
+    if (savedData) {
+      const parsed = JSON.parse(savedData)
+      return {
+        ...DEFAULT_SETTINGS,
+        ...parsed
+      }
+    }
+
+    saveSettings(DEFAULT_SETTINGS)
+    return DEFAULT_SETTINGS
+  } catch (error) {
+    console.error('Error loading settings:', error)
+    return DEFAULT_SETTINGS
+  }
+}
+
+/**
+ * Reset settings to default
+ * @returns {Object} - The default settings
+ */
+export const resetSettings = () => {
+  try {
+    localStorage.removeItem(SETTINGS_KEY)
+    saveSettings(DEFAULT_SETTINGS)
+    return DEFAULT_SETTINGS
+  } catch (error) {
+    console.error('Error resetting settings:', error)
+    return DEFAULT_SETTINGS
   }
 }
 

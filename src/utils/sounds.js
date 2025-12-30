@@ -1,3 +1,5 @@
+import { loadSettings } from './localStorage'
+
 /**
  * Sound System for Maurice's Vocab Trainer
  * Uses Web Audio API for game sounds
@@ -24,6 +26,9 @@ class SoundManager {
     }
 
     try {
+      const settings = loadSettings()
+      this.enabled = settings.soundEnabled
+
       this.audioContext = new (window.AudioContext || window.webkitAudioContext)()
 
       // Resume if suspended (browser autoplay policy)
@@ -302,7 +307,14 @@ class SoundManager {
    * Toggle sound on/off
    */
   toggle() {
-    this.enabled = !this.enabled
+    return this.setEnabled(!this.enabled)
+  }
+
+  /**
+   * Set sound enabled state
+   */
+  setEnabled(enabled) {
+    this.enabled = Boolean(enabled)
     return this.enabled
   }
 
