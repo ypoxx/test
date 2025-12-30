@@ -7,7 +7,7 @@ import LevelUpNotification from './LevelUpNotification'
 import MatchCountdown from './MatchCountdown'
 import vocabsData from '../data/vocabs.json'
 import { selectVocabsForMatch } from '../utils/spacedRepetition'
-import { selectRandomOpponent, checkAnswer, calculateMatchResult, getMatchSummaryMessage } from '../utils/matchLogic'
+import { selectRandomOpponent, getDerbyOpponents, checkAnswer, calculateMatchResult, getMatchSummaryMessage } from '../utils/matchLogic'
 import { updateVocabProgress, updateGoalsAndLeague, addMatchToHistory, loadProgress, unlockAchievement, addXP, updateDailyStreak, loadLastOpponentName, saveLastOpponentName } from '../utils/localStorage'
 import { generateMultipleChoiceOptions } from '../utils/multipleChoice'
 import { calculateStreakBonus, getStreakMessage, getStreakEmoji, getStreakColor, triggerHapticFeedback } from '../utils/gameEffects'
@@ -19,9 +19,13 @@ import soundManager from '../utils/sounds'
 import ShareCard from './ShareCard'
 
 function Match({ progress, onMatchEnd }) {
+  const [specialMatch] = useState(() => Math.random() < 0.2)
   const [opponent] = useState(() => {
     const lastOpponent = loadLastOpponentName()
-    const nextOpponent = selectRandomOpponent(lastOpponent)
+    const derbyPool = getDerbyOpponents()
+    const nextOpponent = specialMatch && derbyPool.length > 0
+      ? selectRandomOpponent(lastOpponent, opponent => opponent.isDerby)
+      : selectRandomOpponent(lastOpponent)
     saveLastOpponentName(nextOpponent.name)
     return nextOpponent
   })
@@ -171,6 +175,8 @@ function Match({ progress, onMatchEnd }) {
     finalXpGained = xpGained
   } = {}) => {
     const result = calculateMatchResult(finalMsvGoals, finalCorrectAnswers, vocabs.length)
+    const bonusXp = specialMatch ? 30 : 0
+    const totalXpGained = finalXpGained + bonusXp
 
     // Save old progress for achievement comparison
     const oldProgress = loadProgress()
@@ -197,7 +203,8 @@ function Match({ progress, onMatchEnd }) {
     setNewAchievements(unlockedAchievements)
 
     // Add XP and check for level up
-    const xpResult = addXP(finalXpGained)
+    setXPGained(totalXpGained)
+    const xpResult = addXP(totalXpGained)
     if (xpResult.leveledUp) {
       setLeveledUpTo(xpResult.newLevel)
       setShowLevelUp(true)
@@ -428,6 +435,13 @@ function Match({ progress, onMatchEnd }) {
           opponentGoals={opponentGoals}
           opponent={opponent}
         />
+        {specialMatch && (
+          <div className="mt-2 text-center animate-bounce-in">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-400/20 text-yellow-100 border border-yellow-300/40 font-semibold text-sm">
+              ⚡ Überraschungs-Derby · +30 XP Bonus
+            </div>
+          </div>
+        )}
 
         {/* Streak Display */}
         {streak > 0 && (

@@ -5,17 +5,17 @@
 // List of Bundesliga opponents
 export const OPPONENTS = [
   { name: 'Bayern München', logo: '🔴⚪', difficulty: 'hard' },
-  { name: 'Borussia Dortmund', logo: '🟡⚫', difficulty: 'hard' },
+  { name: 'Borussia Dortmund', logo: '🟡⚫', difficulty: 'hard', isDerby: true },
   { name: 'RB Leipzig', logo: '🔴⚪', difficulty: 'hard' },
   { name: 'Bayer Leverkusen', logo: '🔴⚫', difficulty: 'medium' },
   { name: 'VfB Stuttgart', logo: '⚪🔴', difficulty: 'medium' },
   { name: 'Eintracht Frankfurt', logo: '🔴⚫', difficulty: 'medium' },
   { name: 'FC Köln', logo: '⚪🔴', difficulty: 'medium' },
-  { name: 'Schalke 04', logo: '🔵⚪', difficulty: 'medium' },
+  { name: 'Schalke 04', logo: '🔵⚪', difficulty: 'medium', isDerby: true },
   { name: 'Werder Bremen', logo: '🟢⚪', difficulty: 'medium' },
   { name: 'Hamburger SV', logo: '🔵⚪', difficulty: 'medium' },
   { name: 'VfL Bochum', logo: '🔵⚪', difficulty: 'easy' },
-  { name: 'Fortuna Düsseldorf', logo: '🔴⚪', difficulty: 'easy' },
+  { name: 'Fortuna Düsseldorf', logo: '🔴⚪', difficulty: 'easy', isDerby: true },
   { name: 'FC St. Pauli', logo: '🟤⚪', difficulty: 'easy' },
   { name: 'Hertha BSC', logo: '🔵⚪', difficulty: 'easy' }
 ]
@@ -23,20 +23,23 @@ export const OPPONENTS = [
 /**
  * Select a random opponent
  */
-export const selectRandomOpponent = (lastOpponentName = null) => {
-  if (OPPONENTS.length <= 1) {
-    return OPPONENTS[0]
+export const selectRandomOpponent = (lastOpponentName = null, filterFn = null) => {
+  const pool = filterFn ? OPPONENTS.filter(filterFn) : OPPONENTS
+  if (pool.length <= 1) {
+    return pool[0] || OPPONENTS[0]
   }
 
   let opponent = null
 
   do {
-    const randomIndex = Math.floor(Math.random() * OPPONENTS.length)
-    opponent = OPPONENTS[randomIndex]
+    const randomIndex = Math.floor(Math.random() * pool.length)
+    opponent = pool[randomIndex]
   } while (opponent?.name === lastOpponentName)
 
   return opponent
 }
+
+export const getDerbyOpponents = () => OPPONENTS.filter(opponent => opponent.isDerby)
 
 /**
  * Constants for match configuration

@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { getRandomFunFact, getTimeBasedGreeting } from '../utils/funFacts'
+import { getPersonalGreeting, getRandomFunFact, getRandomPrompt } from '../utils/funFacts'
 
 function Welcome({ onStart }) {
   const [funFact] = useState(getRandomFunFact())
-  const [greeting] = useState(getTimeBasedGreeting())
+  const [greeting] = useState(getPersonalGreeting())
+  const [prompt] = useState(getRandomPrompt())
   const [showFunFact, setShowFunFact] = useState(true)
   const [answered, setAnswered] = useState(false)
   const [selectedAnswer, setSelectedAnswer] = useState(null)
@@ -49,7 +50,7 @@ function Welcome({ onStart }) {
         <div className="card p-8 text-center mb-6 animate-slide-up">
           <div className="text-5xl mb-4">👋</div>
           <h1 className="text-4xl font-bold text-white mb-2">
-            {greeting}, Maurice!
+            {greeting} Maurice!
           </h1>
           <p className="text-xl text-white/70">
             Willkommen beim MSV Vokabel-Trainer
@@ -71,7 +72,7 @@ function Welcome({ onStart }) {
           {!answered ? (
             <div className="space-y-3">
               <p className="text-white/70 text-center mb-3">
-                Ist das richtig oder falsch?
+                {prompt}
               </p>
               <button
                 onClick={() => handleAnswer(true)}
