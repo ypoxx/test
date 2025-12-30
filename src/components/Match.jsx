@@ -389,7 +389,7 @@ function Match({ progress, onMatchEnd }) {
             {cardReward && (
               <button
                 onClick={() => onMatchEnd(matchResult)}
-                className="btn-secondary btn-secondary--soft w-full mt-3"
+                className="btn-secondary w-full mt-3"
               >
                 Direkt zum Stadion
               </button>
