@@ -198,6 +198,41 @@ class SoundManager {
   }
 
   /**
+   * Play legendary fanfare (golden shimmer)
+   */
+  playLegendaryFanfare() {
+    if (!this.enabled || !this.initialized) return
+
+    const now = this.audioContext.currentTime
+    const melody = [
+      { freq: 523.25, time: 0, duration: 0.18, type: 'triangle' }, // C5
+      { freq: 659.25, time: 0.18, duration: 0.18, type: 'triangle' }, // E5
+      { freq: 783.99, time: 0.36, duration: 0.18, type: 'triangle' }, // G5
+      { freq: 1046.5, time: 0.54, duration: 0.35, type: 'triangle' }, // C6
+      { freq: 1318.51, time: 0.72, duration: 0.4, type: 'sine' } // E6 sparkle
+    ]
+
+    melody.forEach(note => {
+      const oscillator = this.audioContext.createOscillator()
+      const gainNode = this.audioContext.createGain()
+
+      oscillator.connect(gainNode)
+      gainNode.connect(this.audioContext.destination)
+
+      oscillator.frequency.value = note.freq
+      oscillator.type = note.type
+
+      const startTime = now + note.time
+      gainNode.gain.setValueAtTime(0, startTime)
+      gainNode.gain.linearRampToValueAtTime(0.35 * this.masterVolume, startTime + 0.02)
+      gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + note.duration)
+
+      oscillator.start(startTime)
+      oscillator.stop(startTime + note.duration)
+    })
+  }
+
+  /**
    * Play victory fanfare (triumphant melody)
    */
   playVictory() {
