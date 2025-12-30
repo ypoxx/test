@@ -16,6 +16,8 @@ import { checkNewAchievements } from '../utils/achievements'
 import { calculateXPReward } from '../utils/xpSystem'
 import { rollCardReward } from '../utils/cardRewards'
 import soundManager from '../utils/sounds'
+import { createShareCardBlob } from '../utils/shareCard'
+import { downloadImage, shareImage } from '../utils/share'
 
 function Match({ progress, onMatchEnd }) {
   const [opponent] = useState(selectRandomOpponent())
@@ -214,6 +216,43 @@ function Match({ progress, onMatchEnd }) {
       setShowingAchievement(false)
       // Go to stadium after all achievements shown
       onMatchEnd(matchResult)
+    }
+  }
+
+  const handleShare = async () => {
+    if (shareBusy || !matchResult) return
+
+    setShareStatus('loading')
+
+    try {
+      const summary = getMatchSummaryMessage(matchResult, opponent)
+      const shareBlob = await createShareCardBlob({
+        summary,
+        matchResult,
+        opponent,
+        streak,
+        achievement: newAchievements[0],
+        xpGained,
+        level: progress.level || 1
+      })
+
+      const filename = `msv-match-${Date.now()}.png`
+      const { shared } = await shareImage({
+        title: 'Mein MSV Match',
+        text: `${summary.title} – ${matchResult.score}`,
+        blob: shareBlob,
+        filename
+      })
+
+      if (!shared) {
+        downloadImage(shareBlob, filename)
+      }
+
+      setShareStatus('success')
+      setTimeout(() => setShareStatus('idle'), 1500)
+    } catch (error) {
+      setShareStatus('error')
+      setTimeout(() => setShareStatus('idle'), 2000)
     }
   }
 
