@@ -163,7 +163,9 @@ export const ACHIEVEMENTS = {
     description: 'Spiel nach 0:3 Rückstand gewonnen',
     emoji: '🔄',
     rarity: 'epic',
-    condition: (progress) => false // Will be checked during match
+    condition: (progress) => {
+      return progress.matchHistory.some(match => match.comebackWin)
+    }
   },
   DERBY_SIEGER: {
     id: 'derby_sieger',

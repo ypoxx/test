@@ -12,7 +12,9 @@ const DEFAULT_PROGRESS = {
   xp: 0, // Total XP earned
   level: 1, // Current level
   lastPlayedDate: null, // For daily streak tracking
-  dailyStreak: 0 // Consecutive days played
+  dailyStreak: 0, // Consecutive days played
+  unlockedCards: [], // Array of unlocked card IDs
+  unlockedFacts: []
 }
 
 /**
@@ -224,6 +226,32 @@ export const unlockAchievement = (achievementId) => {
 }
 
 /**
+ * Unlock a collectible card
+ * @param {string} cardId - ID of the card to unlock
+ */
+export const unlockCard = (cardId) => {
+  const progress = loadProgress()
+  if (!progress.unlockedCards.includes(cardId)) {
+    progress.unlockedCards.push(cardId)
+    saveProgress(progress)
+  }
+  return progress
+}
+
+/**
+ * Unlock a football fact
+ * @param {string} factId - ID of the fact to unlock
+ */
+export const unlockFact = (factId) => {
+  const progress = loadProgress()
+  if (!progress.unlockedFacts.includes(factId)) {
+    progress.unlockedFacts.push(factId)
+    saveProgress(progress)
+  }
+  return progress
+}
+
+/**
  * Clear new achievements notifications
  */
 export const clearNewAchievements = () => {
@@ -271,7 +299,7 @@ export const addXP = (xpToAdd) => {
  */
 export const updateDailyStreak = () => {
   const progress = loadProgress()
-  const today = new Date().toDateString()
+  const today = getUtcDateString(new Date())
   const lastPlayed = progress.lastPlayedDate
 
   let streakIncreased = false
@@ -281,14 +309,15 @@ export const updateDailyStreak = () => {
     progress.dailyStreak = 1
     streakIncreased = true
   } else {
-    const lastPlayedDate = new Date(lastPlayed)
+    const lastPlayedDate = parseStoredDate(lastPlayed)
     const yesterday = new Date()
-    yesterday.setDate(yesterday.getDate() - 1)
+    yesterday.setUTCDate(yesterday.getUTCDate() - 1)
+    const yesterdayUtc = getUtcDateString(yesterday)
 
-    if (lastPlayed === today) {
+    if (lastPlayedDate === today) {
       // Already played today, no change
       streakIncreased = false
-    } else if (lastPlayedDate.toDateString() === yesterday.toDateString()) {
+    } else if (lastPlayedDate === yesterdayUtc) {
       // Played yesterday, increase streak
       progress.dailyStreak = (progress.dailyStreak || 0) + 1
       streakIncreased = true
@@ -307,4 +336,19 @@ export const updateDailyStreak = () => {
     currentStreak: progress.dailyStreak,
     progress
   }
+}
+
+const getUtcDateString = (date) => date.toISOString().split('T')[0]
+
+const parseStoredDate = (storedDate) => {
+  if (typeof storedDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(storedDate)) {
+    return storedDate
+  }
+
+  const parsed = new Date(storedDate)
+  if (!Number.isNaN(parsed.getTime())) {
+    return getUtcDateString(parsed)
+  }
+
+  return null
 }
