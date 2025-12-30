@@ -5,7 +5,7 @@ import AchievementUnlocked from './AchievementUnlocked'
 import ConfettiExplosion from './ConfettiExplosion'
 import LevelUpNotification from './LevelUpNotification'
 import MatchCountdown from './MatchCountdown'
-import ShareCard from './ShareCard'
+import CardReveal from './CardReveal'
 import vocabsData from '../data/vocabs.json'
 import { selectVocabsForMatch } from '../utils/spacedRepetition'
 import { selectRandomOpponent, checkAnswer, calculateMatchResult, getMatchSummaryMessage } from '../utils/matchLogic'
@@ -14,6 +14,7 @@ import { generateMultipleChoiceOptions } from '../utils/multipleChoice'
 import { calculateStreakBonus, getStreakMessage, getStreakEmoji, getStreakColor, triggerHapticFeedback } from '../utils/gameEffects'
 import { checkNewAchievements } from '../utils/achievements'
 import { calculateXPReward } from '../utils/xpSystem'
+import { rollCardReward } from '../utils/cardRewards'
 import soundManager from '../utils/sounds'
 import { createShareCardBlob } from '../utils/shareCard'
 import { downloadImage, shareImage } from '../utils/share'
@@ -24,6 +25,8 @@ function Match({ progress, onMatchEnd }) {
   const [currentVocabIndex, setCurrentVocabIndex] = useState(0)
   const [msvGoals, setMsvGoals] = useState(0)
   const [opponentGoals, setOpponentGoals] = useState(0)
+  const [correctAnswers, setCorrectAnswers] = useState(0)
+  const [wasDownThree, setWasDownThree] = useState(false)
   const [matchFinished, setMatchFinished] = useState(false)
   const [matchResult, setMatchResult] = useState(null)
   const [streak, setStreak] = useState(0)
@@ -37,8 +40,11 @@ function Match({ progress, onMatchEnd }) {
   const [leveledUpTo, setLeveledUpTo] = useState(null)
   const [showCountdown, setShowCountdown] = useState(true)
   const [matchStarted, setMatchStarted] = useState(false)
-  const [shareStatus, setShareStatus] = useState('idle')
-  const shareBusy = shareStatus === 'loading'
+  const [matchFeedback, setMatchFeedback] = useState(null)
+  const [goalAnimationKey, setGoalAnimationKey] = useState(0)
+  const [crowdAnimationKey, setCrowdAnimationKey] = useState(0)
+  const [cardReward, setCardReward] = useState(null)
+  const [showCardReveal, setShowCardReveal] = useState(false)
 
   useEffect(() => {
     // Initialize sound system on component mount
@@ -68,6 +74,9 @@ function Match({ progress, onMatchEnd }) {
     if (isCorrect) {
       newStreak = streak + 1
       setStreak(newStreak)
+      setMatchFeedback('success')
+      setGoalAnimationKey(prev => prev + 1)
+      setCrowdAnimationKey(prev => prev + 1)
 
       // Trigger haptic feedback for correct answer
       triggerHapticFeedback('success')
@@ -94,10 +103,18 @@ function Match({ progress, onMatchEnd }) {
 
       // Update score (including streak bonus)
       setMsvGoals(prev => prev + 1 + streakBonus)
+      setCorrectAnswers(prev => prev + 1)
     } else {
       setStreak(0)
       setStreakMessage(null)
       setOpponentGoals(prev => prev + 1)
+      setMatchFeedback('miss')
+      setCrowdAnimationKey(prev => prev + 1)
+      const nextOpponentGoals = opponentGoals + 1
+      setOpponentGoals(nextOpponentGoals)
+      if (msvGoals === 0 && nextOpponentGoals >= 3) {
+        setWasDownThree(true)
+      }
 
       // Trigger haptic feedback for wrong answer
       triggerHapticFeedback('error')
@@ -112,19 +129,22 @@ function Match({ progress, onMatchEnd }) {
         setCurrentVocabIndex(prev => prev + 1)
       } else {
         // Match finished
-        finishMatch(isCorrect)
+        finishMatch()
       }
     }, 2000)
+
+    setTimeout(() => {
+      setMatchFeedback(null)
+    }, 700)
 
     return isCorrect
   }
 
-  const finishMatch = (lastAnswerCorrect) => {
+  const finishMatch = () => {
     // Use current scores - they're already updated in handleAnswer!
     const finalMsvGoals = msvGoals
-    const finalOpponentGoals = opponentGoals
 
-    const result = calculateMatchResult(finalMsvGoals, vocabs.length)
+    const result = calculateMatchResult(finalMsvGoals, correctAnswers, vocabs.length)
 
     // Save old progress for achievement comparison
     const oldProgress = loadProgress()
@@ -135,7 +155,8 @@ function Match({ progress, onMatchEnd }) {
       opponent: opponent.name,
       score: result.score,
       vocabsReviewed: vocabs.length,
-      goalsScored: finalMsvGoals
+      goalsScored: finalMsvGoals,
+      comebackWin: wasDownThree && result.status === 'win'
     })
 
     // Check for new achievements
@@ -159,6 +180,9 @@ function Match({ progress, onMatchEnd }) {
     // Update daily streak
     updateDailyStreak()
 
+    const reward = rollCardReward({ resultStatus: result.status, streak })
+    setCardReward(reward)
+
     // Trigger victory haptic feedback and sounds
     if (result.status === 'win') {
       triggerHapticFeedback('victory')
@@ -177,6 +201,8 @@ function Match({ progress, onMatchEnd }) {
     // Simplified: Check if we have achievements to show
     if (newAchievements.length > 0 && !showingAchievement) {
       setShowingAchievement(true)
+    } else if (cardReward && !showCardReveal) {
+      setShowCardReveal(true)
     } else {
       onMatchEnd(matchResult)
     }
@@ -254,6 +280,16 @@ function Match({ progress, onMatchEnd }) {
   if (matchFinished && matchResult) {
     const summary = getMatchSummaryMessage(matchResult, opponent)
 
+    if (showCardReveal && cardReward) {
+      return (
+        <CardReveal
+          card={cardReward.card}
+          isNew={cardReward.isNew}
+          onClose={() => onMatchEnd(matchResult)}
+        />
+      )
+    }
+
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4 stadium-scene field-pattern relative overflow-hidden">
         {/* Floodlights */}
@@ -296,40 +332,13 @@ function Match({ progress, onMatchEnd }) {
               </div>
             </div>
 
-            <div className="mb-6">
-              <ShareCard
-                summary={summary}
-                matchResult={matchResult}
-                opponent={opponent}
-                streak={streak}
-                achievement={newAchievements[0]}
-                xpGained={xpGained}
-                level={progress.level || 1}
-              />
-            </div>
-
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <button
-                onClick={handleShare}
-                className="btn-primary w-full sm:w-auto"
-                disabled={shareBusy}
-              >
-                {shareBusy ? 'Karte wird erstellt…' : 'Teilen'}
-              </button>
-              <button
-                onClick={handleContinue}
-                className="btn-secondary w-full sm:w-auto"
-              >
-                Zurück zum Stadion
-              </button>
-            </div>
-
-            {shareStatus === 'success' && (
-              <div className="mt-3 text-sm text-green-300">📸 Deine Karte ist bereit!</div>
-            )}
-            {shareStatus === 'error' && (
-              <div className="mt-3 text-sm text-red-300">Leider konnte die Karte nicht geteilt werden.</div>
-            )}
+            {/* Continue Button */}
+            <button
+              onClick={handleContinue}
+              className="btn-primary w-full"
+            >
+              {cardReward ? 'Kartenpack öffnen' : 'Zurück zum Stadion'}
+            </button>
           </div>
         </div>
       </div>
@@ -337,7 +346,24 @@ function Match({ progress, onMatchEnd }) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col p-4 pt-28 stadium-scene field-pattern relative">
+    <div className={`min-h-screen flex flex-col p-4 pt-28 stadium-scene field-pattern relative ${matchFeedback === 'success' ? 'match-success' : matchFeedback === 'miss' ? 'match-miss' : ''}`}>
+      <div className="goal-feedback-layer">
+        {matchFeedback === 'success' && (
+          <>
+            <div key={`ball-${goalAnimationKey}`} className="goal-ball ball-shoot-hero">
+              ⚽
+            </div>
+            <div key={`cheer-${crowdAnimationKey}`} className="crowd-reaction crowd-cheer">
+              🙌🙌🙌
+            </div>
+          </>
+        )}
+        {matchFeedback === 'miss' && (
+          <div key={`groan-${crowdAnimationKey}`} className="crowd-reaction crowd-groan">
+            😬😬😬
+          </div>
+        )}
+      </div>
       {/* Header with Score */}
       <div className="fixed top-0 left-0 right-0 bg-field-green/95 backdrop-blur-sm p-4 z-10 border-b border-white/10">
         <ScoreDisplay

@@ -17,8 +17,10 @@ function CategoryStats({ progress }) {
     categoryVocabs.forEach(vocab => {
       const vocabProgress = progress.vocabProgress[vocab.id]
       if (vocabProgress) {
-        totalAttempts += vocabProgress.attempts || 0
-        correctAttempts += vocabProgress.correct || 0
+        const correct = vocabProgress.correct || 0
+        const incorrect = vocabProgress.incorrect || 0
+        totalAttempts += correct + incorrect
+        correctAttempts += correct
         if (vocabProgress.mastered) {
           masteredCount++
         }
