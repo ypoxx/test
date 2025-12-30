@@ -1,77 +1,77 @@
 [
   {
     "id": "fact_msv_zebra",
-    "text": "Der Spitzname des MSV Duisburg lautet \"Die Zebras\" — das passt perfekt zu Maurice.",
+    "text": "Die Zebras stehen für Mut und Zusammenhalt — perfekte Lernpower.",
     "topic": "msv"
   },
   {
     "id": "fact_msv_ruhrgebiet",
-    "text": "Der MSV Duisburg ist ein traditionsreicher Club aus dem Ruhrgebiet — genau Maurices Heimatregion.",
+    "text": "Der MSV kommt aus dem Ruhrgebiet — hier zählen Herz und Einsatz.",
     "topic": "msv"
   },
   {
     "id": "fact_ruhr_rivalry",
-    "text": "Im Ruhrgebiet gibt es viele Traditionsvereine — Derbys sind dort immer ein Highlight.",
+    "text": "Derbys im Revier zeigen: Respekt, Tempo, Leidenschaft.",
     "topic": "ruhrgebiet"
   },
   {
     "id": "fact_muelheim_ruhr",
-    "text": "Mülheim an der Ruhr liegt mitten im Ruhrgebiet — Fußball und Industrie prägen die Region.",
+    "text": "Mülheim liegt im Herzen des Reviers — kurze Wege, große Träume.",
     "topic": "local"
   },
   {
     "id": "fact_msv_home",
-    "text": "Heimspiele vor den eigenen Fans geben dem MSV oft einen Extra-Schub.",
+    "text": "Heimspiele geben Energie — wie ein Lautstärke-Boost fürs Lernen.",
     "topic": "msv"
   },
   {
     "id": "fact_striker_memory",
-    "text": "Top-Stürmer merken sich jede Torchance — genauso kann Maurice sich neue Wörter merken.",
+    "text": "Stürmer merken jede Chance — genauso kannst du Wörter sammeln.",
     "topic": "motivation"
   },
   {
     "id": "fact_ruhr_cities",
-    "text": "Im Ruhrgebiet liegen Städte eng beieinander — Auswärtsfahrten sind oft kurze Strecken.",
+    "text": "Die Städte liegen nah — Teamgeist verbindet überall.",
     "topic": "ruhrgebiet"
   },
   {
     "id": "fact_club_identity",
-    "text": "Ein Club lebt von seiner Identität — beim MSV sind das Kampfgeist und Zusammenhalt.",
+    "text": "MSV-Identität: kämpfen, füreinander da sein, nie aufgeben.",
     "topic": "msv"
   },
   {
     "id": "fact_panini_story",
-    "text": "Sammelkarten leben von Seltenheit — je seltener die Karte, desto größer der Jubel.",
+    "text": "Seltene Karten sind wie seltene Wörter: umso stolzer sammelt man sie.",
     "topic": "cards"
   },
   {
     "id": "fact_matchday_focus",
-    "text": "Profis sprechen vom \"Matchday-Fokus\": volle Konzentration in kurzen Phasen.",
+    "text": "Matchday-Fokus heißt: kurz, klar, konzentriert.",
     "topic": "motivation"
   },
   {
     "id": "fact_quick_pass",
-    "text": "Schnelle Pässe im Fußball sind wie schnelle Vokabeln im Kopf — beides bringt Tempo ins Spiel.",
+    "text": "Schnelle Pässe = schnelle Worte im Kopf — Tempo bringt Spaß.",
     "topic": "motivation"
   },
   {
     "id": "fact_crowd_energy",
-    "text": "Die Kurve pusht das Team — im Spiel ist das wie ein Extra-Boost für Maurice.",
+    "text": "Die Kurve pusht dich — jede richtige Antwort fühlt sich lauter an.",
     "topic": "msv"
   },
   {
     "id": "fact_goal_memory",
-    "text": "Wer viele Tore liebt, kann auch viele Wörter sammeln — jedes richtige Wort ist ein Tor.",
+    "text": "Jedes richtige Wort ist ein Tor — zähl sie mit Stolz.",
     "topic": "motivation"
   },
   {
     "id": "fact_ruhr_football",
-    "text": "Fußball gehört zur Kultur des Ruhrgebiets — jeder Spieltag ist wie ein kleines Fest.",
+    "text": "Im Revier gehört Fußball zum Alltag — Lernen kann genauso feiern.",
     "topic": "ruhrgebiet"
   },
   {
     "id": "fact_msv_colors",
-    "text": "Blau-Weiß sind die klassischen Farben des MSV — sie stehen für Stolz und Tradition.",
+    "text": "Blau und Weiß erinnern: ruhig bleiben, dranbleiben, zusammenstehen.",
     "topic": "msv"
   }
 ]
