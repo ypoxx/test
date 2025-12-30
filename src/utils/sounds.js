@@ -20,7 +20,8 @@ class SoundManager {
    * Initialize audio context (must be called after user interaction)
    */
   init() {
-    if (this.initialized) {
+    const shouldResume = this.audioContext && this.audioContext.state === 'suspended'
+    if (this.initialized && !shouldResume) {
       console.log('🔊 Sound already initialized')
       return
     }
