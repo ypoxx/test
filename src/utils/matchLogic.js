@@ -23,9 +23,19 @@ export const OPPONENTS = [
 /**
  * Select a random opponent
  */
-export const selectRandomOpponent = () => {
-  const randomIndex = Math.floor(Math.random() * OPPONENTS.length)
-  return OPPONENTS[randomIndex]
+export const selectRandomOpponent = (lastOpponentName = null) => {
+  if (OPPONENTS.length <= 1) {
+    return OPPONENTS[0]
+  }
+
+  let opponent = null
+
+  do {
+    const randomIndex = Math.floor(Math.random() * OPPONENTS.length)
+    opponent = OPPONENTS[randomIndex]
+  } while (opponent?.name === lastOpponentName)
+
+  return opponent
 }
 
 /**

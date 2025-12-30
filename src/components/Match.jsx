@@ -8,7 +8,7 @@ import MatchCountdown from './MatchCountdown'
 import vocabsData from '../data/vocabs.json'
 import { selectVocabsForMatch } from '../utils/spacedRepetition'
 import { selectRandomOpponent, checkAnswer, calculateMatchResult, getMatchSummaryMessage } from '../utils/matchLogic'
-import { updateVocabProgress, updateGoalsAndLeague, addMatchToHistory, loadProgress, unlockAchievement, addXP, updateDailyStreak } from '../utils/localStorage'
+import { updateVocabProgress, updateGoalsAndLeague, addMatchToHistory, loadProgress, unlockAchievement, addXP, updateDailyStreak, loadLastOpponentName, saveLastOpponentName } from '../utils/localStorage'
 import { generateMultipleChoiceOptions } from '../utils/multipleChoice'
 import { calculateStreakBonus, getStreakMessage, getStreakEmoji, getStreakColor, triggerHapticFeedback } from '../utils/gameEffects'
 import { checkNewAchievements } from '../utils/achievements'
@@ -19,7 +19,12 @@ import soundManager from '../utils/sounds'
 import ShareCard from './ShareCard'
 
 function Match({ progress, onMatchEnd }) {
-  const [opponent] = useState(selectRandomOpponent())
+  const [opponent] = useState(() => {
+    const lastOpponent = loadLastOpponentName()
+    const nextOpponent = selectRandomOpponent(lastOpponent)
+    saveLastOpponentName(nextOpponent.name)
+    return nextOpponent
+  })
   const [vocabs, setVocabs] = useState([])
   const [currentVocabIndex, setCurrentVocabIndex] = useState(0)
   const [msvGoals, setMsvGoals] = useState(0)

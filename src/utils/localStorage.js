@@ -1,6 +1,7 @@
 import { calculateLevel } from './xpSystem'
 
 const STORAGE_KEY = 'maurice_vocab_trainer_progress'
+const LAST_OPPONENT_KEY = 'maurice_vocab_trainer_last_opponent'
 
 // Initial default progress
 const DEFAULT_PROGRESS = {
@@ -71,6 +72,7 @@ export const loadProgress = () => {
 export const resetProgress = () => {
   try {
     localStorage.removeItem(STORAGE_KEY)
+    localStorage.removeItem(LAST_OPPONENT_KEY)
     saveProgress(DEFAULT_PROGRESS)
     return DEFAULT_PROGRESS
   } catch (error) {
@@ -336,6 +338,26 @@ export const updateDailyStreak = () => {
     streakIncreased,
     currentStreak: progress.dailyStreak,
     progress
+  }
+}
+
+export const loadLastOpponentName = () => {
+  try {
+    return localStorage.getItem(LAST_OPPONENT_KEY)
+  } catch (error) {
+    console.error('Error loading last opponent:', error)
+    return null
+  }
+}
+
+export const saveLastOpponentName = (opponentName) => {
+  try {
+    if (!opponentName) return null
+    localStorage.setItem(LAST_OPPONENT_KEY, opponentName)
+    return opponentName
+  } catch (error) {
+    console.error('Error saving last opponent:', error)
+    return null
   }
 }
 
