@@ -52,7 +52,10 @@ function Welcome({ onStart }) {
             {greeting}, Maurice!
           </h1>
           <p className="text-xl text-white/70">
-            Willkommen beim MSV Vokabel-Trainer
+            Willkommen in der MSV Wort-Liga
+          </p>
+          <p className="text-base text-white/60 mt-2">
+            Scoute neue Wörter und schalte Transfer-Wörter frei
           </p>
         </div>
 
