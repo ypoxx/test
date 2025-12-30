@@ -224,6 +224,7 @@ function Match({ progress, onMatchEnd }) {
             <div className="text-6xl mb-4">{summary.emoji}</div>
             <h2 className="text-3xl font-bold mb-2">{summary.title}</h2>
             <p className="text-xl mb-6">{summary.message}</p>
+            <p className="text-lg text-white/80 italic mb-6">{summary.storyHook}</p>
 
             {/* Final Score */}
             <div className="bg-white/10 rounded-lg p-6 mb-6">

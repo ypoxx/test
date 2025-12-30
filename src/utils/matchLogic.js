@@ -96,18 +96,21 @@ export const getMatchSummaryMessage = (result, opponent) => {
     return {
       title: `🎉 Sieg!`,
       message: `MSV Duisburg schlägt ${opponent.name} mit ${score}!`,
+      storyHook: `Maurice siegt gegen ${opponent.name}.`,
       emoji: '⚽🎊'
     }
   } else if (status === 'lose') {
     return {
       title: `😞 Niederlage`,
       message: `${opponent.name} gewinnt ${score.split(':').reverse().join(':')} gegen MSV Duisburg.`,
+      storyHook: `Maurice muss sich ${opponent.name} geschlagen geben.`,
       emoji: '😔'
     }
   } else {
     return {
       title: `🤝 Unentschieden`,
       message: `MSV Duisburg spielt ${score} gegen ${opponent.name}.`,
+      storyHook: `Maurice teilt die Punkte mit ${opponent.name}.`,
       emoji: '🤝'
     }
   }
