@@ -5,7 +5,7 @@
     "rarity": "Common",
     "art": "🛡️",
     "unlockRule": "Ein Match spielen",
-    "description": "Das klassische Wappen für echte Zebras." 
+    "description": "Ein Zeichen für Mut, Teamgeist und Neuanfänge."
   },
   {
     "id": "stadium-lights",
@@ -13,7 +13,7 @@
     "rarity": "Common",
     "art": "💡",
     "unlockRule": "Ein Match gewinnen",
-    "description": "Die Arena erstrahlt im Flutlichtglanz." 
+    "description": "Wenn es leuchtet, beginnt der Moment, alles zu geben."
   },
   {
     "id": "matchday-scarf",
@@ -21,7 +21,7 @@
     "rarity": "Common",
     "art": "🧣",
     "unlockRule": "3 Tore insgesamt",
-    "description": "Warm, weich und immer blau-weiß." 
+    "description": "Wärmt dich und erinnert: Du gehörst dazu."
   },
   {
     "id": "zebra-stripes",
@@ -29,7 +29,7 @@
     "rarity": "Common",
     "art": "🦓",
     "unlockRule": "5 Fragen korrekt",
-    "description": "Die Legende der Streifen lebt." 
+    "description": "Jede Streife steht für ein gelerntes Wort."
   },
   {
     "id": "captains-band",
@@ -37,7 +37,7 @@
     "rarity": "Rare",
     "art": "🎽",
     "unlockRule": "Match mit 70% Genauigkeit",
-    "description": "Führung auf und neben dem Platz." 
+    "description": "Führt mit Ruhe und zeigt, wohin es geht."
   },
   {
     "id": "victory-whistle",
@@ -45,7 +45,7 @@
     "rarity": "Rare",
     "art": "📣",
     "unlockRule": "2 Siege in Folge",
-    "description": "Der Pfiff, der den Rasen bebt." 
+    "description": "Ein Signal: Ihr habt es gemeinsam geschafft."
   },
   {
     "id": "keeper-gloves",
@@ -53,7 +53,7 @@
     "rarity": "Rare",
     "art": "🧤",
     "unlockRule": "10 Wörter gemeistert",
-    "description": "Halten, was andere nur hoffen." 
+    "description": "Konzentriert bleiben, auch wenn’s knifflig wird."
   },
   {
     "id": "tunnel-anthem",
@@ -61,7 +61,7 @@
     "rarity": "Epic",
     "art": "🎶",
     "unlockRule": "5 Spiele gespielt",
-    "description": "Der Klang, der die Kurve elektrisiert." 
+    "description": "Gänsehaut vor dem Anpfiff – jetzt Fokus."
   },
   {
     "id": "derby-fire",
@@ -69,7 +69,7 @@
     "rarity": "Epic",
     "art": "🔥",
     "unlockRule": "Streak von 5",
-    "description": "Ein Funke, der den Abend entzündet." 
+    "description": "Mutig bleiben, wenn es heiß wird."
   },
   {
     "id": "goal-machine",
@@ -77,7 +77,7 @@
     "rarity": "Epic",
     "art": "⚡",
     "unlockRule": "15 Tore erzielt",
-    "description": "Wenn der Ball weiß, wohin er muss." 
+    "description": "Konstanz macht aus Übung echte Stärke."
   },
   {
     "id": "legendary-banner",
@@ -85,7 +85,7 @@
     "rarity": "Legendary",
     "art": "🏟️",
     "unlockRule": "Perfektes Match",
-    "description": "Nur für die Größten der Großen." 
+    "description": "Dein Name hängt oben, weil du drangeblieben bist."
   },
   {
     "id": "immortal-zebra",
@@ -93,7 +93,7 @@
     "rarity": "Legendary",
     "art": "👑",
     "unlockRule": "10 Siege insgesamt",
-    "description": "Die Krone der blau-weißen Geschichte."
+    "description": "Ein Symbol für Ausdauer und Herz."
   },
   {
     "id": "card_msv_captain",
@@ -101,7 +101,7 @@
     "rarity": "Common",
     "art": "🎴",
     "title": "Kapitän des MSV",
-    "description": "Führt das Team mit Übersicht und Herz.",
+    "description": "Gibt Orientierung und ermutigt jeden im Team.",
     "unlockRule": "match"
   },
   {
@@ -110,7 +110,7 @@
     "rarity": "Rare",
     "art": "🎴",
     "title": "Derby-Spezialist",
-    "description": "Bleibt in hitzigen Spielen eiskalt.",
+    "description": "Bleibt mutig, wenn der Druck steigt.",
     "unlockRule": "win"
   },
   {
@@ -119,7 +119,7 @@
     "rarity": "Common",
     "art": "🎴",
     "title": "Turbo von der Ruhr",
-    "description": "Explosiv auf den ersten Metern.",
+    "description": "Zeigt, wie Tempo und Mut zusammengehören.",
     "unlockRule": "match"
   },
   {
@@ -128,7 +128,7 @@
     "rarity": "Rare",
     "art": "🎴",
     "title": "Heimspiel-Planer",
-    "description": "Kennt jede Ecke des Stadions.",
+    "description": "Plant klug und schafft Raum für Erfolge.",
     "unlockRule": "win"
   },
   {
@@ -137,7 +137,7 @@
     "rarity": "Epic",
     "art": "🎴",
     "title": "Scorer mit Stil",
-    "description": "Schreibt Geschichten mit jedem Tor.",
+    "description": "Verwandelt Chancen in kleine Geschichten.",
     "unlockRule": "streak"
   },
   {
@@ -146,7 +146,7 @@
     "rarity": "Common",
     "art": "🎴",
     "title": "Letzte Instanz",
-    "description": "Hält fest wie Beton.",
+    "description": "Hält stand, wenn es darauf ankommt.",
     "unlockRule": "match"
   },
   {
@@ -155,7 +155,7 @@
     "rarity": "Rare",
     "art": "🎴",
     "title": "Wort-Entdecker",
-    "description": "Findet starke Vokabeln für neue Matches.",
+    "description": "Entdeckt neue Wörter wie seltene Talente.",
     "unlockRule": "match"
   },
   {
@@ -164,7 +164,7 @@
     "rarity": "Common",
     "art": "🎴",
     "title": "Liebling der Kurve",
-    "description": "Treibt die Fans zum Jubeln.",
+    "description": "Zündet Funken – Motivation für alle.",
     "unlockRule": "match"
   },
   {
@@ -173,7 +173,7 @@
     "rarity": "Rare",
     "art": "🎴",
     "title": "Spielmacher",
-    "description": "Sieht den nächsten Pass schon vorher.",
+    "description": "Denkt zwei Schritte voraus.",
     "unlockRule": "win"
   },
   {
@@ -182,7 +182,7 @@
     "rarity": "Common",
     "art": "🎴",
     "title": "Finten-Künstler",
-    "description": "Dribbelt an allem vorbei.",
+    "description": "Leichtfüßig und kreativ im Kopf.",
     "unlockRule": "match"
   },
   {
@@ -191,7 +191,7 @@
     "rarity": "Epic",
     "art": "🎴",
     "title": "Magie am Spieltag",
-    "description": "Wenn es zählt, liefert er ab.",
+    "description": "Wenn es zählt, zaubert er Lösungen.",
     "unlockRule": "streak"
   },
   {
@@ -200,7 +200,7 @@
     "rarity": "Legendary",
     "art": "🎴",
     "title": "Legende des MSV",
-    "description": "Ein Name, den alle kennen.",
+    "description": "Vorbild für alle, die dranbleiben.",
     "unlockRule": "streak"
   },
   {
@@ -209,7 +209,7 @@
     "rarity": "Rare",
     "art": "🎴",
     "title": "Mittelfeld-Motor",
-    "description": "Gibt das Tempo vor.",
+    "description": "Hält das Spiel zusammen, ruhig und wach.",
     "unlockRule": "match"
   },
   {
@@ -218,7 +218,7 @@
     "rarity": "Epic",
     "art": "🎴",
     "title": "Nerven wie Stahl",
-    "description": "Trifft vom Punkt.",
+    "description": "Trifft sicher, weil der Kopf ruhig bleibt.",
     "unlockRule": "win"
   },
   {
@@ -227,7 +227,7 @@
     "rarity": "Rare",
     "art": "🎴",
     "title": "K.O.-Experte",
-    "description": "Holt Siege, wenn es brennt.",
+    "description": "Stark, wenn es wirklich wichtig wird.",
     "unlockRule": "match"
   },
   {
@@ -236,7 +236,7 @@
     "rarity": "Common",
     "art": "🎴",
     "title": "Abschluss-Profi",
-    "description": "Bleibt cool vor dem Tor.",
+    "description": "Bleibt cool und setzt sauber den Abschluss.",
     "unlockRule": "match"
   }
 ]
