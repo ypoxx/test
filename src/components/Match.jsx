@@ -16,8 +16,9 @@ import { checkNewAchievements } from '../utils/achievements'
 import { calculateXPReward } from '../utils/xpSystem'
 import { rollCardReward } from '../utils/cardRewards'
 import soundManager from '../utils/sounds'
-import { createShareCardBlob } from '../utils/shareCard'
-import { downloadImage, shareImage } from '../utils/share'
+import { awardMatchRewards } from '../utils/cardRewards'
+import CardReveal from './CardReveal'
+import ShareCard from './ShareCard'
 
 function Match({ progress, onMatchEnd }) {
   const [opponent] = useState(selectRandomOpponent())
@@ -45,6 +46,8 @@ function Match({ progress, onMatchEnd }) {
   const [crowdAnimationKey, setCrowdAnimationKey] = useState(0)
   const [cardReward, setCardReward] = useState(null)
   const [showCardReveal, setShowCardReveal] = useState(false)
+  const [reward, setReward] = useState(null)
+  const [showReward, setShowReward] = useState(false)
 
   useEffect(() => {
     // Initialize sound system on component mount
@@ -107,9 +110,6 @@ function Match({ progress, onMatchEnd }) {
     } else {
       setStreak(0)
       setStreakMessage(null)
-      setOpponentGoals(prev => prev + 1)
-      setMatchFeedback('miss')
-      setCrowdAnimationKey(prev => prev + 1)
       const nextOpponentGoals = opponentGoals + 1
       setOpponentGoals(nextOpponentGoals)
       if (msvGoals === 0 && nextOpponentGoals >= 3) {
@@ -182,6 +182,13 @@ function Match({ progress, onMatchEnd }) {
 
     const reward = rollCardReward({ resultStatus: result.status, streak })
     setCardReward(reward)
+    // Award collectible card + fact
+    const rewardResult = awardMatchRewards({
+      wonMatch: result.status === 'win',
+      streak
+    })
+    setReward(rewardResult)
+    setShowReward(true)
 
     // Trigger victory haptic feedback and sounds
     if (result.status === 'win') {
@@ -198,6 +205,10 @@ function Match({ progress, onMatchEnd }) {
   }
 
   const handleContinue = () => {
+    if (showReward) {
+      setShowReward(false)
+      return
+    }
     // Simplified: Check if we have achievements to show
     if (newAchievements.length > 0 && !showingAchievement) {
       setShowingAchievement(true)
@@ -279,6 +290,12 @@ function Match({ progress, onMatchEnd }) {
 
   if (matchFinished && matchResult) {
     const summary = getMatchSummaryMessage(matchResult, opponent)
+    const shareSummary = {
+      title: summary.title,
+      message: summary.message,
+      accuracy: matchResult.accuracy,
+      score: matchResult.score
+    }
 
     if (showCardReveal && cardReward) {
       return (
@@ -292,6 +309,10 @@ function Match({ progress, onMatchEnd }) {
 
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4 stadium-scene field-pattern relative overflow-hidden">
+        <CardReveal
+          reward={reward}
+          onClose={() => setShowReward(false)}
+        />
         {/* Floodlights */}
         <div className="floodlight top-10 left-10" />
         <div className="floodlight top-10 right-10" />
@@ -340,6 +361,8 @@ function Match({ progress, onMatchEnd }) {
               {cardReward ? 'Kartenpack öffnen' : 'Zurück zum Stadion'}
             </button>
           </div>
+
+          <ShareCard summary={shareSummary} reward={reward} />
         </div>
       </div>
     )

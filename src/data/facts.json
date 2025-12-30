@@ -1,0 +1,77 @@
+[
+  {
+    "id": "fact_msv_zebra",
+    "text": "Der Spitzname des MSV Duisburg lautet \"Die Zebras\" — das passt perfekt zu Maurice.",
+    "topic": "msv"
+  },
+  {
+    "id": "fact_msv_ruhrgebiet",
+    "text": "Der MSV Duisburg ist ein traditionsreicher Club aus dem Ruhrgebiet — genau Maurices Heimatregion.",
+    "topic": "msv"
+  },
+  {
+    "id": "fact_ruhr_rivalry",
+    "text": "Im Ruhrgebiet gibt es viele Traditionsvereine — Derbys sind dort immer ein Highlight.",
+    "topic": "ruhrgebiet"
+  },
+  {
+    "id": "fact_muelheim_ruhr",
+    "text": "Mülheim an der Ruhr liegt mitten im Ruhrgebiet — Fußball und Industrie prägen die Region.",
+    "topic": "local"
+  },
+  {
+    "id": "fact_msv_home",
+    "text": "Heimspiele vor den eigenen Fans geben dem MSV oft einen Extra-Schub.",
+    "topic": "msv"
+  },
+  {
+    "id": "fact_striker_memory",
+    "text": "Top-Stürmer merken sich jede Torchance — genauso kann Maurice sich neue Wörter merken.",
+    "topic": "motivation"
+  },
+  {
+    "id": "fact_ruhr_cities",
+    "text": "Im Ruhrgebiet liegen Städte eng beieinander — Auswärtsfahrten sind oft kurze Strecken.",
+    "topic": "ruhrgebiet"
+  },
+  {
+    "id": "fact_club_identity",
+    "text": "Ein Club lebt von seiner Identität — beim MSV sind das Kampfgeist und Zusammenhalt.",
+    "topic": "msv"
+  },
+  {
+    "id": "fact_panini_story",
+    "text": "Sammelkarten leben von Seltenheit — je seltener die Karte, desto größer der Jubel.",
+    "topic": "cards"
+  },
+  {
+    "id": "fact_matchday_focus",
+    "text": "Profis sprechen vom \"Matchday-Fokus\": volle Konzentration in kurzen Phasen.",
+    "topic": "motivation"
+  },
+  {
+    "id": "fact_quick_pass",
+    "text": "Schnelle Pässe im Fußball sind wie schnelle Vokabeln im Kopf — beides bringt Tempo ins Spiel.",
+    "topic": "motivation"
+  },
+  {
+    "id": "fact_crowd_energy",
+    "text": "Die Kurve pusht das Team — im Spiel ist das wie ein Extra-Boost für Maurice.",
+    "topic": "msv"
+  },
+  {
+    "id": "fact_goal_memory",
+    "text": "Wer viele Tore liebt, kann auch viele Wörter sammeln — jedes richtige Wort ist ein Tor.",
+    "topic": "motivation"
+  },
+  {
+    "id": "fact_ruhr_football",
+    "text": "Fußball gehört zur Kultur des Ruhrgebiets — jeder Spieltag ist wie ein kleines Fest.",
+    "topic": "ruhrgebiet"
+  },
+  {
+    "id": "fact_msv_colors",
+    "text": "Blau-Weiß sind die klassischen Farben des MSV — sie stehen für Stolz und Tradition.",
+    "topic": "msv"
+  }
+]
