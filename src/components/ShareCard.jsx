@@ -106,6 +106,31 @@ const buildShareSvg = ({ summary, reward }) => {
         </linearGradient>
       </defs>
       <rect width="1080" height="1350" fill="url(#bg)"/>
+      <circle cx="140" cy="180" r="90" fill="rgba(59,130,246,0.15)"/>
+      <circle cx="980" cy="280" r="140" fill="rgba(34,211,238,0.12)"/>
+      <circle cx="960" cy="1120" r="180" fill="rgba(168,85,247,0.12)"/>
+      <circle cx="160" cy="1030" r="120" fill="rgba(250,204,21,0.12)"/>
+      <rect x="60" y="60" width="960" height="1230" rx="48" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.15)" stroke-width="4"/>
+      <text x="540" y="150" font-family="Arial, sans-serif" font-size="40" fill="#93c5fd" text-anchor="middle">Maurice' Vokabel-Match</text>
+      <text x="540" y="240" font-family="Arial, sans-serif" font-size="68" fill="#ffffff" text-anchor="middle">
+        ${titleLines.map((line, index) => `<tspan x="540" dy="${index === 0 ? 0 : 70}">${escapeXml(line)}</tspan>`).join('')}
+      </text>
+      <text x="540" y="360" font-family="Arial, sans-serif" font-size="34" fill="#e5e7eb" text-anchor="middle">
+        ${messageLines.map((line, index) => `<tspan x="540" dy="${index === 0 ? 0 : 48}">${escapeXml(line)}</tspan>`).join('')}
+      </text>
+      <rect x="180" y="380" width="720" height="160" rx="28" fill="rgba(255,255,255,0.08)" />
+      <text x="540" y="460" font-family="Arial, sans-serif" font-size="38" fill="#ffffff" text-anchor="middle">Genauigkeit: ${accuracy}% · Ergebnis: ${score}</text>
+      <rect x="140" y="590" width="800" height="360" rx="32" fill="url(#accent)" opacity="0.15"/>
+      <text x="540" y="660" font-family="Arial, sans-serif" font-size="32" fill="#cbd5f5" text-anchor="middle">Neue Sammelkarte</text>
+      <text x="540" y="740" font-family="Arial, sans-serif" font-size="52" fill="#ffffff" text-anchor="middle">
+        ${cardLines.map((line, index) => `<tspan x="540" dy="${index === 0 ? 0 : 62}">${escapeXml(line)}</tspan>`).join('')}
+      </text>
+      <text x="540" y="830" font-family="Arial, sans-serif" font-size="30" fill="#e2e8f0" text-anchor="middle">⚽ ✨ ⚽</text>
+      <rect x="160" y="940" width="760" height="230" rx="28" fill="rgba(255,255,255,0.08)"/>
+      <text x="540" y="1020" font-family="Arial, sans-serif" font-size="28" fill="#e2e8f0" text-anchor="middle">
+        ${factLines.map((line, index) => `<tspan x="540" dy="${index === 0 ? 0 : 40}">${escapeXml(line)}</tspan>`).join('')}
+      </text>
+      <text x="540" y="1240" font-family="Arial, sans-serif" font-size="26" fill="#94a3b8" text-anchor="middle">MSV Duisburg • Ruhrgebiet • 7. Klasse</text>
       <circle cx="140" cy="180" r="90" fill="rgba(255,255,255,0.3)"/>
       <circle cx="980" cy="280" r="140" fill="rgba(255,255,255,0.2)"/>
       <circle cx="960" cy="1120" r="180" fill="rgba(255,255,255,0.18)"/>
@@ -189,12 +214,22 @@ function ShareCard({ summary, reward }) {
     <div className="card p-4 mt-6">
       <div className="text-center text-xl font-bold mb-4">📲 Erfolgskarte teilen</div>
 
+      <div className={`share-card ${rarityClass}`}>
       <div className={`share-card ${rarityClass} ${resultClass}`}>
         <div className="share-card-header">
           <div className="share-card-eyebrow">Maurice' Vokabel-Match</div>
           <div className="share-card-title">{summary?.title}</div>
         </div>
         <div className="share-card-body">
+          <div className="text-lg font-semibold share-card-message">{summary?.message}</div>
+          <div className="text-sm text-white/80 mt-2">
+            Genauigkeit: {summary?.accuracy}% · Ergebnis: {summary?.score}
+          </div>
+        </div>
+        <div className="share-card-reward">
+          <div className="text-sm text-white/70">Neue Karte</div>
+          <div className="text-lg font-bold">{reward?.card?.name || '—'}</div>
+          <div className="text-xs text-white/70 share-card-fact">{reward?.fact?.text || 'Weiter so!'}</div>
           <div className="share-card-message">{summary?.message}</div>
           <div className="share-card-meta">
             Vokabel-Erfolg: {summary?.accuracy}% · Ergebnis: {summary?.score}

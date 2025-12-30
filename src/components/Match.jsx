@@ -7,6 +7,7 @@ import LevelUpNotification from './LevelUpNotification'
 import MatchCountdown from './MatchCountdown'
 import vocabsData from '../data/vocabs.json'
 import { selectVocabsForMatch } from '../utils/spacedRepetition'
+import { selectRandomOpponent, checkAnswer, calculateMatchResult, getMatchSummaryMessage } from '../utils/matchLogic'
 import { selectRandomOpponent, getDerbyOpponents, checkAnswer, calculateMatchResult, getMatchSummaryMessage } from '../utils/matchLogic'
 import { updateVocabProgress, updateGoalsAndLeague, addMatchToHistory, loadProgress, unlockAchievement, addXP, updateDailyStreak, loadLastOpponentName, saveLastOpponentName } from '../utils/localStorage'
 import { generateMultipleChoiceOptions } from '../utils/multipleChoice'
@@ -19,6 +20,9 @@ import soundManager from '../utils/sounds'
 import ShareCard from './ShareCard'
 
 function Match({ progress, onMatchEnd }) {
+  const [opponent] = useState(() => {
+    const lastOpponent = loadLastOpponentName()
+    const nextOpponent = selectRandomOpponent(lastOpponent)
   const [specialMatch] = useState(() => Math.random() < 0.2)
   const [opponent] = useState(() => {
     const lastOpponent = loadLastOpponentName()
@@ -203,6 +207,7 @@ function Match({ progress, onMatchEnd }) {
     setNewAchievements(unlockedAchievements)
 
     // Add XP and check for level up
+    const xpResult = addXP(finalXpGained)
     setXPGained(totalXpGained)
     const xpResult = addXP(totalXpGained)
     if (xpResult.leveledUp) {
@@ -396,6 +401,7 @@ function Match({ progress, onMatchEnd }) {
             {cardReward && (
               <button
                 onClick={() => onMatchEnd(matchResult)}
+                className="btn-secondary w-full mt-3"
                 className="btn-secondary btn-secondary--soft w-full mt-3"
               >
                 Direkt zum Stadion
