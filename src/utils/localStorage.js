@@ -12,7 +12,9 @@ const DEFAULT_PROGRESS = {
   xp: 0, // Total XP earned
   level: 1, // Current level
   lastPlayedDate: null, // For daily streak tracking
-  dailyStreak: 0 // Consecutive days played
+  dailyStreak: 0, // Consecutive days played
+  unlockedCards: [],
+  unlockedFacts: []
 }
 
 /**
@@ -220,6 +222,32 @@ export const unlockAchievement = (achievementId) => {
     saveProgress(progress)
   }
 
+  return progress
+}
+
+/**
+ * Unlock a collectible card
+ * @param {string} cardId - ID of the card to unlock
+ */
+export const unlockCard = (cardId) => {
+  const progress = loadProgress()
+  if (!progress.unlockedCards.includes(cardId)) {
+    progress.unlockedCards.push(cardId)
+    saveProgress(progress)
+  }
+  return progress
+}
+
+/**
+ * Unlock a football fact
+ * @param {string} factId - ID of the fact to unlock
+ */
+export const unlockFact = (factId) => {
+  const progress = loadProgress()
+  if (!progress.unlockedFacts.includes(factId)) {
+    progress.unlockedFacts.push(factId)
+    saveProgress(progress)
+  }
   return progress
 }
 
