@@ -8,7 +8,7 @@ import MatchCountdown from './MatchCountdown'
 import vocabsData from '../data/vocabs.json'
 import { selectVocabsForMatch } from '../utils/spacedRepetition'
 import { selectRandomOpponent, checkAnswer, calculateMatchResult, getMatchSummaryMessage } from '../utils/matchLogic'
-import { updateVocabProgress, updateGoalsAndLeague, addMatchToHistory, loadProgress, unlockAchievement, addXP, updateDailyStreak } from '../utils/localStorage'
+import { updateVocabProgress, updateGoalsAndLeague, addMatchToHistory, loadProgress, unlockAchievement, addXP, updateDailyStreak, updateLatestMatchEarnedCards } from '../utils/localStorage'
 import { generateMultipleChoiceOptions } from '../utils/multipleChoice'
 import { calculateStreakBonus, getStreakMessage, getStreakEmoji, getStreakColor, triggerHapticFeedback } from '../utils/gameEffects'
 import { checkNewAchievements } from '../utils/achievements'
@@ -136,6 +136,16 @@ function Match({ progress, onMatchEnd }) {
     // Check for new achievements
     const newProgress = loadProgress()
     const unlockedAchievements = checkNewAchievements(oldProgress, newProgress)
+
+    if (unlockedAchievements.length > 0) {
+      updateLatestMatchEarnedCards(
+        unlockedAchievements.map(achievement => ({
+          id: achievement.id,
+          name: achievement.name,
+          emoji: achievement.emoji
+        }))
+      )
+    }
 
     // Unlock achievements
     unlockedAchievements.forEach(achievement => {
