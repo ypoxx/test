@@ -86,6 +86,42 @@ class SoundManager {
   }
 
   /**
+   * Play intro sound after user enables audio
+   */
+  playIntro() {
+    if (!this.enabled || !this.initialized) return
+
+    if (this.playSample('victory')) {
+      return
+    }
+
+    const now = this.audioContext.currentTime
+    const notes = [
+      { freq: 523.25, time: 0, duration: 0.12 },
+      { freq: 659.25, time: 0.12, duration: 0.12 },
+      { freq: 783.99, time: 0.24, duration: 0.2 }
+    ]
+
+    notes.forEach(note => {
+      const oscillator = this.audioContext.createOscillator()
+      const gainNode = this.audioContext.createGain()
+
+      oscillator.connect(gainNode)
+      gainNode.connect(this.audioContext.destination)
+
+      oscillator.frequency.value = note.freq
+      oscillator.type = 'triangle'
+
+      gainNode.gain.setValueAtTime(0, now + note.time)
+      gainNode.gain.linearRampToValueAtTime(0.25 * this.masterVolume, now + note.time + 0.02)
+      gainNode.gain.exponentialRampToValueAtTime(0.01, now + note.time + note.duration)
+
+      oscillator.start(now + note.time)
+      oscillator.stop(now + note.time + note.duration)
+    })
+  }
+
+  /**
    * Play goal celebration sound (ascending melody)
    */
   playGoal() {
