@@ -6,10 +6,13 @@ import CategoryStats from './CategoryStats'
 import soundManager from '../utils/sounds'
 import { getVocabStats } from '../utils/spacedRepetition'
 import vocabsData from '../data/vocabs.json'
+import { getLeagueProgress } from '../utils/localStorage'
 
 function Stadium({ progress, onStartMatch }) {
   const stats = getVocabStats(vocabsData, progress)
   const [showTrophyCase, setShowTrophyCase] = useState(false)
+  const leagueInfo = getLeagueProgress(progress.totalGoalsScored || 0)
+  const { currentLeagueInfo, nextLeagueInfo, goalsNeeded } = leagueInfo
 
   const testSound = () => {
     // Initialize if not already
@@ -56,6 +59,27 @@ function Stadium({ progress, onStartMatch }) {
 
         {/* League Progress */}
         <div className="mb-6">
+          <div className="card p-5 mb-4 flex flex-col sm:flex-row items-center justify-between gap-4 bg-gradient-to-r from-msv-blue/40 to-goal/20 border border-goal/40">
+            <div className="flex items-center gap-4">
+              <div className="text-4xl">{currentLeagueInfo.emoji}</div>
+              <div>
+                <div className="text-sm uppercase tracking-wide text-white/70">Aktuelle Liga</div>
+                <div className="text-2xl font-bold text-white">{currentLeagueInfo.name}</div>
+              </div>
+            </div>
+            <div className="text-center sm:text-right">
+              {nextLeagueInfo ? (
+                <>
+                  <div className="text-sm text-white/70">Ziel</div>
+                  <div className="text-xl font-semibold text-goal">
+                    Noch {goalsNeeded} Tore bis {nextLeagueInfo.name}
+                  </div>
+                </>
+              ) : (
+                <div className="text-xl font-semibold text-goal">Bundesliga erreicht!</div>
+              )}
+            </div>
+          </div>
           <LeagueProgress totalGoals={progress.totalGoalsScored} />
         </div>
 
