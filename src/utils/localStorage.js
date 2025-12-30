@@ -38,6 +38,42 @@ export const saveProgress = (progressData) => {
   }
 }
 
+export const exportProgressData = () => {
+  try {
+    const savedData = localStorage.getItem(STORAGE_KEY)
+    if (savedData) {
+      return savedData
+    }
+    const fallback = JSON.stringify({
+      ...DEFAULT_PROGRESS,
+      lastSaved: new Date().toISOString()
+    })
+    return fallback
+  } catch (error) {
+    console.error('Error exporting progress:', error)
+    return null
+  }
+}
+
+export const importProgressData = (progressData) => {
+  try {
+    const data = typeof progressData === 'string' ? JSON.parse(progressData) : progressData
+    if (!data || typeof data !== 'object' || !data.vocabProgress) {
+      return false
+    }
+    const merged = {
+      ...DEFAULT_PROGRESS,
+      ...data,
+      lastSaved: new Date().toISOString()
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(merged))
+    return true
+  } catch (error) {
+    console.error('Error importing progress:', error)
+    return false
+  }
+}
+
 /**
  * Load progress from localStorage
  * @returns {Object} - The loaded progress or default progress if none exists

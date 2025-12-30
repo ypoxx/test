@@ -126,7 +126,81 @@ export const FOOTBALL_FUN_FACTS = [
     fact: "Fußball ist die beliebteste Sportart der Welt",
     isTrue: true,
     explanation: "Richtig! Über 4 Milliarden Menschen weltweit interessieren sich für Fußball."
+  },
+  {
+    fact: "Ein Spielball darf nur schwarz-weiß sein",
+    isTrue: false,
+    explanation: "Falsch! Bälle gibt es in vielen Farben, damit sie besser sichtbar sind."
+  },
+  {
+    fact: "Man darf beim Einwurf beide Füße in der Luft haben",
+    isTrue: false,
+    explanation: "Falsch! Beim Einwurf müssen beide Füße den Boden berühren."
+  },
+  {
+    fact: "Ein Tor zählt nur, wenn der Ball komplett hinter der Linie war",
+    isTrue: true,
+    explanation: "Richtig! Der Ball muss vollständig über die Linie."
+  },
+  {
+    fact: "Ein Stürmer darf im Strafraum mit dem Rücken zum Tor stehen",
+    isTrue: true,
+    explanation: "Richtig! Die Körperhaltung ist egal, nur Abseits und Fouls zählen."
+  },
+  {
+    fact: "In Deutschland nennt man Fußballschuhe auch 'Stollen'",
+    isTrue: true,
+    explanation: "Richtig! 'Stollen' ist ein häufiger Spitzname für Fußballschuhe."
+  },
+  {
+    fact: "Die Eckfahne muss mindestens 2 Meter hoch sein",
+    isTrue: false,
+    explanation: "Falsch! Sie muss mindestens 1,5 Meter hoch sein."
+  },
+  {
+    fact: "Ein Torwart darf den Ball 10 Sekunden in der Hand halten",
+    isTrue: false,
+    explanation: "Falsch! Er darf ihn nur 6 Sekunden halten."
+  },
+  {
+    fact: "Der Anstoß kann direkt zum Tor führen",
+    isTrue: true,
+    explanation: "Richtig! Ein Tor aus dem Anstoß ist erlaubt."
+  },
+  {
+    fact: "Beim Freistoß muss die Mauer genau 9,15 Meter entfernt stehen",
+    isTrue: true,
+    explanation: "Richtig! Das entspricht 10 Yards."
+  },
+  {
+    fact: "Ein Spiel kann wegen Gewitter unterbrochen werden",
+    isTrue: true,
+    explanation: "Richtig! Sicherheit geht vor, auch im Fußball."
   }
+]
+
+export const GREETINGS = [
+  "Moin",
+  "Hallöchen",
+  "Hey Maurice",
+  "Servus",
+  "Bonjour",
+  "Hello",
+  "Hi",
+  "Ahoi",
+  "Na du",
+  "Guten Morgen",
+  "Guten Tag",
+  "Guten Abend"
+]
+
+export const FUN_FACT_PROMPTS = [
+  "Stimmt das oder ist das Quatsch?",
+  "Was meinst du, wahr oder falsch?",
+  "Glaubst du, dass das stimmt?",
+  "Ist das richtig oder falsch?",
+  "Kann das wirklich sein?",
+  "Deine Einschätzung: wahr oder falsch?"
 ]
 
 /**
@@ -135,6 +209,16 @@ export const FOOTBALL_FUN_FACTS = [
 export const getRandomFunFact = () => {
   const randomIndex = Math.floor(Math.random() * FOOTBALL_FUN_FACTS.length)
   return FOOTBALL_FUN_FACTS[randomIndex]
+}
+
+export const getRandomGreeting = () => {
+  const randomIndex = Math.floor(Math.random() * GREETINGS.length)
+  return GREETINGS[randomIndex]
+}
+
+export const getRandomPrompt = () => {
+  const randomIndex = Math.floor(Math.random() * FUN_FACT_PROMPTS.length)
+  return FUN_FACT_PROMPTS[randomIndex]
 }
 
 /**
@@ -154,4 +238,10 @@ export const getTimeBasedGreeting = () => {
   } else {
     return "Gute Nacht" // 22-23
   }
+}
+
+export const getPersonalGreeting = () => {
+  const timeGreeting = getTimeBasedGreeting()
+  const randomGreeting = getRandomGreeting()
+  return Math.random() < 0.5 ? `${randomGreeting}!` : `${timeGreeting}!`
 }

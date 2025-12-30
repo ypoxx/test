@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import LeagueProgress from './LeagueProgress'
 import TrophyCase from './TrophyCase'
 import XPBar from './XPBar'
@@ -6,7 +6,7 @@ import CategoryStats from './CategoryStats'
 import CardAlbum from './CardAlbum'
 import { getVocabStats } from '../utils/spacedRepetition'
 import vocabsData from '../data/vocabs.json'
-import { getLeagueProgress } from '../utils/localStorage'
+import { exportProgressData, getLeagueProgress, importProgressData } from '../utils/localStorage'
 
 function Stadium({ progress, onStartMatch }) {
   const stats = getVocabStats(vocabsData, progress)
@@ -14,6 +14,39 @@ function Stadium({ progress, onStartMatch }) {
   const leagueInfo = getLeagueProgress(progress.totalGoalsScored || 0)
   const { currentLeagueInfo, nextLeagueInfo, goalsNeeded } = leagueInfo
   const [showAlbum, setShowAlbum] = useState(false)
+  const [backupStatus, setBackupStatus] = useState(null)
+  const fileInputRef = useRef(null)
+
+  const handleExport = () => {
+    const data = exportProgressData()
+    if (!data) {
+      setBackupStatus('Export fehlgeschlagen.')
+      return
+    }
+    const blob = new Blob([data], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'maurice-vokabel-stand.json'
+    link.click()
+    URL.revokeObjectURL(url)
+    setBackupStatus('Backup gespeichert.')
+  }
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleImport = (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      const success = importProgressData(reader.result)
+      setBackupStatus(success ? 'Backup geladen. Bitte Seite neu öffnen.' : 'Backup konnte nicht geladen werden.')
+    }
+    reader.readAsText(file)
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 stadium-scene field-pattern relative overflow-hidden">
@@ -94,6 +127,30 @@ function Stadium({ progress, onStartMatch }) {
         >
           📘 Kartenalbum ({progress.unlockedCards?.length || 0})
         </button>
+
+        <div className="card p-4 mb-6 text-center">
+          <div className="text-sm text-white/80 mb-3">
+            Fortschritt bleibt auf dem iPhone gespeichert. Für extra Sicherheit kannst du ein Backup sichern.
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button onClick={handleExport} className="btn-secondary btn-secondary--soft w-full">
+              💾 Backup speichern
+            </button>
+            <button onClick={handleImportClick} className="btn-secondary btn-secondary--soft w-full">
+              📂 Backup laden
+            </button>
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/json"
+            className="hidden"
+            onChange={handleImport}
+          />
+          {backupStatus && (
+            <div className="mt-3 text-xs text-white/60">{backupStatus}</div>
+          )}
+        </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-4 mb-6">
