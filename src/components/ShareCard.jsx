@@ -101,7 +101,7 @@ const buildShareSvg = ({ summary, reward }) => {
       <text x="540" y="1020" font-family="Arial, sans-serif" font-size="28" fill="#e2e8f0" text-anchor="middle">
         ${factLines.map((line, index) => `<tspan x="540" dy="${index === 0 ? 0 : 40}">${escapeXml(line)}</tspan>`).join('')}
       </text>
-      <text x="540" y="1240" font-family="Arial, sans-serif" font-size="26" fill="#94a3b8" text-anchor="middle">MSV Duisburg • Ruhrgebiet</text>
+      <text x="540" y="1240" font-family="Arial, sans-serif" font-size="26" fill="#94a3b8" text-anchor="middle">MSV Duisburg • Ruhrgebiet • 7. Klasse</text>
     </svg>
   `.trim()
 }
