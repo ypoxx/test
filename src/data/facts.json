@@ -1,0 +1,62 @@
+[
+  {
+    "id": "msv-1902",
+    "title": "MSV seit 1902",
+    "fact": "Der MSV Duisburg wurde am 2. Juni 1902 gegründet und gehört zu den ältesten Traditionsvereinen im Ruhrgebiet.",
+    "category": "msv"
+  },
+  {
+    "id": "msv-zebra",
+    "title": "Zebras fürs Revier",
+    "fact": "Der Spitzname \"Zebras\" stammt von den blau-weiß geringelten Trikots des MSV Duisburg.",
+    "category": "msv"
+  },
+  {
+    "id": "msv-arena",
+    "title": "Stadion mit Geschichte",
+    "fact": "Die Schauinsland-Reisen-Arena fasst rund 31.500 Zuschauer und ersetzte 2004 das Wedaustadion.",
+    "category": "msv"
+  },
+  {
+    "id": "msv-1963",
+    "title": "Bundesliga-Premiere",
+    "fact": "MSV Duisburg war 1963 Gründungsmitglied der Bundesliga und belegte in der ersten Saison Platz 2.",
+    "category": "msv"
+  },
+  {
+    "id": "msv-1979",
+    "title": "UEFA-Cup-Nächte",
+    "fact": "In der Saison 1978/79 zog der MSV Duisburg bis ins Halbfinale des UEFA-Pokals ein.",
+    "category": "msv"
+  },
+  {
+    "id": "bl-1963",
+    "title": "Bundesliga seit 1963",
+    "fact": "Die Bundesliga startete 1963 mit 16 Teams – heute sind es 18 Vereine.",
+    "category": "bundesliga"
+  },
+  {
+    "id": "bl-torrekord",
+    "title": "Torrekord in Sicht",
+    "fact": "Der Rekord für die meisten Tore in einer Bundesliga-Saison liegt bei 41 Treffern (Robert Lewandowski, 2020/21).",
+    "category": "bundesliga"
+  },
+  {
+    "id": "bl-meisterschale",
+    "title": "Meisterschale",
+    "fact": "Die Meisterschale wurde 1949 eingeführt und wiegt über 11 Kilogramm.",
+    "category": "bundesliga"
+  },
+  {
+    "id": "bl-fans",
+    "title": "Volle Stadien",
+    "fact": "Die Bundesliga gilt als Liga mit den höchsten durchschnittlichen Zuschauerzahlen in Europa.",
+    "category": "bundesliga"
+  },
+  {
+    "id": "bl-revierderby",
+    "title": "Revierderby-Klassiker",
+    "fact": "Das Revierderby zwischen Dortmund und Schalke zählt zu den bekanntesten Derbys der Bundesliga.",
+    "category": "bundesliga"
+  }
+]

@@ -9,6 +9,7 @@ const DEFAULT_PROGRESS = {
   matchHistory: [],
   achievements: [], // Array of unlocked achievement IDs
   newAchievements: [], // Recently unlocked, shown in notification
+  unlockedFacts: [], // Array of unlocked fact IDs
   xp: 0, // Total XP earned
   level: 1, // Current level
   lastPlayedDate: null, // For daily streak tracking
@@ -217,6 +218,21 @@ export const unlockAchievement = (achievementId) => {
   if (!progress.achievements.includes(achievementId)) {
     progress.achievements.push(achievementId)
     progress.newAchievements.push(achievementId)
+    saveProgress(progress)
+  }
+
+  return progress
+}
+
+/**
+ * Unlock a fun fact
+ * @param {string} factId - ID of the fact to unlock
+ */
+export const unlockFact = (factId) => {
+  const progress = loadProgress()
+
+  if (!progress.unlockedFacts.includes(factId)) {
+    progress.unlockedFacts.push(factId)
     saveProgress(progress)
   }
 

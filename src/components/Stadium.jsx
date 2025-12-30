@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import LeagueProgress from './LeagueProgress'
 import TrophyCase from './TrophyCase'
+import FactAlbum from './FactAlbum'
 import XPBar from './XPBar'
 import CategoryStats from './CategoryStats'
 import soundManager from '../utils/sounds'
@@ -10,6 +11,7 @@ import vocabsData from '../data/vocabs.json'
 function Stadium({ progress, onStartMatch }) {
   const stats = getVocabStats(vocabsData, progress)
   const [showTrophyCase, setShowTrophyCase] = useState(false)
+  const [showFactAlbum, setShowFactAlbum] = useState(false)
 
   const testSound = () => {
     // Initialize if not already
@@ -73,6 +75,13 @@ function Stadium({ progress, onStartMatch }) {
           className="btn-secondary w-full mb-3 text-lg py-3"
         >
           🏆 Meine Trophäen ({progress.achievements?.length || 0})
+        </button>
+
+        <button
+          onClick={() => setShowFactAlbum(true)}
+          className="btn-secondary w-full mb-3 text-lg py-3"
+        >
+          📚 Sammelalbum ({progress.unlockedFacts?.length || 0})
         </button>
 
         {/* Sound Test Button */}
@@ -165,6 +174,13 @@ function Stadium({ progress, onStartMatch }) {
         <TrophyCase
           unlockedAchievementIds={progress.achievements || []}
           onClose={() => setShowTrophyCase(false)}
+        />
+      )}
+
+      {showFactAlbum && (
+        <FactAlbum
+          unlockedFactIds={progress.unlockedFacts || []}
+          onClose={() => setShowFactAlbum(false)}
         />
       )}
     </div>

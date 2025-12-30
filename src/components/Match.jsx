@@ -2,13 +2,15 @@ import { useState, useEffect } from 'react'
 import VocabCard from './VocabCard'
 import ScoreDisplay from './ScoreDisplay'
 import AchievementUnlocked from './AchievementUnlocked'
+import FactUnlocked from './FactUnlocked'
 import ConfettiExplosion from './ConfettiExplosion'
 import LevelUpNotification from './LevelUpNotification'
 import MatchCountdown from './MatchCountdown'
 import vocabsData from '../data/vocabs.json'
+import factsData from '../data/facts.json'
 import { selectVocabsForMatch } from '../utils/spacedRepetition'
 import { selectRandomOpponent, checkAnswer, calculateMatchResult, getMatchSummaryMessage } from '../utils/matchLogic'
-import { updateVocabProgress, updateGoalsAndLeague, addMatchToHistory, loadProgress, unlockAchievement, addXP, updateDailyStreak } from '../utils/localStorage'
+import { updateVocabProgress, updateGoalsAndLeague, addMatchToHistory, loadProgress, unlockAchievement, unlockFact, addXP, updateDailyStreak } from '../utils/localStorage'
 import { generateMultipleChoiceOptions } from '../utils/multipleChoice'
 import { calculateStreakBonus, getStreakMessage, getStreakEmoji, getStreakColor, triggerHapticFeedback } from '../utils/gameEffects'
 import { checkNewAchievements } from '../utils/achievements'
@@ -28,6 +30,9 @@ function Match({ progress, onMatchEnd }) {
   const [newAchievements, setNewAchievements] = useState([])
   const [showAchievementIndex, setShowAchievementIndex] = useState(0)
   const [showingAchievement, setShowingAchievement] = useState(false)
+  const [unlockedFact, setUnlockedFact] = useState(null)
+  const [showingFact, setShowingFact] = useState(false)
+  const [maxStreak, setMaxStreak] = useState(0)
   const [showConfetti, setShowConfetti] = useState(false)
   const [xpGained, setXPGained] = useState(0)
   const [showLevelUp, setShowLevelUp] = useState(false)
@@ -63,6 +68,7 @@ function Match({ progress, onMatchEnd }) {
     if (isCorrect) {
       newStreak = streak + 1
       setStreak(newStreak)
+      setMaxStreak(prev => Math.max(prev, newStreak))
 
       // Trigger haptic feedback for correct answer
       triggerHapticFeedback('success')
@@ -144,6 +150,19 @@ function Match({ progress, onMatchEnd }) {
 
     setNewAchievements(unlockedAchievements)
 
+    const shouldUnlockFact = result.status === 'win' || maxStreak >= 5
+    if (shouldUnlockFact) {
+      const progressWithMatch = loadProgress()
+      const unlockedFactIds = progressWithMatch.unlockedFacts || []
+      const lockedFacts = factsData.filter((fact) => !unlockedFactIds.includes(fact.id))
+
+      if (lockedFacts.length > 0) {
+        const randomFact = lockedFacts[Math.floor(Math.random() * lockedFacts.length)]
+        unlockFact(randomFact.id)
+        setUnlockedFact(randomFact)
+      }
+    }
+
     // Add XP and check for level up
     const xpResult = addXP(xpGained)
     if (xpResult.leveledUp) {
@@ -172,6 +191,8 @@ function Match({ progress, onMatchEnd }) {
     // Simplified: Check if we have achievements to show
     if (newAchievements.length > 0 && !showingAchievement) {
       setShowingAchievement(true)
+    } else if (unlockedFact && !showingFact) {
+      setShowingFact(true)
     } else {
       onMatchEnd(matchResult)
     }
@@ -183,9 +204,18 @@ function Match({ progress, onMatchEnd }) {
       setShowAchievementIndex(nextIndex)
     } else {
       setShowingAchievement(false)
-      // Go to stadium after all achievements shown
-      onMatchEnd(matchResult)
+      if (unlockedFact) {
+        setShowingFact(true)
+      } else {
+        // Go to stadium after all achievements shown
+        onMatchEnd(matchResult)
+      }
     }
+  }
+
+  const handleFactClose = () => {
+    setShowingFact(false)
+    onMatchEnd(matchResult)
   }
 
   // Show countdown before match starts
@@ -315,6 +345,13 @@ function Match({ progress, onMatchEnd }) {
         <AchievementUnlocked
           achievement={newAchievements[showAchievementIndex]}
           onClose={handleAchievementClose}
+        />
+      )}
+
+      {showingFact && unlockedFact && (
+        <FactUnlocked
+          fact={unlockedFact}
+          onClose={handleFactClose}
         />
       )}
 
