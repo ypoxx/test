@@ -23,9 +23,6 @@ export const OPPONENTS = [
 /**
  * Select a random opponent
  */
-export const selectRandomOpponent = (lastOpponentName = null) => {
-  if (OPPONENTS.length <= 1) {
-    return OPPONENTS[0]
 export const selectRandomOpponent = (lastOpponentName = null, filterFn = null) => {
   const pool = filterFn ? OPPONENTS.filter(filterFn) : OPPONENTS
   if (pool.length <= 1) {
@@ -35,8 +32,6 @@ export const selectRandomOpponent = (lastOpponentName = null, filterFn = null) =
   let opponent = null
 
   do {
-    const randomIndex = Math.floor(Math.random() * OPPONENTS.length)
-    opponent = OPPONENTS[randomIndex]
     const randomIndex = Math.floor(Math.random() * pool.length)
     opponent = pool[randomIndex]
   } while (opponent?.name === lastOpponentName)
