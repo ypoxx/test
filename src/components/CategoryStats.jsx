@@ -13,6 +13,7 @@ function CategoryStats({ progress }) {
     let masteredCount = 0
     let totalAttempts = 0
     let correctAttempts = 0
+    let attemptedCount = 0
 
     categoryVocabs.forEach(vocab => {
       const vocabProgress = progress.vocabProgress[vocab.id]
@@ -21,6 +22,9 @@ function CategoryStats({ progress }) {
         const incorrect = vocabProgress.incorrect || 0
         totalAttempts += correct + incorrect
         correctAttempts += correct
+        if (correct + incorrect > 0) {
+          attemptedCount++
+        }
         if (vocabProgress.mastered) {
           masteredCount++
         }
@@ -28,6 +32,7 @@ function CategoryStats({ progress }) {
     })
 
     const masteredPercent = Math.round((masteredCount / totalCount) * 100)
+    const attemptedPercent = Math.round((attemptedCount / totalCount) * 100)
     const accuracy = totalAttempts > 0 ? Math.round((correctAttempts / totalAttempts) * 100) : 0
 
     return {
@@ -36,6 +41,8 @@ function CategoryStats({ progress }) {
       emoji: getCategoryEmoji(category),
       totalCount,
       masteredCount,
+      attemptedCount,
+      attemptedPercent,
       masteredPercent,
       accuracy
     }
@@ -43,9 +50,12 @@ function CategoryStats({ progress }) {
 
   return (
     <div className="card p-6">
-      <h3 className="text-2xl font-bold text-white mb-6 text-center">
+      <h3 className="text-2xl font-bold text-white mb-2 text-center">
         📊 Deine Kategorien
       </h3>
+      <p className="text-sm text-white/70 text-center mb-6">
+        Schraffiert = geübt, Vollfarbe = gemeistert (5× richtig, &gt;80%).
+      </p>
 
       <div className="space-y-4">
         {categoryData.map((cat) => (
@@ -57,12 +67,16 @@ function CategoryStats({ progress }) {
                 <span className="text-white font-semibold">{cat.name}</span>
               </div>
               <div className="text-sm text-white/60">
-                {cat.masteredCount}/{cat.totalCount}
+                {cat.masteredCount}/{cat.totalCount} gemeistert · {cat.attemptedCount}/{cat.totalCount} geübt
               </div>
             </div>
 
             {/* Progress Bar */}
             <div className="relative h-6 bg-white/10 rounded-full overflow-hidden">
+              <div
+                className="absolute top-0 left-0 h-full progress-hatched"
+                style={{ width: `${cat.attemptedPercent}%` }}
+              />
               <div
                 className="absolute top-0 left-0 h-full bg-gradient-to-r from-green-500 to-emerald-600 transition-all duration-700"
                 style={{ width: `${cat.masteredPercent}%` }}
@@ -70,7 +84,7 @@ function CategoryStats({ progress }) {
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shine" />
               </div>
               <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow">
-                {cat.masteredPercent}% gemeistert · {cat.accuracy}% Genauigkeit
+                {cat.masteredPercent}% gemeistert · {cat.attemptedPercent}% geübt · {cat.accuracy}% Genauigkeit
               </div>
             </div>
           </div>

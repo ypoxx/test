@@ -1,13 +1,12 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import LeagueProgress from './LeagueProgress'
 import TrophyCase from './TrophyCase'
 import XPBar from './XPBar'
 import CategoryStats from './CategoryStats'
 import CardAlbum from './CardAlbum'
-import soundManager from '../utils/sounds'
 import { getVocabStats } from '../utils/spacedRepetition'
 import vocabsData from '../data/vocabs.json'
-import { getLeagueProgress } from '../utils/localStorage'
+import { exportProgressData, getLeagueProgress, importProgressData } from '../utils/localStorage'
 
 function Stadium({ progress, onStartMatch }) {
   const stats = getVocabStats(vocabsData, progress)
@@ -15,18 +14,38 @@ function Stadium({ progress, onStartMatch }) {
   const leagueInfo = getLeagueProgress(progress.totalGoalsScored || 0)
   const { currentLeagueInfo, nextLeagueInfo, goalsNeeded } = leagueInfo
   const [showAlbum, setShowAlbum] = useState(false)
+  const [backupStatus, setBackupStatus] = useState(null)
+  const fileInputRef = useRef(null)
 
-  const testSound = () => {
-    // Initialize if not already
-    if (!soundManager.initialized) {
-      soundManager.init()
+  const handleExport = () => {
+    const data = exportProgressData()
+    if (!data) {
+      setBackupStatus('Export fehlgeschlagen.')
+      return
     }
-    // Play test sound
-    soundManager.playGoal()
-    console.log('🔊 Sound test clicked!')
-    console.log('   - Initialized:', soundManager.initialized)
-    console.log('   - Enabled:', soundManager.enabled)
-    console.log('   - AudioContext:', soundManager.audioContext)
+    const blob = new Blob([data], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'maurice-vokabel-stand.json'
+    link.click()
+    URL.revokeObjectURL(url)
+    setBackupStatus('Backup gespeichert.')
+  }
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleImport = (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      const success = importProgressData(reader.result)
+      setBackupStatus(success ? 'Backup geladen. Bitte Seite neu öffnen.' : 'Backup konnte nicht geladen werden.')
+    }
+    reader.readAsText(file)
   }
 
   return (
@@ -88,7 +107,7 @@ function Stadium({ progress, onStartMatch }) {
         {/* Start Match Button */}
         <button
           onClick={onStartMatch}
-          className="btn-primary w-full mb-3 text-xl py-4"
+          className="btn-primary btn-primary--hero w-full mb-4"
         >
           ⚽ Neues Spiel starten
         </button>
@@ -96,7 +115,7 @@ function Stadium({ progress, onStartMatch }) {
         {/* Trophy Case Button */}
         <button
           onClick={() => setShowTrophyCase(true)}
-          className="btn-secondary w-full mb-3 text-lg py-3"
+          className="btn-secondary btn-secondary--soft w-full mb-3 text-lg py-3"
         >
           🏆 Meine Trophäen ({progress.achievements?.length || 0})
         </button>
@@ -104,18 +123,34 @@ function Stadium({ progress, onStartMatch }) {
         {/* Card Album Button */}
         <button
           onClick={() => setShowAlbum(true)}
-          className="btn-secondary w-full mb-3 text-lg py-3 bg-emerald-600 hover:bg-emerald-700"
+          className="btn-secondary btn-secondary--soft w-full mb-3 text-lg py-3 bg-emerald-600 hover:bg-emerald-700"
         >
           📘 Kartenalbum ({progress.unlockedCards?.length || 0})
         </button>
 
-        {/* Sound Test Button */}
-        <button
-          onClick={testSound}
-          className="btn-secondary w-full mb-6 text-base py-3 bg-purple-600 hover:bg-purple-700"
-        >
-          🔊 Sound testen
-        </button>
+        <div className="card p-4 mb-6 text-center">
+          <div className="text-sm text-white/80 mb-3">
+            Fortschritt bleibt auf dem iPhone gespeichert. Für extra Sicherheit kannst du ein Backup sichern.
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button onClick={handleExport} className="btn-secondary btn-secondary--soft w-full">
+              💾 Backup speichern
+            </button>
+            <button onClick={handleImportClick} className="btn-secondary btn-secondary--soft w-full">
+              📂 Backup laden
+            </button>
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/json"
+            className="hidden"
+            onChange={handleImport}
+          />
+          {backupStatus && (
+            <div className="mt-3 text-xs text-white/60">{backupStatus}</div>
+          )}
+        </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-4 mb-6">
