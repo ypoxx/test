@@ -11,7 +11,6 @@ class SoundManager {
     this.enabled = true
     this.masterVolume = 0.3
     this.useHowler = false
-    this.lastStreakAt = 0
 
     // Initialize on user interaction (required by browsers)
     this.initialized = false
@@ -145,14 +144,7 @@ class SoundManager {
     if (!this.enabled || !this.initialized) return
 
     if (this.useHowler && this.sounds.streak) {
-      const now = performance.now()
-      if (now - this.lastStreakAt < 180) {
-        return
-      }
-      this.lastStreakAt = now
-
       const rate = 1 + Math.min(3, Math.max(0, streakLevel - 1)) * 0.08
-      this.sounds.streak.stop()
       const id = this.sounds.streak.play()
       this.sounds.streak.rate(rate, id)
       return
