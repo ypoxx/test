@@ -42,10 +42,13 @@ function Stadium({ progress, onStartMatch }) {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold text-white mb-2">
-            ⚽ Vokabel-Trainer
+            ⚽ Wort-Liga
           </h1>
           <p className="text-xl text-white/80">
             MSV Duisburg Edition
+          </p>
+          <p className="text-sm text-white/60 mt-2">
+            Scoute neue Wörter • Transfer-Wörter freischalten
           </p>
         </div>
 
@@ -64,7 +67,7 @@ function Stadium({ progress, onStartMatch }) {
           onClick={onStartMatch}
           className="btn-primary w-full mb-3 text-xl py-4"
         >
-          ⚽ Neues Spiel starten
+          ⚽ Match starten
         </button>
 
         {/* Trophy Case Button */}
@@ -89,25 +92,25 @@ function Stadium({ progress, onStartMatch }) {
             <div className="text-3xl font-bold text-white mb-1">
               {stats.mastered}
             </div>
-            <div className="text-sm text-white/70">Gemeistert</div>
+            <div className="text-sm text-white/70">Top-Form</div>
           </div>
           <div className="card p-4 text-center">
             <div className="text-3xl font-bold text-white mb-1">
               {stats.learning}
             </div>
-            <div className="text-sm text-white/70">Am Lernen</div>
+            <div className="text-sm text-white/70">Im Training</div>
           </div>
           <div className="card p-4 text-center">
             <div className="text-3xl font-bold text-white mb-1">
               {stats.neverSeen}
             </div>
-            <div className="text-sm text-white/70">Noch nicht gelernt</div>
+            <div className="text-sm text-white/70">Noch nicht im Kader</div>
           </div>
           <div className="card p-4 text-center">
             <div className="text-3xl font-bold text-white mb-1">
               {stats.overallAccuracy}%
             </div>
-            <div className="text-sm text-white/70">Genauigkeit</div>
+            <div className="text-sm text-white/70">Team-Stärke</div>
           </div>
         </div>
 
