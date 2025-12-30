@@ -121,6 +121,7 @@ export const addMatchToHistory = (matchData) => {
 
   const match = {
     date: new Date().toISOString(),
+    earnedCards: [],
     ...matchData
   }
 
@@ -129,6 +130,26 @@ export const addMatchToHistory = (matchData) => {
   // Keep only last 20 matches
   if (progress.matchHistory.length > 20) {
     progress.matchHistory = progress.matchHistory.slice(0, 20)
+  }
+
+  saveProgress(progress)
+  return progress
+}
+
+/**
+ * Update earned cards for the latest match
+ * @param {Array} earnedCards - Cards earned in the latest match
+ */
+export const updateLatestMatchEarnedCards = (earnedCards) => {
+  const progress = loadProgress()
+
+  if (!progress.matchHistory || progress.matchHistory.length === 0) {
+    return progress
+  }
+
+  progress.matchHistory[0] = {
+    ...progress.matchHistory[0],
+    earnedCards: earnedCards || []
   }
 
   saveProgress(progress)

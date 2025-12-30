@@ -153,6 +153,26 @@ function Stadium({ progress, onStartMatch }) {
                       <div className="text-white/60 text-sm">
                         {new Date(match.date).toLocaleDateString('de-DE')}
                       </div>
+                      {match.earnedCards?.length > 0 && (
+                        <div className="text-yellow-300/90 text-sm font-semibold flex items-center gap-2">
+                          <span>🎴</span>
+                          <span>
+                            {(() => {
+                              const earnedNames = match.earnedCards
+                                .map(card => (typeof card === 'string' ? card : card.name))
+                                .filter(Boolean)
+
+                              if (earnedNames.length === 0) {
+                                return 'Karte freigeschaltet'
+                              }
+
+                              return earnedNames.length === 1
+                                ? `Karte ${earnedNames[0]} freigeschaltet`
+                                : `Karten ${earnedNames.join(', ')} freigeschaltet`
+                            })()}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="text-white font-bold text-lg">
@@ -163,6 +183,10 @@ function Stadium({ progress, onStartMatch }) {
             </div>
           </div>
         )}
+
+        <div className="mt-6">
+          <CardAlbum progress={progress} />
+        </div>
 
         {/* Footer */}
         <div className="text-center mt-8 text-white/50 text-sm">
