@@ -1,3 +1,5 @@
+import { calculateLevel } from './xpSystem'
+
 const STORAGE_KEY = 'maurice_vocab_trainer_progress'
 
 // Initial default progress
@@ -275,7 +277,6 @@ export const addXP = (xpToAdd) => {
   progress.xp = oldXP + xpToAdd
 
   // Calculate new level based on total XP
-  const { calculateLevel } = require('./xpSystem')
   const newLevel = calculateLevel(progress.xp)
 
   const leveledUp = newLevel > oldLevel
