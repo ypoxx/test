@@ -3,6 +3,7 @@ import LeagueProgress from './LeagueProgress'
 import TrophyCase from './TrophyCase'
 import XPBar from './XPBar'
 import CategoryStats from './CategoryStats'
+import CardAlbum from './CardAlbum'
 import soundManager from '../utils/sounds'
 import { getVocabStats } from '../utils/spacedRepetition'
 import vocabsData from '../data/vocabs.json'
@@ -13,6 +14,7 @@ function Stadium({ progress, onStartMatch }) {
   const [showTrophyCase, setShowTrophyCase] = useState(false)
   const leagueInfo = getLeagueProgress(progress.totalGoalsScored || 0)
   const { currentLeagueInfo, nextLeagueInfo, goalsNeeded } = leagueInfo
+  const [showAlbum, setShowAlbum] = useState(false)
 
   const testSound = () => {
     // Initialize if not already
@@ -97,6 +99,14 @@ function Stadium({ progress, onStartMatch }) {
           className="btn-secondary w-full mb-3 text-lg py-3"
         >
           🏆 Meine Trophäen ({progress.achievements?.length || 0})
+        </button>
+
+        {/* Card Album Button */}
+        <button
+          onClick={() => setShowAlbum(true)}
+          className="btn-secondary w-full mb-3 text-lg py-3 bg-emerald-600 hover:bg-emerald-700"
+        >
+          📘 Kartenalbum ({progress.unlockedCards?.length || 0})
         </button>
 
         {/* Sound Test Button */}
@@ -189,6 +199,13 @@ function Stadium({ progress, onStartMatch }) {
         <TrophyCase
           unlockedAchievementIds={progress.achievements || []}
           onClose={() => setShowTrophyCase(false)}
+        />
+      )}
+
+      {showAlbum && (
+        <CardAlbum
+          progress={progress}
+          onClose={() => setShowAlbum(false)}
         />
       )}
     </div>
