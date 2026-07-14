@@ -8,7 +8,7 @@ import soundManager from './utils/sounds'
 function App() {
   const [gameState, setGameState] = useState('welcome') // 'welcome', 'stadium', or 'match'
   const [progress, setProgress] = useState(null)
-  const [matchFilters, setMatchFilters] = useState(null)
+  const [matchOptions, setMatchOptions] = useState(null)
   // Ask about sound only once — afterwards the stored preference applies
   // (it can still be changed anytime in the settings menu).
   const [soundPromptVisible, setSoundPromptVisible] = useState(() => loadSoundPreference() === null)
@@ -30,8 +30,8 @@ function App() {
     setGameState('stadium')
   }
 
-  const startMatch = (filters) => {
-    setMatchFilters(filters || null)
+  const startMatch = (options) => {
+    setMatchOptions(options || null)
     setGameState('match')
   }
 
@@ -40,6 +40,10 @@ function App() {
     // Progress will be updated by Match component
     const updatedProgress = loadProgress()
     setProgress(updatedProgress)
+  }
+
+  const refreshProgress = () => {
+    setProgress(loadProgress())
   }
 
   const handleProgressReset = () => {
@@ -96,9 +100,21 @@ function App() {
       {gameState === 'welcome' ? (
         <Welcome onStart={startStadium} />
       ) : gameState === 'stadium' ? (
-        <Stadium progress={progress} onStartMatch={startMatch} onProgressReset={handleProgressReset} />
+        <Stadium
+          progress={progress}
+          onStartMatch={startMatch}
+          onProgressReset={handleProgressReset}
+          onProgressRefresh={refreshProgress}
+        />
       ) : (
-        <Match progress={progress} onMatchEnd={endMatch} filters={matchFilters} />
+        <Match
+          progress={progress}
+          onMatchEnd={endMatch}
+          filters={matchOptions ? { category: matchOptions.category, difficulty: matchOptions.difficulty } : null}
+          mode={matchOptions?.mode || 'training'}
+          seasonOpponent={matchOptions?.opponent || null}
+          seasonMatchday={matchOptions?.matchday || null}
+        />
       )}
     </div>
   )

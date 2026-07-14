@@ -47,10 +47,16 @@ const shuffleArray = (array) => {
  */
 export const generateWrongAnswers = (correctVocab, allVocabs, count = 3, field = 'german') => {
   const correctValue = correctVocab[field]
+  const otherField = field === 'german' ? 'english' : 'german'
 
-  // Exclude the vocab itself and anything that would also be a correct answer
+  // Exclude the vocab itself and anything that would also be a correct
+  // answer. A distractor must differ on BOTH sides — e.g. for the question
+  // "essen" neither "to eat" nor "eat – ate – eaten" may appear as a wrong
+  // option, because both share the German meaning.
   const otherVocabs = allVocabs.filter(
-    v => v.id !== correctVocab.id && !collides(v[field], correctValue)
+    v => v.id !== correctVocab.id
+      && !collides(v[field], correctValue)
+      && !collides(v[otherField], correctVocab[otherField])
   )
 
   const sameCategory = otherVocabs.filter(v => v.category === correctVocab.category)

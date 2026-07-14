@@ -2,7 +2,7 @@
  * Match Logic Utilities
  */
 
-// List of Bundesliga opponents
+// Opponent clubs (17 opponents + MSV = 18 teams -> 34 season matchdays)
 export const OPPONENTS = [
   { name: 'Bayern München', logo: '🔴⚪', difficulty: 'hard' },
   { name: 'Borussia Dortmund', logo: '🟡⚫', difficulty: 'hard', isDerby: true },
@@ -14,10 +14,13 @@ export const OPPONENTS = [
   { name: 'Schalke 04', logo: '🔵⚪', difficulty: 'medium', isDerby: true },
   { name: 'Werder Bremen', logo: '🟢⚪', difficulty: 'medium' },
   { name: 'Hamburger SV', logo: '🔵⚪', difficulty: 'medium' },
-  { name: 'VfL Bochum', logo: '🔵⚪', difficulty: 'easy' },
+  { name: 'Borussia Mönchengladbach', logo: '⚫⚪', difficulty: 'medium', isDerby: true },
+  { name: 'SC Freiburg', logo: '⚫🔴', difficulty: 'medium' },
+  { name: 'VfL Bochum', logo: '🔵⚪', difficulty: 'easy', isDerby: true },
   { name: 'Fortuna Düsseldorf', logo: '🔴⚪', difficulty: 'easy', isDerby: true },
   { name: 'FC St. Pauli', logo: '🟤⚪', difficulty: 'easy' },
-  { name: 'Hertha BSC', logo: '🔵⚪', difficulty: 'easy' }
+  { name: 'Hertha BSC', logo: '🔵⚪', difficulty: 'easy' },
+  { name: '1. FC Union Berlin', logo: '🔴⚪', difficulty: 'easy' }
 ]
 
 /**

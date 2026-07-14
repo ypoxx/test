@@ -166,6 +166,32 @@ export const ACHIEVEMENTS = {
     }
   },
 
+  // Saison
+  SAISON_KAEMPFER: {
+    id: 'saison_kaempfer',
+    name: 'Saison-Kämpfer',
+    description: 'Eine komplette Saison (34 Spieltage) gespielt',
+    emoji: '📅',
+    rarity: 'rare',
+    condition: (progress) => (progress.seasonHistory || []).length >= 1
+  },
+  EUROPAPOKAL: {
+    id: 'europapokal',
+    name: 'Europapokal',
+    description: 'Eine Saison in den Top 7 abgeschlossen',
+    emoji: '🌍',
+    rarity: 'epic',
+    condition: (progress) => (progress.seasonHistory || []).some(s => s.rank <= 7)
+  },
+  DEUTSCHER_MEISTER: {
+    id: 'deutscher_meister',
+    name: 'Deutscher Meister',
+    description: 'Eine Saison auf Platz 1 abgeschlossen',
+    emoji: '🏆',
+    rarity: 'legendary',
+    condition: (progress) => (progress.seasonHistory || []).some(s => s.rank === 1)
+  },
+
   // Besondere Erfolge
   COMEBACK_KING: {
     id: 'comeback_king',

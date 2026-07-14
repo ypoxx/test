@@ -15,6 +15,7 @@ import { checkNewAchievements } from '../utils/achievements'
 import { calculateXPReward } from '../utils/xpSystem'
 import CardReveal from './CardReveal'
 import { rollCardReward } from '../utils/cardRewards'
+import { recordSeasonResult, getRankZone, MATCHDAYS } from '../utils/season'
 import soundManager from '../utils/sounds'
 import ShareCard from './ShareCard'
 
@@ -33,9 +34,16 @@ const prepareVocab = (vocab, progressData) => {
   }
 }
 
-function Match({ progress, onMatchEnd, filters }) {
-  const [specialMatch] = useState(() => Math.random() < 0.2)
+function Match({ progress, onMatchEnd, filters, mode = 'training', seasonOpponent = null, seasonMatchday = null }) {
+  const isSeasonMatch = mode === 'season' && Boolean(seasonOpponent)
+  // Season: derby fixtures pay a bonus. Training: 20% surprise derby.
+  const [specialMatch] = useState(() =>
+    isSeasonMatch ? Boolean(seasonOpponent.isDerby) : Math.random() < 0.2
+  )
   const [opponent] = useState(() => {
+    if (isSeasonMatch) {
+      return seasonOpponent
+    }
     const lastOpponent = loadLastOpponentName()
     const derbyPool = getDerbyOpponents()
     const nextOpponent = specialMatch && derbyPool.length > 0
@@ -290,6 +298,20 @@ function Match({ progress, onMatchEnd, filters }) {
       comebackWin: finalWasDownThree && result.status === 'win'
     })
 
+    // Season: record the matchday, simulate the rest of the league
+    let seasonInfo = null
+    if (isSeasonMatch) {
+      const update = recordSeasonResult({
+        msvGoals: finalMsvGoals,
+        opponentGoals: finalOpponentGoals
+      })
+      seasonInfo = {
+        matchday: update.matchday,
+        rank: update.rank,
+        finished: update.finished
+      }
+    }
+
     // Add XP and check for level up
     setXPGained(totalXpGained)
     const xpResult = addXP(totalXpGained)
@@ -324,7 +346,7 @@ function Match({ progress, onMatchEnd, filters }) {
       soundManager.playDefeat()
     }
 
-    setMatchResult({ ...result, extraCorrect: finalExtraCorrect, missedVocabs: finalMissedVocabs })
+    setMatchResult({ ...result, extraCorrect: finalExtraCorrect, missedVocabs: finalMissedVocabs, seasonInfo })
     setMatchFinished(true)
   }
 
@@ -408,6 +430,21 @@ function Match({ progress, onMatchEnd, filters }) {
             <div className="text-6xl mb-4">{summary.emoji}</div>
             <h2 className="text-3xl font-bold mb-2">{summary.title}</h2>
             <p className="text-xl mb-6">{summary.message}</p>
+
+            {/* Season standing after this matchday */}
+            {matchResult.seasonInfo && (
+              <div className="bg-white/10 rounded-lg p-3 mb-6 flex items-center justify-center gap-3 text-sm">
+                <span className="text-white/70">
+                  Spieltag {matchResult.seasonInfo.matchday}/{MATCHDAYS}
+                </span>
+                <span className="font-bold">
+                  {getRankZone(matchResult.seasonInfo.rank).emoji} Platz {matchResult.seasonInfo.rank}
+                </span>
+                <span className={`${getRankZone(matchResult.seasonInfo.rank).color} font-semibold`}>
+                  {getRankZone(matchResult.seasonInfo.rank).label}
+                </span>
+              </div>
+            )}
 
             {/* Final Score */}
             <div className="bg-white/10 rounded-lg p-6 mb-6">
@@ -533,10 +570,15 @@ function Match({ progress, onMatchEnd, filters }) {
           opponentGoals={opponentGoals}
           opponent={opponent}
         />
+        {isSeasonMatch && !isExtraTime && seasonMatchday && (
+          <div className="mt-1 text-center text-xs text-white/60">
+            📅 Spieltag {seasonMatchday}/{MATCHDAYS}
+          </div>
+        )}
         {specialMatch && !isExtraTime && (
           <div className="mt-2 text-center animate-bounce-in">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-400/20 text-yellow-100 border border-yellow-300/40 font-semibold text-sm">
-              ⚡ Überraschungs-Derby · +30 XP Bonus
+              {isSeasonMatch ? '🔥 Derby! · +30 XP Bonus' : '⚡ Überraschungs-Derby · +30 XP Bonus'}
             </div>
           </div>
         )}

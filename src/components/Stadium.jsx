@@ -5,17 +5,18 @@ import XPBar from './XPBar'
 import CategoryStats from './CategoryStats'
 import CardAlbum from './CardAlbum'
 import Settings from './Settings'
+import SeasonTable from './SeasonTable'
+import SeasonSummary from './SeasonSummary'
 import { getVocabStats } from '../utils/spacedRepetition'
 import vocabsData from '../data/vocabs.json'
-import { exportProgressData, getLeagueProgress, importProgressData } from '../utils/localStorage'
+import { exportProgressData, getLeagueProgress, importProgressData, addXP } from '../utils/localStorage'
+import { loadSeason, getNextFixture, getRank, getRankZone, getSeasonReward, startNextSeason, MATCHDAYS } from '../utils/season'
+import { OPPONENTS } from '../utils/matchLogic'
+import { CATEGORIES } from '../utils/categories'
 
 const CATEGORY_OPTIONS = [
   { value: 'all', label: 'Alle', emoji: '🎲' },
-  { value: 'sport', label: 'Sport', emoji: '⚽' },
-  { value: 'school', label: 'Schule', emoji: '📚' },
-  { value: 'family', label: 'Familie', emoji: '👨‍👩‍👦' },
-  { value: 'everyday', label: 'Alltag', emoji: '🏠' },
-  { value: 'nature', label: 'Natur', emoji: '🌳' }
+  ...CATEGORIES
 ]
 
 const DIFFICULTY_OPTIONS = [
@@ -25,7 +26,7 @@ const DIFFICULTY_OPTIONS = [
   { value: 3, label: 'Schwer' }
 ]
 
-function Stadium({ progress, onStartMatch, onProgressReset }) {
+function Stadium({ progress, onStartMatch, onProgressReset, onProgressRefresh }) {
   const stats = getVocabStats(vocabsData, progress)
   const [showTrophyCase, setShowTrophyCase] = useState(false)
   const leagueInfo = getLeagueProgress(progress.totalGoalsScored || 0)
@@ -36,6 +37,25 @@ function Stadium({ progress, onStartMatch, onProgressReset }) {
   const [category, setCategory] = useState('all')
   const [difficulty, setDifficulty] = useState('all')
   const fileInputRef = useRef(null)
+
+  // Season state (lazily created on first visit)
+  const [season, setSeason] = useState(() => loadSeason())
+  const [showTable, setShowTable] = useState(false)
+  const nextFixture = getNextFixture(season)
+  const fixtureOpponent = nextFixture
+    ? OPPONENTS.find(o => o.name === nextFixture.opponent)
+    : null
+  const seasonRank = getRank(season)
+  const seasonZone = getRankZone(seasonRank)
+  const playedMatchdays = Math.min(season.currentMatchday - 1, MATCHDAYS)
+
+  const handleNextSeason = () => {
+    const reward = getSeasonReward(season.completed.rank)
+    addXP(reward.xp)
+    const freshSeason = startNextSeason()
+    setSeason(freshSeason)
+    onProgressRefresh?.()
+  }
 
   const dailyStreak = progress.dailyStreak || 0
 
@@ -70,8 +90,19 @@ function Stadium({ progress, onStartMatch, onProgressReset }) {
     reader.readAsText(file)
   }
 
-  const startMatch = () => {
-    onStartMatch({ category, difficulty })
+  const startSeasonMatch = () => {
+    if (!nextFixture || !fixtureOpponent) return
+    onStartMatch({
+      mode: 'season',
+      category,
+      difficulty,
+      opponent: fixtureOpponent,
+      matchday: nextFixture.matchday
+    })
+  }
+
+  const startTrainingMatch = () => {
+    onStartMatch({ mode: 'training', category, difficulty })
   }
 
   return (
@@ -151,6 +182,39 @@ function Stadium({ progress, onStartMatch, onProgressReset }) {
           <LeagueProgress totalGoals={progress.totalGoalsScored} />
         </div>
 
+        {/* Season Panel */}
+        <div className="card p-5 mb-4 bg-gradient-to-r from-emerald-900/40 to-msv-blue/30 border border-emerald-400/30">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <div className="text-sm uppercase tracking-wide text-white/70">
+                📅 Saison {season.seasonNumber} · Spieltag {Math.min(season.currentMatchday, MATCHDAYS)}/{MATCHDAYS}
+              </div>
+              <div className={`text-lg font-bold ${seasonZone.color}`}>
+                {seasonZone.emoji} Platz {seasonRank} · {seasonZone.label}
+              </div>
+            </div>
+            <button
+              onClick={() => setShowTable(true)}
+              className="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm font-semibold"
+            >
+              📊 Tabelle
+            </button>
+          </div>
+          {nextFixture && fixtureOpponent && (
+            <div className="flex items-center gap-3 bg-white/5 rounded-lg p-3">
+              <div className="text-3xl">{fixtureOpponent.logo}</div>
+              <div>
+                <div className="text-white font-semibold">
+                  {nextFixture.home ? 'Heimspiel' : 'Auswärts'} gegen {fixtureOpponent.name}
+                </div>
+                <div className="text-xs text-white/60">
+                  {fixtureOpponent.isDerby ? '🔥 Derby! +30 XP Bonus' : `Nächster Gegner am ${nextFixture.matchday}. Spieltag`}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Training Filter */}
         <div className="card p-4 mb-4">
           <div className="text-sm font-bold text-white/80 mb-2">🎯 Was willst du üben?</div>
@@ -186,12 +250,20 @@ function Stadium({ progress, onStartMatch, onProgressReset }) {
           </div>
         </div>
 
-        {/* Start Match Button */}
+        {/* Start Match Buttons */}
+        {nextFixture && fixtureOpponent && (
+          <button
+            onClick={startSeasonMatch}
+            className="btn-primary btn-primary--hero w-full mb-3"
+          >
+            ⚽ Spieltag {nextFixture.matchday} spielen
+          </button>
+        )}
         <button
-          onClick={startMatch}
-          className="btn-primary btn-primary--hero w-full mb-4"
+          onClick={startTrainingMatch}
+          className="btn-secondary btn-secondary--soft w-full mb-4 text-lg py-3"
         >
-          ⚽ Neues Spiel starten
+          🎯 Freies Training (ohne Tabelle)
         </button>
 
         {/* Trophy Case Button */}
@@ -330,6 +402,15 @@ function Stadium({ progress, onStartMatch, onProgressReset }) {
           onClose={() => setShowSettings(false)}
           onProgressReset={onProgressReset}
         />
+      )}
+
+      {showTable && (
+        <SeasonTable season={season} onClose={() => setShowTable(false)} />
+      )}
+
+      {/* Season finished — show summary and start the next one */}
+      {season.completed && (
+        <SeasonSummary season={season} onNextSeason={handleNextSeason} />
       )}
     </div>
   )

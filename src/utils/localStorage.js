@@ -22,7 +22,9 @@ const DEFAULT_PROGRESS = {
   lastPlayedDate: null, // For daily streak tracking
   dailyStreak: 0, // Consecutive days played
   unlockedCards: [], // Array of unlocked card IDs
-  unlockedFacts: []
+  unlockedFacts: [],
+  season: null, // Current season state (created lazily by utils/season.js)
+  seasonHistory: [] // Completed seasons: { seasonNumber, rank, points, ... }
 }
 
 /**
