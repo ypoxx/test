@@ -5,7 +5,8 @@
     "rarity": "Common",
     "art": "🛡️",
     "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
-    "description": "Ein Zeichen für Mut, Teamgeist und Neuanfänge."
+    "description": "Ein Zeichen für Mut, Teamgeist und Neuanfänge.",
+    "image": "/cards/msv-crest.webp"
   },
   {
     "id": "stadium-lights",
@@ -13,7 +14,8 @@
     "rarity": "Common",
     "art": "💡",
     "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
-    "description": "Wenn es leuchtet, beginnt der Moment, alles zu geben."
+    "description": "Wenn es leuchtet, beginnt der Moment, alles zu geben.",
+    "image": "/cards/stadium-lights.webp"
   },
   {
     "id": "matchday-scarf",
@@ -21,7 +23,8 @@
     "rarity": "Common",
     "art": "🧣",
     "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
-    "description": "Wärmt dich und erinnert: Du gehörst dazu."
+    "description": "Wärmt dich und erinnert: Du gehörst dazu.",
+    "image": "/cards/matchday-scarf.webp"
   },
   {
     "id": "zebra-stripes",
@@ -29,7 +32,8 @@
     "rarity": "Common",
     "art": "🦓",
     "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
-    "description": "Jede Streife steht für ein gelerntes Wort."
+    "description": "Jede Streife steht für ein gelerntes Wort.",
+    "image": "/cards/zebra-stripes.webp"
   },
   {
     "id": "captains-band",
@@ -37,7 +41,8 @@
     "rarity": "Rare",
     "art": "🎽",
     "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
-    "description": "Führt mit Ruhe und zeigt, wohin es geht."
+    "description": "Führt mit Ruhe und zeigt, wohin es geht.",
+    "image": "/cards/captains-band.webp"
   },
   {
     "id": "victory-whistle",
@@ -45,7 +50,8 @@
     "rarity": "Rare",
     "art": "📣",
     "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
-    "description": "Ein Signal: Ihr habt es gemeinsam geschafft."
+    "description": "Ein Signal: Ihr habt es gemeinsam geschafft.",
+    "image": "/cards/victory-whistle.webp"
   },
   {
     "id": "keeper-gloves",
@@ -53,7 +59,8 @@
     "rarity": "Rare",
     "art": "🧤",
     "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
-    "description": "Konzentriert bleiben, auch wenn’s knifflig wird."
+    "description": "Konzentriert bleiben, auch wenn’s knifflig wird.",
+    "image": "/cards/keeper-gloves.webp"
   },
   {
     "id": "tunnel-anthem",
@@ -61,7 +68,8 @@
     "rarity": "Epic",
     "art": "🎶",
     "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
-    "description": "Gänsehaut vor dem Anpfiff – jetzt Fokus."
+    "description": "Gänsehaut vor dem Anpfiff – jetzt Fokus.",
+    "image": "/cards/tunnel-anthem.webp"
   },
   {
     "id": "derby-fire",
@@ -69,7 +77,8 @@
     "rarity": "Epic",
     "art": "🔥",
     "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
-    "description": "Mutig bleiben, wenn es heiß wird."
+    "description": "Mutig bleiben, wenn es heiß wird.",
+    "image": "/cards/derby-fire.webp"
   },
   {
     "id": "goal-machine",
@@ -77,7 +86,8 @@
     "rarity": "Epic",
     "art": "⚡",
     "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
-    "description": "Konstanz macht aus Übung echte Stärke."
+    "description": "Konstanz macht aus Übung echte Stärke.",
+    "image": "/cards/goal-machine.webp"
   },
   {
     "id": "legendary-banner",
@@ -85,7 +95,8 @@
     "rarity": "Legendary",
     "art": "🏟️",
     "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
-    "description": "Dein Name hängt oben, weil du drangeblieben bist."
+    "description": "Dein Name hängt oben, weil du drangeblieben bist.",
+    "image": "/cards/legendary-banner.webp"
   },
   {
     "id": "immortal-zebra",
@@ -93,7 +104,8 @@
     "rarity": "Legendary",
     "art": "👑",
     "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
-    "description": "Ein Symbol für Ausdauer und Herz."
+    "description": "Ein Symbol für Ausdauer und Herz.",
+    "image": "/cards/immortal-zebra.webp"
   },
   {
     "id": "card_msv_captain",
@@ -102,7 +114,8 @@
     "art": "🎴",
     "title": "Kapitän des MSV",
     "description": "Gibt Orientierung und ermutigt jeden im Team.",
-    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)"
+    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
+    "image": "/cards/card_msv_captain.webp"
   },
   {
     "id": "card_derby_hero",
@@ -111,7 +124,8 @@
     "art": "🎴",
     "title": "Derby-Spezialist",
     "description": "Bleibt mutig, wenn der Druck steigt.",
-    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)"
+    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
+    "image": "/cards/card_derby_hero.webp"
   },
   {
     "id": "card_ruhr_sprinter",
@@ -120,7 +134,8 @@
     "art": "🎴",
     "title": "Turbo von der Ruhr",
     "description": "Zeigt, wie Tempo und Mut zusammengehören.",
-    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)"
+    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
+    "image": "/cards/card_ruhr_sprinter.webp"
   },
   {
     "id": "card_stadium_architect",
@@ -129,7 +144,8 @@
     "art": "🎴",
     "title": "Heimspiel-Planer",
     "description": "Plant klug und schafft Raum für Erfolge.",
-    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)"
+    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
+    "image": "/cards/card_stadium_architect.webp"
   },
   {
     "id": "card_goal_poet",
@@ -138,7 +154,8 @@
     "art": "🎴",
     "title": "Scorer mit Stil",
     "description": "Verwandelt Chancen in kleine Geschichten.",
-    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)"
+    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
+    "image": "/cards/card_goal_poet.webp"
   },
   {
     "id": "card_goalkeeper_wall",
@@ -147,7 +164,8 @@
     "art": "🎴",
     "title": "Letzte Instanz",
     "description": "Hält stand, wenn es darauf ankommt.",
-    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)"
+    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
+    "image": "/cards/card_goalkeeper_wall.webp"
   },
   {
     "id": "card_scout_master",
@@ -156,7 +174,8 @@
     "art": "🎴",
     "title": "Wort-Entdecker",
     "description": "Entdeckt neue Wörter wie seltene Talente.",
-    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)"
+    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
+    "image": "/cards/card_scout_master.webp"
   },
   {
     "id": "card_crowd_favorite",
@@ -165,7 +184,8 @@
     "art": "🎴",
     "title": "Liebling der Kurve",
     "description": "Zündet Funken – Motivation für alle.",
-    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)"
+    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
+    "image": "/cards/card_crowd_favorite.webp"
   },
   {
     "id": "card_playmaker",
@@ -174,7 +194,8 @@
     "art": "🎴",
     "title": "Spielmacher",
     "description": "Denkt zwei Schritte voraus.",
-    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)"
+    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
+    "image": "/cards/card_playmaker.webp"
   },
   {
     "id": "card_speed_dribbler",
@@ -183,7 +204,8 @@
     "art": "🎴",
     "title": "Finten-Künstler",
     "description": "Leichtfüßig und kreativ im Kopf.",
-    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)"
+    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
+    "image": "/cards/card_speed_dribbler.webp"
   },
   {
     "id": "card_matchday_magician",
@@ -192,7 +214,8 @@
     "art": "🎴",
     "title": "Magie am Spieltag",
     "description": "Wenn es zählt, zaubert er Lösungen.",
-    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)"
+    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
+    "image": "/cards/card_matchday_magician.webp"
   },
   {
     "id": "card_zebra_legend",
@@ -201,7 +224,8 @@
     "art": "🎴",
     "title": "Legende des MSV",
     "description": "Vorbild für alle, die dranbleiben.",
-    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)"
+    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
+    "image": "/cards/card_zebra_legend.webp"
   },
   {
     "id": "card_ruhr_midfield",
@@ -210,7 +234,8 @@
     "art": "🎴",
     "title": "Mittelfeld-Motor",
     "description": "Hält das Spiel zusammen, ruhig und wach.",
-    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)"
+    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
+    "image": "/cards/card_ruhr_midfield.webp"
   },
   {
     "id": "card_penalty_ace",
@@ -219,7 +244,8 @@
     "art": "🎴",
     "title": "Nerven wie Stahl",
     "description": "Trifft sicher, weil der Kopf ruhig bleibt.",
-    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)"
+    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
+    "image": "/cards/card_penalty_ace.webp"
   },
   {
     "id": "card_cup_specialist",
@@ -228,7 +254,8 @@
     "art": "🎴",
     "title": "K.O.-Experte",
     "description": "Stark, wenn es wirklich wichtig wird.",
-    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)"
+    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
+    "image": "/cards/card_cup_specialist.webp"
   },
   {
     "id": "card_calm_finisher",
@@ -237,6 +264,7 @@
     "art": "🎴",
     "title": "Abschluss-Profi",
     "description": "Bleibt cool und setzt sauber den Abschluss.",
-    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)"
+    "unlockRule": "Aus einem Kartenpack (Sieg oder 4er-Serie)",
+    "image": "/cards/card_calm_finisher.webp"
   }
 ]

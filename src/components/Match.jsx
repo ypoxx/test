@@ -564,7 +564,7 @@ function Match({ progress, onMatchEnd, filters, mode = 'training', seasonOpponen
         )}
       </div>
       {/* Header with Score */}
-      <div className="fixed top-0 left-0 right-0 bg-field-green/95 backdrop-blur-sm p-4 pt-safe z-10 border-b border-white/10">
+      <div className="fixed top-0 left-0 right-0 bg-night/95 backdrop-blur-sm p-4 pt-safe z-10 border-b border-white/10">
         <ScoreDisplay
           msvGoals={msvGoals}
           opponentGoals={opponentGoals}

@@ -8,14 +8,16 @@ export default {
     extend: {
       colors: {
         'msv-blue': '#005CA9',
+        'msv-blue-bright': '#0A7AD1',
         'msv-white': '#FFFFFF',
-        'field-green': '#2D8659',
+        'field-green': '#14532D',
+        'night': '#0B1220',
         'goal': '#FFD700',
         'success': '#10B981',
         'error': '#EF4444'
       },
       fontFamily: {
-        'display': ['"Segoe UI"', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
+        'display': ['"Archivo Variable"', 'system-ui', 'sans-serif'],
       }
     }
   },

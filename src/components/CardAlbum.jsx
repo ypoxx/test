@@ -59,13 +59,23 @@ function CardAlbum({ progress, onClose }) {
             return (
               <div
                 key={card.id}
-                className={`rounded-xl border border-white/10 p-4 text-center transition-all ${
+                className={`rounded-xl border border-white/10 p-3 text-center transition-all ${
                   unlocked ? 'bg-white/10 hover:scale-105' : 'bg-black/30 card-silhouette'
                 }`}
               >
-                <div className="text-4xl mb-3">
-                  {unlocked ? card.art : '❔'}
-                </div>
+                {unlocked && card.image ? (
+                  <img
+                    src={card.image}
+                    alt={card.name}
+                    className="w-full aspect-square object-cover rounded-lg mb-3 border border-white/15"
+                    loading="lazy"
+                    onError={(event) => { event.currentTarget.style.display = 'none' }}
+                  />
+                ) : (
+                  <div className="text-4xl mb-3 py-6">
+                    {unlocked ? card.art : '❔'}
+                  </div>
+                )}
                 <h3 className="text-lg font-bold mb-1">
                   {unlocked ? card.name : 'Unbekannt'}
                 </h3>

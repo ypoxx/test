@@ -67,9 +67,9 @@ function CardReveal({ card, isNew, fact, onClose }) {
           </div>
         ) : (
           <>
-            <div className={`card-reveal ${styles.glow} ${styles.border} animate-bounce-in border-2 rounded-2xl p-6 relative overflow-hidden`}>
+            <div className={`card-reveal ${styles.glow} ${styles.border} animate-bounce-in border-2 rounded-2xl p-4 relative overflow-hidden`}>
               <div className="card-shine" />
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-3">
                 <span className={`text-xs px-3 py-1 rounded-full uppercase tracking-widest ${styles.badge}`}>
                   {card.rarity}
                 </span>
@@ -79,9 +79,18 @@ function CardReveal({ card, isNew, fact, onClose }) {
                   </span>
                 )}
               </div>
-              <div className="text-7xl mb-4">{card.art || '🎴'}</div>
-              <h3 className="text-2xl font-bold mb-2">{card.name}</h3>
-              <p className="text-white/80 mb-2">{card.description}</p>
+              {card.image ? (
+                <img
+                  src={card.image}
+                  alt={card.name}
+                  className="w-full aspect-square object-cover rounded-xl mb-3 border border-white/20"
+                  onError={(event) => { event.currentTarget.style.display = 'none' }}
+                />
+              ) : (
+                <div className="text-7xl mb-4">{card.art || '🎴'}</div>
+              )}
+              <h3 className="text-2xl font-bold mb-1">{card.name}</h3>
+              <p className="text-white/80 text-sm mb-1">{card.description}</p>
               <div className="glimmer-particles" />
             </div>
 

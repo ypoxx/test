@@ -18,8 +18,13 @@ function Welcome({ onStart }) {
       <div className="w-full max-w-2xl">
         {/* Greeting Card */}
         <div className="card p-8 text-center mb-6 animate-slide-up">
-          <div className="text-5xl mb-4">👋</div>
-          <h1 className="text-4xl font-bold text-white mb-2">
+          <img
+            src="/img/mascot.webp"
+            alt="Zebra-Maskottchen"
+            className="w-32 h-32 mx-auto mb-4 rounded-full object-cover border-2 border-msv-blue-bright shadow-lg"
+            onError={(event) => { event.currentTarget.style.display = 'none' }}
+          />
+          <h1 className="text-4xl font-extrabold text-white mb-2 uppercase tracking-wide">
             {greeting} Maurice!
           </h1>
           <p className="text-xl text-white/70">

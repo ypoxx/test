@@ -111,12 +111,15 @@ function Stadium({ progress, onStartMatch, onProgressReset, onProgressRefresh })
       <div className="floodlight top-10 left-10" />
       <div className="floodlight top-10 right-10" />
 
-      {/* Crowd silhouette at top */}
-      <div className="crowd-silhouette absolute top-0 left-0 right-0 flex justify-around items-end px-4">
-        <div className="crowd-wave text-6xl opacity-40">👤👤👤</div>
-        <div className="crowd-wave text-6xl opacity-40">👤👤👤</div>
-        <div className="crowd-wave text-6xl opacity-40">👤👤👤</div>
-        <div className="crowd-wave text-6xl opacity-40">👤👤👤</div>
+      {/* Stadium crowd backdrop at top */}
+      <div className="absolute top-0 left-0 right-0 h-48 overflow-hidden pointer-events-none">
+        <img
+          src="/img/stadium-backdrop.webp"
+          alt=""
+          className="w-full h-full object-cover opacity-45"
+          onError={(event) => { event.currentTarget.style.display = 'none' }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-night/30 via-night/60 to-night" />
       </div>
 
       <div className="w-full max-w-2xl relative z-10">
@@ -130,11 +133,11 @@ function Stadium({ progress, onStartMatch, onProgressReset, onProgressRefresh })
         </button>
 
         {/* Header */}
-        <div className="text-center mb-6">
-          <h1 className="text-5xl font-bold text-white mb-2">
+        <div className="text-center mb-6 px-10">
+          <h1 className="text-4xl font-black text-white mb-1 uppercase tracking-tight">
             ⚽ Vokabel-Trainer
           </h1>
-          <p className="text-xl text-white/80">
+          <p className="text-lg text-goal/90 font-semibold uppercase tracking-[0.25em]">
             MSV Duisburg Edition
           </p>
 
