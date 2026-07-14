@@ -23,8 +23,8 @@ function MatchCountdown({ opponent, onComplete }) {
           currentCount--
         } else {
           clearInterval(interval)
-          // Play final "LOS!" sound
-          soundManager.playTone(800, 0.2, 'square', 0.4)
+          // Play final "LOS!" sound — referee kickoff whistle
+          soundManager.playWhistle()
           setCount(0)
 
           // Complete after showing LOS

@@ -1,10 +1,26 @@
 /**
  * Sound System for Maurice's Vocab Trainer
  * Uses Howler.js (bundled, works offline) for richer sampled game sounds.
- * The base64 sample data (~800 KB) is loaded lazily so it stays out of the
- * initial bundle.
+ * The samples are high-quality stadium MP3s served from /sounds/ and
+ * precached by the service worker, so they work offline after the first visit.
  */
 import { Howl, Howler } from 'howler'
+
+// Sampled stadium sounds shipped as static assets in public/sounds/.
+// Served from the site root and precached by the PWA service worker.
+const SOUND_FILES = {
+  goal: '/sounds/goal.mp3',
+  wrong: '/sounds/wrong.mp3',
+  streak: '/sounds/streak.mp3',
+  achievement: '/sounds/achievement.mp3',
+  legendary: '/sounds/legendary.mp3',
+  victory: '/sounds/victory.mp3',
+  defeat: '/sounds/defeat.mp3',
+  crowd: '/sounds/crowd.mp3',
+  whistle: '/sounds/whistle.mp3',
+  pack: '/sounds/pack.mp3',
+  ambient: '/sounds/ambient.mp3'
+}
 
 class SoundManager {
   constructor() {
@@ -34,20 +50,20 @@ class SoundManager {
 
     this.initPromise = (async () => {
       try {
-        const { default: soundData } = await import('./soundData')
-
         Howler.volume(this.masterVolume)
 
         this.sounds = {
-          goal: new Howl({ src: [soundData.goal] }),
-          wrong: new Howl({ src: [soundData.wrong] }),
-          streak: new Howl({ src: [soundData.streak] }),
-          achievement: new Howl({ src: [soundData.achievement] }),
-          legendary: new Howl({ src: [soundData.legendary] }),
-          victory: new Howl({ src: [soundData.victory] }),
-          defeat: new Howl({ src: [soundData.defeat] }),
-          crowd: new Howl({ src: [soundData.crowd] }),
-          ambient: new Howl({ src: [soundData.ambient], loop: true })
+          goal: new Howl({ src: [SOUND_FILES.goal] }),
+          wrong: new Howl({ src: [SOUND_FILES.wrong] }),
+          streak: new Howl({ src: [SOUND_FILES.streak] }),
+          achievement: new Howl({ src: [SOUND_FILES.achievement] }),
+          legendary: new Howl({ src: [SOUND_FILES.legendary] }),
+          victory: new Howl({ src: [SOUND_FILES.victory] }),
+          defeat: new Howl({ src: [SOUND_FILES.defeat] }),
+          crowd: new Howl({ src: [SOUND_FILES.crowd] }),
+          whistle: new Howl({ src: [SOUND_FILES.whistle] }),
+          pack: new Howl({ src: [SOUND_FILES.pack] }),
+          ambient: new Howl({ src: [SOUND_FILES.ambient], loop: true })
         }
 
         this.useHowler = true
@@ -227,6 +243,23 @@ class SoundManager {
   playCrowd() {
     if (this.playSample('crowd')) return
     this.playCrowdSynth()
+  }
+
+  /**
+   * Play referee whistle (kickoff / "LOS!")
+   */
+  playWhistle() {
+    if (this.playSample('whistle')) return
+    // Synth fallback: short sharp high tone
+    this.playTone(2000, 0.15, 'square', 0.3)
+  }
+
+  /**
+   * Play card-pack opening shimmer
+   */
+  playPack() {
+    if (this.playSample('pack')) return
+    this.playPackSynth()
   }
 
   /**
@@ -493,6 +526,32 @@ class SoundManager {
 
     noise.start(now)
     noise.stop(now + 0.5)
+  }
+
+  playPackSynth() {
+    if (!this.audioContext) return
+
+    const now = this.audioContext.currentTime
+    const notes = [659.25, 987.77, 1318.51]
+
+    notes.forEach((freq, i) => {
+      const oscillator = this.audioContext.createOscillator()
+      const gainNode = this.audioContext.createGain()
+
+      oscillator.connect(gainNode)
+      gainNode.connect(this.audioContext.destination)
+
+      oscillator.frequency.value = freq
+      oscillator.type = 'triangle'
+
+      const startTime = now + (i * 0.06)
+      gainNode.gain.setValueAtTime(0, startTime)
+      gainNode.gain.linearRampToValueAtTime(0.2 * this.masterVolume, startTime + 0.01)
+      gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 0.25)
+
+      oscillator.start(startTime)
+      oscillator.stop(startTime + 0.25)
+    })
   }
 
   /**

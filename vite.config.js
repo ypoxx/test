@@ -20,9 +20,9 @@ export default defineConfig({
         'apple-touch-icon.png'
       ],
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,webp,json,woff2}'],
-        // The sampled sound chunk is ~1 MB base64
-        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+        globPatterns: ['**/*.{js,css,html,svg,png,webp,json,woff2,mp3}'],
+        // Stadium sound MP3s (~0.6 MB total) are precached for offline play
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         navigateFallback: '/index.html'
       }
     })

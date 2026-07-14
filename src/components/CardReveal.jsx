@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import soundManager from '../utils/sounds'
 
 const RARITY_STYLES = {
   Common: {
@@ -36,6 +37,7 @@ function CardReveal({ card, isNew, fact, onClose }) {
 
   const openPack = () => {
     if (stage !== 'closed') return
+    soundManager.playPack()
     setStage('opening')
     setTimeout(() => setStage('revealed'), 900)
   }
