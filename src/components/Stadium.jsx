@@ -382,6 +382,7 @@ function Stadium({ progress, onStartMatch, onProgressReset, onProgressRefresh })
         {/* Footer */}
         <div className="text-center mt-8 text-white/50 text-sm">
           Made with ⚽ for Maurice
+          <div className="text-xs text-white/30 mt-1">Version 3 · Design-Update</div>
         </div>
       </div>
 
