@@ -1,7 +1,11 @@
 import { calculateLevel } from './xpSystem'
+import { getNextIntervalDays } from './spacedRepetition'
 
 const STORAGE_KEY = 'maurice_vocab_trainer_progress'
 const LAST_OPPONENT_KEY = 'maurice_vocab_trainer_last_opponent'
+const SOUND_PREF_KEY = 'maurice_vocab_trainer_sound'
+
+const DAY_MS = 24 * 60 * 60 * 1000
 
 // Initial default progress
 const DEFAULT_PROGRESS = {
@@ -10,6 +14,7 @@ const DEFAULT_PROGRESS = {
   currentLeague: 'kreisliga', // kreisliga, regionalliga, zweite_liga, bundesliga
   vocabProgress: {},
   matchHistory: [],
+  totalMatchesPlayed: 0, // Lifetime counter (matchHistory is capped at 20 entries)
   achievements: [], // Array of unlocked achievement IDs
   newAchievements: [], // Recently unlocked, shown in notification
   xp: 0, // Total XP earned
@@ -58,12 +63,33 @@ export const exportProgressData = () => {
 export const importProgressData = (progressData) => {
   try {
     const data = typeof progressData === 'string' ? JSON.parse(progressData) : progressData
-    if (!data || typeof data !== 'object' || !data.vocabProgress) {
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
       return false
     }
+    if (!data.vocabProgress || typeof data.vocabProgress !== 'object' || Array.isArray(data.vocabProgress)) {
+      return false
+    }
+
+    // Only accept known fields with the expected shape, so a corrupt or
+    // foreign JSON file cannot break the app on the next load.
+    const asNumber = (value, fallback) => (typeof value === 'number' && Number.isFinite(value) ? value : fallback)
+    const asArray = (value) => (Array.isArray(value) ? value : [])
+
     const merged = {
       ...DEFAULT_PROGRESS,
-      ...data,
+      vocabProgress: data.vocabProgress,
+      matchHistory: asArray(data.matchHistory).slice(0, 20),
+      totalGoalsScored: asNumber(data.totalGoalsScored, 0),
+      totalMatchesPlayed: Math.max(asNumber(data.totalMatchesPlayed, 0), asArray(data.matchHistory).length),
+      currentLeague: typeof data.currentLeague === 'string' ? data.currentLeague : 'kreisliga',
+      achievements: asArray(data.achievements),
+      newAchievements: [],
+      xp: asNumber(data.xp, 0),
+      level: asNumber(data.level, 1),
+      lastPlayedDate: typeof data.lastPlayedDate === 'string' ? data.lastPlayedDate : null,
+      dailyStreak: asNumber(data.dailyStreak, 0),
+      unlockedCards: asArray(data.unlockedCards),
+      unlockedFacts: asArray(data.unlockedFacts),
       lastSaved: new Date().toISOString()
     }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(merged))
@@ -86,10 +112,19 @@ export const loadProgress = () => {
       const parsed = JSON.parse(savedData)
 
       // Ensure all required fields exist
-      return {
+      const merged = {
         ...DEFAULT_PROGRESS,
         ...parsed
       }
+
+      // Migration: older saves had no lifetime match counter. matchHistory is
+      // capped at 20, so seed the counter with whatever we still know about.
+      merged.totalMatchesPlayed = Math.max(
+        merged.totalMatchesPlayed || 0,
+        Array.isArray(merged.matchHistory) ? merged.matchHistory.length : 0
+      )
+
+      return merged
     }
 
     // No saved data - return and save default progress
@@ -144,6 +179,12 @@ export const updateVocabProgress = (vocabId, wasCorrect) => {
 
   vocabProgress.lastReviewed = new Date().toISOString()
 
+  // Spaced repetition: wrong answers become due immediately,
+  // correct answers push the next review further into the future.
+  const nextInterval = getNextIntervalDays(vocabProgress.interval, wasCorrect)
+  vocabProgress.interval = nextInterval
+  vocabProgress.dueDate = new Date(Date.now() + nextInterval * DAY_MS).toISOString()
+
   // Mark as mastered if correct 5+ times and accuracy > 80%
   const total = vocabProgress.correct + vocabProgress.incorrect
   const accuracy = vocabProgress.correct / total
@@ -171,6 +212,10 @@ export const addMatchToHistory = (matchData) => {
   if (progress.matchHistory.length > 20) {
     progress.matchHistory = progress.matchHistory.slice(0, 20)
   }
+
+  // Lifetime counter — matchHistory alone cannot track "25/50 matches played"
+  // achievements because of the 20-entry cap above.
+  progress.totalMatchesPlayed = (progress.totalMatchesPlayed || 0) + 1
 
   saveProgress(progress)
   return progress
@@ -338,7 +383,9 @@ export const addXP = (xpToAdd) => {
  */
 export const updateDailyStreak = () => {
   const progress = loadProgress()
-  const today = getUtcDateString(new Date())
+  // Local calendar day — a UTC day boundary would break the streak for a
+  // German user playing shortly after midnight.
+  const today = getLocalDateString(new Date())
   const lastPlayed = progress.lastPlayedDate
 
   let streakIncreased = false
@@ -350,13 +397,13 @@ export const updateDailyStreak = () => {
   } else {
     const lastPlayedDate = parseStoredDate(lastPlayed)
     const yesterday = new Date()
-    yesterday.setUTCDate(yesterday.getUTCDate() - 1)
-    const yesterdayUtc = getUtcDateString(yesterday)
+    yesterday.setDate(yesterday.getDate() - 1)
+    const yesterdayLocal = getLocalDateString(yesterday)
 
     if (lastPlayedDate === today) {
       // Already played today, no change
       streakIncreased = false
-    } else if (lastPlayedDate === yesterdayUtc) {
+    } else if (lastPlayedDate === yesterdayLocal) {
       // Played yesterday, increase streak
       progress.dailyStreak = (progress.dailyStreak || 0) + 1
       streakIncreased = true
@@ -374,6 +421,29 @@ export const updateDailyStreak = () => {
     streakIncreased,
     currentStreak: progress.dailyStreak,
     progress
+  }
+}
+
+/**
+ * Sound preference — stored separately from progress so the
+ * "Sound aktivieren?" dialog only has to be answered once.
+ * @returns {boolean|null} - true/false once chosen, null if never asked
+ */
+export const loadSoundPreference = () => {
+  try {
+    const value = localStorage.getItem(SOUND_PREF_KEY)
+    if (value === null) return null
+    return value === 'on'
+  } catch (error) {
+    return null
+  }
+}
+
+export const saveSoundPreference = (enabled) => {
+  try {
+    localStorage.setItem(SOUND_PREF_KEY, enabled ? 'on' : 'off')
+  } catch (error) {
+    console.error('Error saving sound preference:', error)
   }
 }
 
@@ -397,7 +467,12 @@ export const saveLastOpponentName = (opponentName) => {
   }
 }
 
-const getUtcDateString = (date) => date.toISOString().split('T')[0]
+const getLocalDateString = (date) => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
 
 const parseStoredDate = (storedDate) => {
   if (typeof storedDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(storedDate)) {
@@ -406,7 +481,7 @@ const parseStoredDate = (storedDate) => {
 
   const parsed = new Date(storedDate)
   if (!Number.isNaN(parsed.getTime())) {
-    return getUtcDateString(parsed)
+    return getLocalDateString(parsed)
   }
 
   return null

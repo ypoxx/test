@@ -1,75 +1,28 @@
 /**
- * Generate plausible wrong answers for multiple choice
- * @param {Object} correctVocab - The correct vocabulary
- * @param {Array} allVocabs - All available vocabularies
- * @param {number} count - Number of wrong answers to generate (default 3)
- * @returns {Array} - Array of wrong answers
+ * Multiple choice option generation.
+ * Supports both quiz directions:
+ *  - 'en-de' (default): question shows the English word, options are German
+ *  - 'de-en': question shows the German word, options are English
  */
-export const generateWrongAnswers = (correctVocab, allVocabs, count = 3) => {
-  // Filter out the correct answer
-  const otherVocabs = allVocabs.filter(v => v.id !== correctVocab.id)
-
-  // Prioritize same category for more challenging questions
-  const sameCategory = otherVocabs.filter(v => v.category === correctVocab.category)
-
-  // Prioritize similar difficulty
-  const sameDifficulty = otherVocabs.filter(v => v.difficulty === correctVocab.difficulty)
-
-  // Create a weighted pool
-  const weightedPool = [
-    ...sameCategory.map(v => ({ ...v, weight: 3 })), // 3x weight for same category
-    ...sameDifficulty.map(v => ({ ...v, weight: 2 })), // 2x weight for same difficulty
-    ...otherVocabs.map(v => ({ ...v, weight: 1 })) // 1x weight for all others
-  ]
-
-  // Remove duplicates (keep highest weight)
-  const uniquePool = Object.values(
-    weightedPool.reduce((acc, vocab) => {
-      if (!acc[vocab.id] || acc[vocab.id].weight < vocab.weight) {
-        acc[vocab.id] = vocab
-      }
-      return acc
-    }, {})
-  )
-
-  // Shuffle the pool
-  const shuffled = uniquePool.sort(() => Math.random() - 0.5)
-
-  // Select wrong answers based on weights
-  const selected = []
-  for (const vocab of shuffled) {
-    if (selected.length >= count) break
-
-    // Higher weight = higher chance of selection
-    const chance = vocab.weight / 3 // Max weight is 3
-    if (Math.random() < chance || selected.length < count - 1) {
-      selected.push(vocab.german)
-    }
-  }
-
-  // Fill up if we don't have enough (safety net)
-  while (selected.length < count && shuffled.length > selected.length) {
-    const vocab = shuffled[selected.length]
-    if (!selected.includes(vocab.german)) {
-      selected.push(vocab.german)
-    }
-  }
-
-  return selected.slice(0, count)
-}
 
 /**
- * Generate multiple choice options
- * @param {Object} correctVocab - The correct vocabulary
- * @param {Array} allVocabs - All available vocabularies
- * @returns {Array} - Shuffled array of 4 options
+ * Split a vocab value like "rennen, laufen" or "Saison/Spielzeit"
+ * into normalized alternatives.
  */
-export const generateMultipleChoiceOptions = (correctVocab, allVocabs) => {
-  const wrongAnswers = generateWrongAnswers(correctVocab, allVocabs, 3)
-  const options = [correctVocab.german, ...wrongAnswers]
+const splitAlternatives = (value) =>
+  String(value)
+    .split(/[,/]/)
+    .map(part => part.trim().toLowerCase())
+    .filter(Boolean)
 
-  // Shuffle the options
-  return shuffleArray(options)
+/**
+ * Two answers collide if they share at least one alternative
+ * (e.g. "schießen" collides with "treten, schießen"). Colliding
+ * distractors would be a second "correct" option in disguise.
+ */
+const collides = (a, b) => {
+  const alternativesA = splitAlternatives(a)
+  return splitAlternatives(b).some(alt => alternativesA.includes(alt))
 }
 
 /**
@@ -82,4 +35,62 @@ const shuffleArray = (array) => {
     ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
   }
   return shuffled
+}
+
+/**
+ * Generate plausible wrong answers for multiple choice
+ * @param {Object} correctVocab - The correct vocabulary
+ * @param {Array} allVocabs - All available vocabularies
+ * @param {number} count - Number of wrong answers to generate (default 3)
+ * @param {string} field - Which side of the vocab to use ('german' or 'english')
+ * @returns {Array} - Array of wrong answers
+ */
+export const generateWrongAnswers = (correctVocab, allVocabs, count = 3, field = 'german') => {
+  const correctValue = correctVocab[field]
+
+  // Exclude the vocab itself and anything that would also be a correct answer
+  const otherVocabs = allVocabs.filter(
+    v => v.id !== correctVocab.id && !collides(v[field], correctValue)
+  )
+
+  const sameCategory = otherVocabs.filter(v => v.category === correctVocab.category)
+  const sameDifficulty = otherVocabs.filter(
+    v => v.category !== correctVocab.category && v.difficulty === correctVocab.difficulty
+  )
+  const rest = otherVocabs.filter(
+    v => v.category !== correctVocab.category && v.difficulty !== correctVocab.difficulty
+  )
+
+  // Same-category distractors first (harder, more plausible), then same difficulty
+  const candidates = [
+    ...shuffleArray(sameCategory),
+    ...shuffleArray(sameDifficulty),
+    ...shuffleArray(rest)
+  ]
+
+  const selected = []
+  for (const vocab of candidates) {
+    if (selected.length >= count) break
+    const value = vocab[field]
+    if (!selected.some(existing => collides(existing, value))) {
+      selected.push(value)
+    }
+  }
+
+  return selected
+}
+
+/**
+ * Generate multiple choice options
+ * @param {Object} correctVocab - The correct vocabulary
+ * @param {Array} allVocabs - All available vocabularies
+ * @param {string} direction - 'en-de' (German options) or 'de-en' (English options)
+ * @returns {Array} - Shuffled array of 4 options
+ */
+export const generateMultipleChoiceOptions = (correctVocab, allVocabs, direction = 'en-de') => {
+  const field = direction === 'de-en' ? 'english' : 'german'
+  const wrongAnswers = generateWrongAnswers(correctVocab, allVocabs, 3, field)
+  const options = [correctVocab[field], ...wrongAnswers]
+
+  return shuffleArray(options)
 }

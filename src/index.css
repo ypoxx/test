@@ -1041,3 +1041,14 @@
     }
   }
 }
+
+/* iPhone safe area (Dynamic Island / notch) — used on fixed headers and
+   full-screen containers together with viewport-fit=cover */
+.pt-safe {
+  padding-top: calc(env(safe-area-inset-top, 0px) + 1rem);
+}
+
+/* Content offset below the fixed match header */
+.pt-match {
+  padding-top: calc(env(safe-area-inset-top, 0px) + 7rem);
+}

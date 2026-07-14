@@ -23,12 +23,12 @@ export const FOOTBALL_FUN_FACTS = [
   {
     fact: "MSV Duisburg gewann 1966 den DFB-Pokal",
     isTrue: false,
-    explanation: "Falsch! MSV Duisburg war 1966 im Finale, verlor aber gegen Bayern München. Sie gewannen den DFB-Pokal 2011."
+    explanation: "Falsch! Der MSV stand viermal im DFB-Pokal-Finale (1966, 1975, 1998 und 2011), hat aber leider nie gewonnen. 2011 verloren die Zebras das Finale 0:5 gegen Schalke 04."
   },
   {
-    fact: "Bernard Dietz, eine MSV-Legende, wurde 1980 Fußballer des Jahres",
+    fact: "MSV-Legende Bernard Dietz war 1980 Kapitän der deutschen Nationalmannschaft, als sie Europameister wurde",
     isTrue: true,
-    explanation: "Richtig! Bernard Dietz ist eine absolute MSV-Legende und wurde 1980 zu Deutschlands Fußballer des Jahres gewählt."
+    explanation: "Richtig! Bernard Dietz ist eine absolute MSV-Legende, spielte über 400 Bundesligaspiele für Duisburg und führte Deutschland 1980 als Kapitän zum EM-Titel."
   },
 
   // General Football Facts
@@ -83,9 +83,9 @@ export const FOOTBALL_FUN_FACTS = [
     explanation: "Richtig! Deutschland siegte 1:0 nach Verlängerung durch ein Tor von Mario Götze."
   },
   {
-    fact: "Ein Elfmeter wird immer vom Elfmeterpunkt geschossen",
-    isTrue: false,
-    explanation: "Falsch! Der Punkt heißt 'Strafstoßpunkt' und liegt genau 11 Meter (12 Yards) vor dem Tor."
+    fact: "Der Elfmeterpunkt liegt genau 11 Meter von der Torlinie entfernt",
+    isTrue: true,
+    explanation: "Richtig! Daher kommt auch der Name 'Elfmeter'. Im Englischen sind es 12 Yards – das ist fast genau dasselbe."
   },
   {
     fact: "Cristiano Ronaldo ist der Rekordtorschütze der Champions League",
@@ -149,8 +149,8 @@ export const FOOTBALL_FUN_FACTS = [
   },
   {
     fact: "In Deutschland nennt man Fußballschuhe auch 'Stollen'",
-    isTrue: true,
-    explanation: "Richtig! 'Stollen' ist ein häufiger Spitzname für Fußballschuhe."
+    isTrue: false,
+    explanation: "Falsch! Stollen sind die Noppen unter den Fußballschuhen, die für Halt auf dem Rasen sorgen – nicht die Schuhe selbst."
   },
   {
     fact: "Die Eckfahne muss mindestens 2 Meter hoch sein",
@@ -160,7 +160,7 @@ export const FOOTBALL_FUN_FACTS = [
   {
     fact: "Ein Torwart darf den Ball 10 Sekunden in der Hand halten",
     isTrue: false,
-    explanation: "Falsch! Er darf ihn nur 6 Sekunden halten."
+    explanation: "Falsch! Seit der Saison 2025/26 darf er ihn 8 Sekunden halten (vorher 6). Hält er ihn länger, gibt es Eckball für den Gegner."
   },
   {
     fact: "Der Anstoß kann direkt zum Tor führen",

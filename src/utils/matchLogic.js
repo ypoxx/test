@@ -45,32 +45,31 @@ export const getDerbyOpponents = () => OPPONENTS.filter(opponent => opponent.isD
  * Constants for match configuration
  */
 export const MATCH_CONFIG = {
-  vocabsPerMatch: 10,
-  passingScore: 6 // 6/10 correct = Win
+  vocabsPerMatch: 10
 }
+
+// How long the answer feedback stays visible before the next question.
+// Wrong answers get more time so the correction can actually be read.
+export const ANSWER_DELAY_CORRECT = 2000
+export const ANSWER_DELAY_WRONG = 3500
 
 /**
  * Check if answer is correct (case-insensitive, trimmed)
- * Accepts multiple valid answers separated by comma or slash
+ * Accepts multiple valid answers separated by comma or slash.
+ * Uses exact matching only — substring matching would let a wrong
+ * multiple-choice option count as a goal while the UI shows "Daneben!".
  */
 export const checkAnswer = (userAnswer, correctAnswer) => {
-  const normalize = (str) => str.toLowerCase().trim()
+  const normalize = (str) => String(str).toLowerCase().trim()
 
   const userNormalized = normalize(userAnswer)
 
-  // Split correct answer by comma or slash to handle multiple valid answers
-  const validAnswers = correctAnswer
+  const validAnswers = String(correctAnswer)
     .split(/[,/]/)
     .map(answer => normalize(answer))
+    .filter(Boolean)
 
-  // Check if user answer matches any valid answer
-  return validAnswers.some(validAnswer => {
-    // Exact match
-    if (userNormalized === validAnswer) return true
-
-    // Allow slight variations (e.g., "laufen" matches "rennen, laufen")
-    return validAnswer.includes(userNormalized) || userNormalized.includes(validAnswer)
-  })
+  return userNormalized === normalize(correctAnswer) || validAnswers.includes(userNormalized)
 }
 
 /**

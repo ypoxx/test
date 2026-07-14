@@ -2,6 +2,11 @@
  * Achievement and Badge System
  */
 
+// matchHistory is capped at 20 entries, so lifetime counts must use the
+// dedicated counter (with the history length as fallback for old saves).
+const getMatchesPlayed = (progress) =>
+  Math.max(progress.totalMatchesPlayed || 0, progress.matchHistory?.length || 0)
+
 export const ACHIEVEMENTS = {
   // Erste Schritte
   FIRST_MATCH: {
@@ -10,7 +15,7 @@ export const ACHIEVEMENTS = {
     description: 'Dein erstes Spiel gespielt',
     emoji: '👟',
     rarity: 'common',
-    condition: (progress) => progress.matchHistory.length >= 1
+    condition: (progress) => getMatchesPlayed(progress) >= 1
   },
   FIRST_WIN: {
     id: 'first_win',
@@ -64,11 +69,16 @@ export const ACHIEVEMENTS = {
   PERFEKT: {
     id: 'perfekt',
     name: 'Perfekt!',
-    description: '10/10 richtig beantwortet',
+    description: 'Alle Vokabeln eines Spiels richtig beantwortet',
     emoji: '💯',
     rarity: 'rare',
     condition: (progress) => {
-      return progress.matchHistory.some(m => m.score === '10:0')
+      // Streak bonus goals inflate the own score (a perfect match ends e.g.
+      // 24:0), so "perfect" means: the opponent never scored.
+      return progress.matchHistory.some(m => {
+        const opponentGoals = Number(m.score?.split(':')[1])
+        return opponentGoals === 0 && (m.vocabsReviewed || 0) > 0
+      })
     }
   },
 
@@ -79,7 +89,7 @@ export const ACHIEVEMENTS = {
     description: '10 Spiele gespielt',
     emoji: '🦓',
     rarity: 'common',
-    condition: (progress) => progress.matchHistory.length >= 10
+    condition: (progress) => getMatchesPlayed(progress) >= 10
   },
   UNAUFHALTSAM_25: {
     id: 'unaufhaltsam_25',
@@ -87,7 +97,7 @@ export const ACHIEVEMENTS = {
     description: '25 Spiele gespielt',
     emoji: '🚀',
     rarity: 'rare',
-    condition: (progress) => progress.matchHistory.length >= 25
+    condition: (progress) => getMatchesPlayed(progress) >= 25
   },
   MARATHONLAEUFER_50: {
     id: 'marathonlaeufer_50',
@@ -95,7 +105,7 @@ export const ACHIEVEMENTS = {
     description: '50 Spiele gespielt',
     emoji: '🏃',
     rarity: 'epic',
-    condition: (progress) => progress.matchHistory.length >= 50
+    condition: (progress) => getMatchesPlayed(progress) >= 50
   },
 
   // Liga

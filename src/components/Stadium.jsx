@@ -4,18 +4,40 @@ import TrophyCase from './TrophyCase'
 import XPBar from './XPBar'
 import CategoryStats from './CategoryStats'
 import CardAlbum from './CardAlbum'
+import Settings from './Settings'
 import { getVocabStats } from '../utils/spacedRepetition'
 import vocabsData from '../data/vocabs.json'
 import { exportProgressData, getLeagueProgress, importProgressData } from '../utils/localStorage'
 
-function Stadium({ progress, onStartMatch }) {
+const CATEGORY_OPTIONS = [
+  { value: 'all', label: 'Alle', emoji: '🎲' },
+  { value: 'sport', label: 'Sport', emoji: '⚽' },
+  { value: 'school', label: 'Schule', emoji: '📚' },
+  { value: 'family', label: 'Familie', emoji: '👨‍👩‍👦' },
+  { value: 'everyday', label: 'Alltag', emoji: '🏠' },
+  { value: 'nature', label: 'Natur', emoji: '🌳' }
+]
+
+const DIFFICULTY_OPTIONS = [
+  { value: 'all', label: 'Gemischt' },
+  { value: 1, label: 'Leicht' },
+  { value: 2, label: 'Mittel' },
+  { value: 3, label: 'Schwer' }
+]
+
+function Stadium({ progress, onStartMatch, onProgressReset }) {
   const stats = getVocabStats(vocabsData, progress)
   const [showTrophyCase, setShowTrophyCase] = useState(false)
   const leagueInfo = getLeagueProgress(progress.totalGoalsScored || 0)
   const { currentLeagueInfo, nextLeagueInfo, goalsNeeded } = leagueInfo
   const [showAlbum, setShowAlbum] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
   const [backupStatus, setBackupStatus] = useState(null)
+  const [category, setCategory] = useState('all')
+  const [difficulty, setDifficulty] = useState('all')
   const fileInputRef = useRef(null)
+
+  const dailyStreak = progress.dailyStreak || 0
 
   const handleExport = () => {
     const data = exportProgressData()
@@ -48,8 +70,12 @@ function Stadium({ progress, onStartMatch }) {
     reader.readAsText(file)
   }
 
+  const startMatch = () => {
+    onStartMatch({ category, difficulty })
+  }
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 stadium-scene field-pattern relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 pt-safe stadium-scene field-pattern relative overflow-hidden">
       {/* Floodlights */}
       <div className="floodlight top-10 left-10" />
       <div className="floodlight top-10 right-10" />
@@ -63,14 +89,35 @@ function Stadium({ progress, onStartMatch }) {
       </div>
 
       <div className="w-full max-w-2xl relative z-10">
+        {/* Settings Button */}
+        <button
+          onClick={() => setShowSettings(true)}
+          className="absolute top-0 right-0 text-2xl p-2 text-white/70 hover:text-white transition-colors"
+          aria-label="Einstellungen"
+        >
+          ⚙️
+        </button>
+
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <h1 className="text-5xl font-bold text-white mb-2">
             ⚽ Vokabel-Trainer
           </h1>
           <p className="text-xl text-white/80">
             MSV Duisburg Edition
           </p>
+
+          {/* Daily Streak */}
+          {dailyStreak > 0 && (
+            <div className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/20 border border-orange-400/40 text-orange-100 font-bold animate-fade-in">
+              <span className="text-2xl">🔥</span>
+              <span>
+                {dailyStreak === 1
+                  ? 'Tages-Serie gestartet!'
+                  : `${dailyStreak} Tage in Folge!`}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* XP and Level */}
@@ -104,9 +151,44 @@ function Stadium({ progress, onStartMatch }) {
           <LeagueProgress totalGoals={progress.totalGoalsScored} />
         </div>
 
+        {/* Training Filter */}
+        <div className="card p-4 mb-4">
+          <div className="text-sm font-bold text-white/80 mb-2">🎯 Was willst du üben?</div>
+          <div className="flex flex-wrap gap-2 mb-3">
+            {CATEGORY_OPTIONS.map(option => (
+              <button
+                key={option.value}
+                onClick={() => setCategory(option.value)}
+                className={`px-3 py-2 rounded-full text-sm font-semibold transition-all ${
+                  category === option.value
+                    ? 'bg-msv-blue text-white'
+                    : 'bg-white/10 text-white/70 hover:bg-white/20'
+                }`}
+              >
+                {option.emoji} {option.label}
+              </button>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {DIFFICULTY_OPTIONS.map(option => (
+              <button
+                key={option.value}
+                onClick={() => setDifficulty(option.value)}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                  difficulty === option.value
+                    ? 'bg-goal text-gray-900'
+                    : 'bg-white/10 text-white/70 hover:bg-white/20'
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Start Match Button */}
         <button
-          onClick={onStartMatch}
+          onClick={startMatch}
           className="btn-primary btn-primary--hero w-full mb-4"
         >
           ⚽ Neues Spiel starten
@@ -192,33 +274,32 @@ function Stadium({ progress, onStartMatch }) {
               📋 Letzte Spiele
             </h3>
             <div className="space-y-2">
-              {progress.matchHistory.slice(0, 5).map((match, index) => (
-                <div
-                  key={index}
-                  className="bg-white/5 rounded-lg p-3 flex justify-between items-center"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="text-2xl">
-                      {match.score.split(':')[0] > match.score.split(':')[1]
-                        ? '✅'
-                        : match.score.split(':')[0] < match.score.split(':')[1]
-                        ? '❌'
-                        : '🤝'}
+              {progress.matchHistory.slice(0, 5).map((match, index) => {
+                const [msv, opp] = String(match.score).split(':').map(Number)
+                return (
+                  <div
+                    key={index}
+                    className="bg-white/5 rounded-lg p-3 flex justify-between items-center"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="text-2xl">
+                        {msv > opp ? '✅' : msv < opp ? '❌' : '🤝'}
+                      </div>
+                      <div>
+                        <div className="text-white font-semibold">
+                          vs {match.opponent}
+                        </div>
+                        <div className="text-white/60 text-sm">
+                          {new Date(match.date).toLocaleDateString('de-DE')}
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="text-white font-semibold">
-                        vs {match.opponent}
-                      </div>
-                      <div className="text-white/60 text-sm">
-                        {new Date(match.date).toLocaleDateString('de-DE')}
-                      </div>
+                    <div className="text-white font-bold text-lg">
+                      {match.score}
                     </div>
                   </div>
-                  <div className="text-white font-bold text-lg">
-                    {match.score}
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         )}
@@ -241,6 +322,13 @@ function Stadium({ progress, onStartMatch }) {
         <CardAlbum
           progress={progress}
           onClose={() => setShowAlbum(false)}
+        />
+      )}
+
+      {showSettings && (
+        <Settings
+          onClose={() => setShowSettings(false)}
+          onProgressReset={onProgressReset}
         />
       )}
     </div>

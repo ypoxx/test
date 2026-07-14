@@ -5,11 +5,16 @@ Progressive Web App zum spielerischen Lernen von Englisch-Vokabeln mit Fußball-
 ## 🎯 Features
 
 - **Match-Day System**: Jede Lernsession ist ein Fußballspiel gegen Bundesliga-Teams
-- **Spaced Repetition**: Intelligenter Algorithmus wählt Vokabeln basierend auf Lernfortschritt
+- **Echtes Spaced Repetition**: Falsche Vokabeln kommen sofort wieder, richtige in wachsenden Abständen (1 → 3 → 7 → … Tage)
+- **Nachspielzeit**: Falsch beantwortete Wörter werden direkt am Matchende noch einmal geübt
+- **Beide Richtungen**: EN→DE und DE→EN (aktives Abrufen für bekannte Wörter)
+- **Trainings-Filter**: Gezielt nach Kategorie (Sport, Schule, …) und Schwierigkeit üben
 - **Liga-System**: Aufstieg von Kreisliga bis Bundesliga durch Tore
+- **Tages-Serie**: 🔥-Streak für tägliches Spielen
+- **Sammelkarten & Trophäen**: Kartenpacks nach Siegen, Achievements mit Seltenheitsstufen
 - **350 Vokabeln**: 7. Klasse Englisch mit Fußball-Beispielen
-- **Offline-fähig**: PWA funktioniert ohne Internet
-- **Mobile-optimiert**: Speziell für iPhone 16
+- **Offline-fähig**: PWA mit Precaching (funktioniert ab dem ersten Besuch offline)
+- **Mobile-optimiert**: Speziell für iPhone (Safe-Area, Homescreen-Icon, Sound-Unlock)
 
 ## 🚀 Installation & Start
 

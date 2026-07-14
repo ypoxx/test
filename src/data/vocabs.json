@@ -74,7 +74,7 @@
   {
     "id": "vocab_010",
     "english": "to tackle",
-    "german": "tackling machen, grätschen",
+    "german": "angreifen, grätschen",
     "exampleSentence": "The defender tackles the opponent",
     "category": "sport",
     "difficulty": 2
@@ -1081,9 +1081,9 @@
   },
   {
     "id": "vocab_136",
-    "english": "to practice",
-    "german": "üben",
-    "exampleSentence": "Practice makes perfect",
+    "english": "to repeat",
+    "german": "wiederholen",
+    "exampleSentence": "Please repeat the question",
     "category": "school",
     "difficulty": 1
   },
@@ -1449,9 +1449,9 @@
   },
   {
     "id": "vocab_182",
-    "english": "to celebrate",
-    "german": "feiern",
-    "exampleSentence": "We celebrate Christmas together",
+    "english": "to hug",
+    "german": "umarmen",
+    "exampleSentence": "I hug my little brother",
     "category": "family",
     "difficulty": 1
   },
@@ -1531,7 +1531,7 @@
     "id": "vocab_192",
     "english": "to grow up",
     "german": "aufwachsen",
-    "exampleSentence": "I grow up in Duisburg",
+    "exampleSentence": "I grew up in Duisburg",
     "category": "family",
     "difficulty": 2
   },
@@ -1985,9 +1985,9 @@
   },
   {
     "id": "vocab_249",
-    "english": "music",
-    "german": "Musik",
-    "exampleSentence": "Music makes me happy",
+    "english": "headphones",
+    "german": "Kopfhörer",
+    "exampleSentence": "I listen to music with my headphones",
     "category": "everyday",
     "difficulty": 1
   },
@@ -2601,9 +2601,9 @@
   },
   {
     "id": "vocab_326",
-    "english": "season",
-    "german": "Jahreszeit",
-    "exampleSentence": "Summer is my favorite season",
+    "english": "shadow",
+    "german": "Schatten",
+    "exampleSentence": "The tree gives a big shadow",
     "category": "nature",
     "difficulty": 1
   },
