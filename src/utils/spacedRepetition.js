@@ -141,7 +141,9 @@ export const filterByDifficulty = (allVocabs, difficulties) => {
  * (same category, other difficulties), closest difficulty first. Some
  * category/difficulty combinations are sparse (e.g. only one hard nature
  * word) — without padding they would produce one-question matches or an
- * empty pool.
+ * empty pool. Fillers are shuffled before the (stable) distance sort, so
+ * equally-close words rotate between matches instead of always being the
+ * same first entries in file order.
  * @param {Array} pool - Words matching all filters
  * @param {Array} fallbackPool - Words matching the category filter only
  * @param {number} targetDifficulty - The selected difficulty level
@@ -153,8 +155,7 @@ export const padPoolToMinimum = (pool, fallbackPool, targetDifficulty, minSize =
     return pool
   }
   const poolIds = new Set(pool.map(vocab => vocab.id))
-  const fillers = fallbackPool
-    .filter(vocab => !poolIds.has(vocab.id))
+  const fillers = shuffleArray(fallbackPool.filter(vocab => !poolIds.has(vocab.id)))
     .sort((a, b) =>
       Math.abs(a.difficulty - targetDifficulty) - Math.abs(b.difficulty - targetDifficulty)
     )

@@ -99,7 +99,7 @@
     "id": "vocab_013",
     "english": "team",
     "german": "Mannschaft, Team",
-    "exampleSentence": "MSV Duisburg is my favorite team",
+    "exampleSentence": "MSV Duisburg is my favourite team",
     "category": "sport",
     "difficulty": 1
   },
@@ -377,9 +377,9 @@
   },
   {
     "id": "vocab_048",
-    "english": "to practice",
+    "english": "to practise",
     "german": "üben",
-    "exampleSentence": "We practice free kicks after training",
+    "exampleSentence": "We practise free kicks after training",
     "category": "sport",
     "difficulty": 1
   },
@@ -763,7 +763,7 @@
     "id": "vocab_096",
     "english": "subject",
     "german": "Schulfach",
-    "exampleSentence": "My favorite subject is PE",
+    "exampleSentence": "My favourite subject is PE",
     "category": "school",
     "difficulty": 2
   },
@@ -1313,9 +1313,9 @@
   },
   {
     "id": "vocab_165",
-    "english": "apartment",
+    "english": "flat",
     "german": "Wohnung",
-    "exampleSentence": "They live in an apartment",
+    "exampleSentence": "They live in a flat",
     "category": "family",
     "difficulty": 2
   },
@@ -1563,7 +1563,7 @@
     "id": "vocab_196",
     "english": "neighbour",
     "german": "Nachbar",
-    "exampleSentence": "Our neighbor is very friendly",
+    "exampleSentence": "Our neighbour is very friendly",
     "category": "family",
     "difficulty": 2
   },
@@ -1592,7 +1592,7 @@
     "difficulty": 2
   },
   {
-    "id": "vocab_200",
+    "id": "vocab_453",
     "english": "siblings",
     "german": "Geschwister",
     "exampleSentence": "I have two siblings",
@@ -1993,9 +1993,9 @@
   },
   {
     "id": "vocab_250",
-    "english": "movie",
+    "english": "film",
     "german": "Film",
-    "exampleSentence": "We watch a movie tonight",
+    "exampleSentence": "We watch a film tonight",
     "category": "everyday",
     "difficulty": 1
   },
@@ -2619,7 +2619,7 @@
     "id": "vocab_328",
     "english": "summer",
     "german": "Sommer",
-    "exampleSentence": "We have vacation in summer",
+    "exampleSentence": "We are on holiday in summer",
     "category": "nature",
     "difficulty": 1
   },
@@ -2755,7 +2755,7 @@
     "id": "vocab_345",
     "english": "butterfly",
     "german": "Schmetterling",
-    "exampleSentence": "Butterflies are colorful",
+    "exampleSentence": "Butterflies are colourful",
     "category": "nature",
     "difficulty": 2
   },
@@ -3608,7 +3608,7 @@
     "difficulty": 2
   },
   {
-    "id": "vocab_452",
+    "id": "vocab_454",
     "english": "loudspeaker",
     "german": "Lautsprecher",
     "exampleSentence": "The stadium loudspeaker announces the teams",
