@@ -196,111 +196,6 @@
     pointer-events: none;
   }
 
-  /* Crowd silhouette */
-  .crowd-silhouette {
-    background: linear-gradient(to bottom,
-      rgba(0, 0, 0, 0.4) 0%,
-      rgba(0, 0, 0, 0.6) 50%,
-      transparent 100%
-    );
-    height: 120px;
-    position: relative;
-  }
-
-  /* Animated crowd wave */
-  @keyframes crowdWave {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-  }
-
-  .crowd-wave {
-    animation: crowdWave 2s ease-in-out infinite;
-  }
-
-  .crowd-wave:nth-child(2) {
-    animation-delay: 0.3s;
-  }
-
-  .crowd-wave:nth-child(3) {
-    animation-delay: 0.6s;
-  }
-
-  .crowd-wave:nth-child(4) {
-    animation-delay: 0.9s;
-  }
-
-  /* Streak fire effect */
-  .streak-fire {
-    position: relative;
-    text-shadow:
-      0 0 10px rgba(255, 100, 0, 0.8),
-      0 0 20px rgba(255, 100, 0, 0.6),
-      0 0 30px rgba(255, 100, 0, 0.4);
-    animation: fireFlicker 0.3s infinite alternate;
-  }
-
-  @keyframes fireFlicker {
-    0% {
-      text-shadow:
-        0 0 10px rgba(255, 100, 0, 0.8),
-        0 0 20px rgba(255, 100, 0, 0.6),
-        0 0 30px rgba(255, 100, 0, 0.4);
-    }
-    100% {
-      text-shadow:
-        0 0 15px rgba(255, 150, 0, 1),
-        0 0 25px rgba(255, 150, 0, 0.8),
-        0 0 35px rgba(255, 150, 0, 0.6);
-    }
-  }
-
-  /* Streak lightning effect */
-  .streak-lightning {
-    position: relative;
-    text-shadow:
-      0 0 10px rgba(100, 200, 255, 0.8),
-      0 0 20px rgba(100, 200, 255, 0.6),
-      0 0 30px rgba(100, 200, 255, 0.4);
-    animation: lightningPulse 0.5s infinite alternate;
-  }
-
-  @keyframes lightningPulse {
-    0% {
-      text-shadow:
-        0 0 10px rgba(100, 200, 255, 0.8),
-        0 0 20px rgba(100, 200, 255, 0.6),
-        0 0 30px rgba(100, 200, 255, 0.4);
-      transform: scale(1);
-    }
-    100% {
-      text-shadow:
-        0 0 20px rgba(150, 220, 255, 1),
-        0 0 30px rgba(150, 220, 255, 0.8),
-        0 0 40px rgba(150, 220, 255, 0.6);
-      transform: scale(1.05);
-    }
-  }
-
-  /* Particle burst for streaks */
-  .particle-burst {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    animation: burstOut 0.8s ease-out forwards;
-  }
-
-  @keyframes burstOut {
-    0% {
-      transform: translate(0, 0) scale(1);
-      opacity: 1;
-    }
-    100% {
-      transform: translate(var(--tx, 50px), var(--ty, -50px)) scale(0);
-      opacity: 0;
-    }
-  }
-
   /* Animations */
   .animate-fade-in {
     animation: fadeIn 0.3s ease-in;
@@ -387,130 +282,6 @@
     overflow: hidden;
     z-index: 5;
   }
-
-  .goal-ball {
-    position: absolute;
-    bottom: 20%;
-    left: 10%;
-    font-size: 4rem;
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
-  }
-
-  .ball-shoot-hero {
-    animation: ballShootHero 1.4s cubic-bezier(0.22, 0.61, 0.36, 1);
-  }
-
-  @keyframes ballShootHero {
-    0% {
-      transform: translate(0, 0) scale(0.5) rotate(0deg);
-      opacity: 0;
-    }
-    15% {
-      opacity: 1;
-    }
-    55% {
-      transform: translate(55vw, -40vh) scale(1.3) rotate(360deg);
-    }
-    100% {
-      transform: translate(85vw, -65vh) scale(0.2) rotate(720deg);
-      opacity: 0;
-    }
-  }
-
-  .crowd-reaction {
-    position: absolute;
-    top: 10%;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 2.5rem;
-    letter-spacing: 0.2rem;
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
-  }
-
-  .crowd-cheer {
-    animation: crowdCheer 0.8s ease-out;
-  }
-
-  .crowd-groan {
-    animation: crowdGroan 0.8s ease-out;
-  }
-
-  @keyframes crowdCheer {
-    0% {
-      transform: translate(-50%, 10px) scale(0.8);
-      opacity: 0;
-    }
-    60% {
-      transform: translate(-50%, -10px) scale(1.2);
-      opacity: 1;
-    }
-    100% {
-      transform: translate(-50%, -20px) scale(1);
-      opacity: 0;
-    }
-  }
-
-  @keyframes crowdGroan {
-    0% {
-      transform: translate(-50%, -10px) scale(1);
-      opacity: 0;
-    }
-    40% {
-      transform: translate(-50%, 0) scale(1.1);
-      opacity: 1;
-    }
-    100% {
-      transform: translate(-50%, 10px) scale(0.9);
-      opacity: 0;
-    }
-  }
-
-  .match-success::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at center, rgba(34, 197, 94, 0.35), transparent 65%);
-    animation: goalGlow 0.7s ease-out;
-    pointer-events: none;
-  }
-
-  .match-miss {
-    animation: screenShake 0.45s ease-in-out;
-  }
-
-  .match-miss::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at center, rgba(239, 68, 68, 0.25), transparent 70%);
-    animation: missGlow 0.6s ease-out;
-    pointer-events: none;
-  }
-
-  @keyframes goalGlow {
-    0% {
-      opacity: 0;
-    }
-    30% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-    }
-  }
-
-  @keyframes missGlow {
-    0% {
-      opacity: 0;
-    }
-    40% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-    }
-  }
-
   @keyframes screenShake {
     0%, 100% {
       transform: translateX(0);
@@ -530,63 +301,9 @@
   }
 
   /* Ball shooting animation */
-  .ball-shoot {
-    animation: ballShoot 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  }
-
-  @keyframes ballShoot {
-    0% {
-      transform: translate(-50%, 50%) scale(0.5);
-      opacity: 0;
-    }
-    20% {
-      opacity: 1;
-    }
-    50% {
-      transform: translate(40vw, -30vh) scale(1.2) rotate(360deg);
-    }
-    100% {
-      transform: translate(80vw, -50vh) scale(0.3) rotate(720deg);
-      opacity: 0;
-    }
-  }
-
   /* Goal flash effect */
-  .goal-flash {
-    animation: flash 0.4s ease-out;
-  }
-
-  @keyframes flash {
-    0%, 100% {
-      opacity: 0;
-    }
-    50% {
-      opacity: 1;
-    }
-  }
-
   /* Goal shake effect */
-  .animate-shake {
-    animation: shake 0.5s ease-in-out;
-  }
-
-  @keyframes shake {
-    0%, 100% {
-      transform: translateX(0);
-    }
-    25% {
-      transform: translateX(-10px) rotate(-5deg);
-    }
-    75% {
-      transform: translateX(10px) rotate(5deg);
-    }
-  }
-
   /* Slow spin for ball */
-  .animate-spin-slow {
-    animation: spin 1s linear infinite;
-  }
-
   @keyframes spin {
     from {
       transform: rotate(0deg);
@@ -597,62 +314,8 @@
   }
 
   /* Confetti animation */
-  .confetti {
-    animation: confettiFall 3s ease-out forwards;
-  }
-
-  @keyframes confettiFall {
-    0% {
-      transform: translateY(-100vh) rotate(0deg);
-      opacity: 1;
-    }
-    100% {
-      transform: translateY(100vh) rotate(720deg);
-      opacity: 0;
-    }
-  }
-
   /* Firework particle */
-  .firework-particle {
-    animation: fireworkExpand 1s ease-out forwards;
-  }
-
   /* Card reward visuals */
-  .pack-shell {
-    @apply bg-white/10 border border-white/20 rounded-3xl px-10 py-8 shadow-xl;
-    position: relative;
-    overflow: hidden;
-    transition: transform var(--zut-dur-base) ease;
-  }
-
-  .pack-shell:hover {
-    transform: translateY(-4px) scale(1.02);
-  }
-
-  .pack-glow {
-    position: absolute;
-    inset: -40%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent 60%);
-    animation: pulseGlow 2s infinite;
-  }
-
-  .pack-opening {
-    animation: packOpen 0.9s ease forwards;
-  }
-
-  @keyframes packOpen {
-    0% {
-      transform: scale(1) rotate(0deg);
-    }
-    40% {
-      transform: scale(1.05) rotate(-2deg);
-    }
-    100% {
-      transform: scale(0.9) rotate(2deg);
-      opacity: 0.6;
-    }
-  }
-
   .card-reveal {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
     position: relative;
@@ -668,27 +331,6 @@
     transform: rotate(20deg);
     animation: shine 3s infinite;
   }
-
-  .glimmer-particles {
-    position: absolute;
-    inset: 0;
-    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, transparent 40%);
-    opacity: 0.2;
-    animation: glimmer 2.2s infinite alternate;
-    pointer-events: none;
-  }
-
-  @keyframes glimmer {
-    0% {
-      opacity: 0.15;
-      transform: scale(0.95);
-    }
-    100% {
-      opacity: 0.35;
-      transform: scale(1.05);
-    }
-  }
-
   .card-glow-common {
     box-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
   }
@@ -704,27 +346,7 @@
   .card-glow-legendary {
     box-shadow: 0 0 45px rgba(250, 204, 21, 0.6);
   }
-
-  .card-silhouette {
-    filter: grayscale(1);
-  }
-
-  @keyframes fireworkExpand {
-    0% {
-      transform: translate(0, 0) scale(0);
-      opacity: 1;
-    }
-    100% {
-      transform: var(--tx, translate(100px, -100px)) scale(1);
-      opacity: 0;
-    }
-  }
-
   /* Button glow on hover */
-  .btn-glow {
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
-  }
-
   /* Button squeeze animation */
   @keyframes buttonSqueezeactive {
     0% {
@@ -737,43 +359,8 @@
       transform: scale(1);
     }
   }
-
-  .button-squeeze:active {
-    animation: buttonSqueezeactive 0.3s ease-out;
-  }
-
   /* Success particle burst */
-  .success-particle {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background: #10b981;
-    border-radius: 50%;
-    pointer-events: none;
-    animation: particleBurst 0.8s ease-out forwards;
-  }
-
   /* Collectible card styles */
-  .card-frame {
-    @apply rounded-2xl p-4 border border-white/10 bg-gradient-to-br from-slate-800 to-slate-900 text-center relative overflow-hidden shadow-xl;
-  }
-
-  .card-header {
-    @apply flex items-center justify-between text-white/70 text-xs mb-3;
-  }
-
-  .card-body {
-    @apply flex flex-col items-center gap-1;
-  }
-
-  .card-footer {
-    @apply mt-4 text-[10px] uppercase tracking-wide text-white/60;
-  }
-
-  .card-locked {
-    @apply grayscale opacity-50;
-  }
-
   /* .rarity-common/-rare/-epic/-legendary: konsolidiert weiter unten
      unter "Rarity card styles" (eine Definition pro Rarität). */
 
@@ -933,98 +520,7 @@
       rgba(148, 163, 184, 0.1) 12px
     );
   }
-
-  @keyframes particleBurst {
-    0% {
-      transform: translate(0, 0) scale(1);
-      opacity: 1;
-    }
-    100% {
-      transform: translate(var(--x, 50px), var(--y, -50px)) scale(0);
-      opacity: 0;
-    }
-  }
-
   /* Rarity card styles — je Rarität EINE Definition (Border + Background + Glow) */
-  .rarity-common {
-    background: linear-gradient(135deg, rgba(148, 163, 184, 0.4), rgba(71, 85, 105, 0.4));
-    border: 1px solid rgba(148, 163, 184, 0.4);
-    box-shadow: 0 0 20px rgba(148, 163, 184, 0.25);
-  }
-
-  .rarity-rare {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(14, 116, 144, 0.4));
-    border: 1px solid rgba(96, 165, 250, 0.6);
-    box-shadow: 0 0 30px rgba(59, 130, 246, 0.35);
-    animation: rarityGlow 3s ease-in-out infinite;
-  }
-
-  .rarity-epic {
-    background: linear-gradient(135deg, rgba(168, 85, 247, 0.45), rgba(88, 28, 135, 0.5));
-    border: 1px solid rgba(192, 132, 252, 0.7);
-    box-shadow: 0 0 40px rgba(168, 85, 247, 0.45);
-    animation: rarityGlow 2.5s ease-in-out infinite;
-  }
-
-  .rarity-rare::before,
-  .rarity-epic::before {
-    content: '';
-    position: absolute;
-    inset: -40%;
-    background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
-    animation: shine 4s infinite;
-  }
-
-  .rarity-legendary {
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient(135deg, rgba(250, 204, 21, 0.55), rgba(245, 158, 11, 0.6));
-    border: 1px solid rgba(253, 224, 71, 0.8);
-    box-shadow: 0 0 45px rgba(251, 191, 36, 0.6);
-    animation: legendaryGlow 2.2s ease-in-out infinite;
-  }
-
-  .rarity-legendary::before {
-    content: '';
-    position: absolute;
-    inset: -60% -30%;
-    background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
-    transform: translateX(-100%);
-    animation: legendaryShimmer 3s linear infinite;
-    pointer-events: none;
-  }
-
-  .rarity-particles {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-  }
-
-  .rarity-particle {
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    border-radius: 999px;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.95), rgba(250, 204, 21, 0.5));
-    box-shadow: 0 0 8px rgba(251, 191, 36, 0.9);
-    animation: sparkleFloat 2.8s ease-in-out infinite;
-  }
-
-  .rarity-particle:nth-child(1) { top: 20%; left: 15%; animation-delay: 0s; }
-  .rarity-particle:nth-child(2) { top: 30%; right: 20%; animation-delay: 0.4s; }
-  .rarity-particle:nth-child(3) { bottom: 25%; left: 30%; animation-delay: 0.8s; }
-  .rarity-particle:nth-child(4) { bottom: 20%; right: 25%; animation-delay: 1.2s; }
-  .rarity-particle:nth-child(5) { top: 55%; left: 50%; animation-delay: 1.6s; }
-
-  @keyframes rarityGlow {
-    0%, 100% {
-      box-shadow: 0 0 25px rgba(59, 130, 246, 0.35);
-    }
-    50% {
-      box-shadow: 0 0 45px rgba(59, 130, 246, 0.6);
-    }
-  }
-
   @keyframes legendaryGlow {
     0%, 100% {
       box-shadow: 0 0 35px rgba(251, 191, 36, 0.5);
@@ -1032,30 +528,7 @@
     50% {
       box-shadow: 0 0 60px rgba(251, 191, 36, 0.8);
     }
-  }
-
-  @keyframes legendaryShimmer {
-    0% {
-      transform: translateX(-100%) rotate(15deg);
-      opacity: 0.6;
-    }
-    100% {
-      transform: translateX(120%) rotate(15deg);
-      opacity: 0;
-    }
-  }
-
-  @keyframes sparkleFloat {
-    0%, 100% {
-      transform: translateY(0) scale(1);
-      opacity: 0.8;
-    }
-    50% {
-      transform: translateY(-12px) scale(1.3);
-      opacity: 1;
-    }
-  }
-}
+  }}
 
 /* iPhone safe area (Dynamic Island / notch) — used on fixed headers and
    full-screen containers together with viewport-fit=cover */
@@ -1063,9 +536,12 @@
   padding-top: calc(env(safe-area-inset-top, 0px) + 1rem);
 }
 
-/* Content offset below the fixed match header */
+/* Content offset below the fixed match header. Der Header enthält pt-safe
+   bereits in seiner gemessenen Höhe; der Fallback gilt bis zur ersten Messung. */
 .pt-match {
-  padding-top: calc(env(safe-area-inset-top, 0px) + 7rem);
+  padding-top: calc(
+    var(--zut-matchhead-h, calc(env(safe-area-inset-top, 0px) + 6.5rem)) + 0.75rem
+  );
 }
 
 /* Globaler Reduced-Motion-Fallback: respektiert die iOS-Einstellung

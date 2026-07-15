@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import VocabCard from './VocabCard'
 import ScoreDisplay from './ScoreDisplay'
 import AchievementUnlocked from './AchievementUnlocked'
@@ -10,8 +10,10 @@ import { selectVocabsForMatch, filterByCategory, filterByDifficulty } from '../u
 import { selectRandomOpponent, getDerbyOpponents, calculateMatchResult, getMatchSummaryMessage, ANSWER_DELAY_CORRECT, ANSWER_DELAY_WRONG } from '../utils/matchLogic'
 import { updateVocabProgress, updateGoalsAndLeague, addMatchToHistory, loadProgress, unlockAchievement, addXP, updateDailyStreak, loadLastOpponentName, saveLastOpponentName } from '../utils/localStorage'
 import { generateMultipleChoiceOptions } from '../utils/multipleChoice'
-import { calculateStreakBonus, getStreakMessage, getStreakTier, triggerHapticFeedback } from '../utils/gameEffects'
-import { getZoneStyle, getStreakStyle } from './zoneStyles'
+import { calculateStreakBonus, getStreakMessage, triggerHapticFeedback } from '../utils/gameEffects'
+import { getZoneStyle } from './zoneStyles'
+import StadiumScene from './StadiumScene'
+import './Match.css'
 import { checkNewAchievements } from '../utils/achievements'
 import { calculateXPReward } from '../utils/xpSystem'
 import CardReveal from './CardReveal'
@@ -21,6 +23,45 @@ import soundManager from '../utils/sounds'
 import ShareCard from './ShareCard'
 
 const EXTRA_TIME_XP = 5
+
+// Emojis aus Logik-Strings (z. B. getStreakMessage) für die Broadcast-UI
+// entfernen — die Strings selbst bleiben unverändert in der Logik-Schicht.
+const stripEmojis = (text) =>
+  String(text).replace(/[\p{Extended_Pictographic}️‍]/gu, '').replace(/\s{2,}/g, ' ').trim()
+
+/* Inline-SVG-Glyphen statt Emoji-Grafiken (Barrierefreiheits-Regel) */
+const FlameGlyph = () => (
+  <svg width="11" height="14" viewBox="0 0 11 15" fill="currentColor" aria-hidden="true">
+    <path d="M5.5 0C7 2.8 10 5 10 9.2 10 12.4 8 15 5.5 15 3 15 1 12.9 1 9.9 1 7.6 2.2 6 3.4 4.6c.2 1.2.7 2 1.6 2.5C4.6 4.8 4.8 2.3 5.5 0z" />
+  </svg>
+)
+
+const ClockGlyph = () => (
+  <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+    <circle cx="8" cy="8" r="6.6" />
+    <path d="M8 4.5V8l2.5 1.8" strokeLinecap="round" />
+  </svg>
+)
+
+const TargetGlyph = () => (
+  <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+    <circle cx="8" cy="8" r="6.5" />
+    <circle cx="8" cy="8" r="3.4" />
+    <circle cx="8" cy="8" r="0.8" fill="currentColor" stroke="none" />
+  </svg>
+)
+
+const StarGlyph = () => (
+  <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+    <path d="M8 1.2 10 5.6l4.8.5-3.6 3.2 1 4.7L8 11.6 3.8 14l1-4.7L1.2 6.1 6 5.6 8 1.2z" />
+  </svg>
+)
+
+const LevelGlyph = () => (
+  <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+    <path d="M3 13.5h10M8 11V3M4.6 6.4 8 3l3.4 3.4" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+)
 
 // Ask German→English (active recall) for words Maurice has seen before
 const DE_EN_SHARE = 0.4
@@ -78,6 +119,26 @@ function Match({ progress, onMatchEnd, filters, mode = 'training', seasonOpponen
   const [crowdAnimationKey, setCrowdAnimationKey] = useState(0)
   const [cardReward, setCardReward] = useState(null)
   const [showCardReveal, setShowCardReveal] = useState(false)
+
+  // Fixed-Header-Höhe variiert mit Meta-Chips (Spieltag/Derby/Nachspielzeit) —
+  // gemessen statt geraten, damit der Content-Offset (.pt-match) nie zu klein ist.
+  // Callback-Ref statt useEffect: der Header mountet erst nach dem Countdown.
+  const matchHeadRO = useRef(null)
+  const matchHeadRef = (el) => {
+    if (matchHeadRO.current) {
+      matchHeadRO.current.disconnect()
+      matchHeadRO.current = null
+    }
+    if (el && typeof ResizeObserver !== 'undefined') {
+      const ro = new ResizeObserver(() => {
+        document.documentElement.style.setProperty('--zut-matchhead-h', `${el.offsetHeight}px`)
+      })
+      ro.observe(el)
+      matchHeadRO.current = ro
+    } else {
+      document.documentElement.style.removeProperty('--zut-matchhead-h')
+    }
+  }
 
   // "Nachspielzeit": wrong answers get replayed at the end of the match
   const [phase, setPhase] = useState('regular') // 'regular' | 'extraTime'
@@ -171,6 +232,7 @@ function Match({ progress, onMatchEnd, filters, mode = 'training', seasonOpponen
       nextStreak = 0
       setStreak(0)
       setStreakMessage(null)
+      setMatchFeedback('miss')
       nextOpponentGoals += 1
       setOpponentGoals(nextOpponentGoals)
       if (nextMsvGoals === 0 && nextOpponentGoals >= 3) {
@@ -249,6 +311,7 @@ function Match({ progress, onMatchEnd, filters, mode = 'training', seasonOpponen
       setXPGained(nextXPGained)
       setExtraCorrectCount(nextExtraCorrect)
     } else {
+      setMatchFeedback('miss')
       triggerHapticFeedback('error')
       soundManager.playWrong()
     }
@@ -372,10 +435,10 @@ function Match({ progress, onMatchEnd, filters, mode = 'training', seasonOpponen
 
   const continueLabel = () => {
     if (newAchievements.length > 0 && showAchievementIndex < newAchievements.length) {
-      return '🏆 Trophäe ansehen'
+      return 'Trophäe ansehen'
     }
     if (cardReward && !showCardReveal) {
-      return '🎁 Kartenpack öffnen'
+      return 'Kartenpack öffnen'
     }
     return 'Zurück zum Stadion'
   }
@@ -414,129 +477,147 @@ function Match({ progress, onMatchEnd, filters, mode = 'training', seasonOpponen
           card={cardReward.card}
           isNew={cardReward.isNew}
           fact={cardReward.fact}
+          isVictory={matchResult.status === 'win'}
           onClose={() => onMatchEnd(matchResult)}
         />
       )
     }
 
+    const resultTitle = matchResult.status === 'win'
+      ? 'Sieg!'
+      : matchResult.status === 'lose'
+        ? 'Niederlage'
+        : 'Unentschieden'
+
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 pt-safe stadium-scene field-pattern relative overflow-hidden">
-        {/* Floodlights */}
-        <div className="floodlight top-10 left-10" />
-        <div className="floodlight top-10 right-10" />
+      <StadiumScene variant={matchResult.status === 'win' ? 'gold' : 'default'} className="zut-focusables">
+        <div className="min-h-screen flex flex-col items-center justify-center p-4 pt-safe">
+          <div className="w-full max-w-2xl relative z-10">
+            {/* Result Panel */}
+            <div className="zut-panel zut-panel--main p-6 text-center mb-6">
+              <div className="zut-eyebrow mb-1">Abpfiff</div>
+              <h2 className="zut-result-title mb-2">{resultTitle}</h2>
+              <p className="text-lg text-white/90 mb-6">{summary.message}</p>
 
-        <div className="w-full max-w-2xl relative z-10">
-          {/* Result Card */}
-          <div className="card p-8 text-center mb-6">
-            <div className="text-6xl mb-4">{summary.emoji}</div>
-            <h2 className="text-3xl font-bold mb-2">{summary.title}</h2>
-            <p className="text-xl mb-6">{summary.message}</p>
-
-            {/* Season standing after this matchday */}
-            {matchResult.seasonInfo && (
-              <div className="bg-white/10 rounded-lg p-3 mb-6 flex items-center justify-center gap-3 text-sm">
-                <span className="text-white/70">
-                  Spieltag {matchResult.seasonInfo.matchday}/{MATCHDAYS}
-                </span>
-                <span className="font-bold">
-                  Platz {matchResult.seasonInfo.rank}
-                </span>
-                <span className={`${getZoneStyle(getRankZone(matchResult.seasonInfo.rank).zone).text} font-semibold`}>
-                  {getRankZone(matchResult.seasonInfo.rank).label}
-                </span>
-              </div>
-            )}
-
-            {/* Final Score */}
-            <div className="bg-white/10 rounded-lg p-6 mb-6">
-              <ScoreDisplay
-                msvGoals={matchResult.msvGoals}
-                opponentGoals={matchResult.opponentGoals}
-                opponent={opponent}
-              />
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-all">
-                <div className="text-3xl font-bold text-goal">{matchResult.msvGoals}</div>
-                <div className="text-sm text-white/70">⚽ Tore geschossen</div>
-              </div>
-              <div className="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-all">
-                <div className="text-3xl font-bold text-white">{matchResult.accuracy}%</div>
-                <div className="text-sm text-white/70">🎯 Genauigkeit</div>
-              </div>
-              <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg p-4 border-2 border-blue-400/50 animate-pulse-glow hover:scale-105 transition-all">
-                <div className="text-3xl font-bold text-blue-300">+{xpGained} XP</div>
-                <div className="text-sm text-white/70">⭐ Erfahrung gewonnen</div>
-              </div>
-              <div className="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-all">
-                <div className="text-3xl font-bold text-yellow-300">{postMatchLevel || progress.level || 1}</div>
-                <div className="text-sm text-white/70">💪 Dein Level</div>
-              </div>
-            </div>
-
-            {/* Recap of missed words */}
-            {missed.length > 0 && (
-              <div className="bg-white/5 rounded-lg p-4 mb-6 text-left">
-                <div className="font-bold text-white mb-1">
-                  📝 Das übst du noch:
+              {/* Season standing after this matchday */}
+              {matchResult.seasonInfo && (
+                <div className="zut-panel zut-panel--inset p-3 mb-6 flex items-center justify-center gap-3 text-sm">
+                  <span className="text-white/70">
+                    Spieltag {matchResult.seasonInfo.matchday}/{MATCHDAYS}
+                  </span>
+                  <span className="font-bold">
+                    Platz {matchResult.seasonInfo.rank}
+                  </span>
+                  <span className={`${getZoneStyle(getRankZone(matchResult.seasonInfo.rank).zone).text} font-semibold`}>
+                    {getRankZone(matchResult.seasonInfo.rank).label}
+                  </span>
                 </div>
-                {matchResult.extraCorrect > 0 && (
-                  <div className="text-xs text-emerald-300 mb-2">
-                    ⏱️ {matchResult.extraCorrect} von {missed.length} in der Nachspielzeit wiedergutgemacht!
-                  </div>
-                )}
-                <ul className="space-y-1">
-                  {missed.map(vocab => (
-                    <li key={vocab.id} className="text-sm text-white/80 flex justify-between gap-3">
-                      <span className="font-semibold">{vocab.english}</span>
-                      <span className="text-white/60 text-right">{vocab.german}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+              )}
 
-            {/* Continue Button */}
-            <button
-              onClick={handleContinue}
-              className="btn-primary btn-primary--hero w-full"
-            >
-              {continueLabel()}
-            </button>
-            {(cardReward || newAchievements.length > 0) && (
+              {/* Final Score als Broadcast-Bar */}
+              <div className="zut-panel zut-panel--inset px-4 py-5 mb-6">
+                <ScoreDisplay
+                  msvGoals={matchResult.msvGoals}
+                  opponentGoals={matchResult.opponentGoals}
+                  opponent={opponent}
+                  final
+                />
+              </div>
+
+              {/* Stats als ZUT-Panels */}
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="zut-panel zut-panel--inset p-4">
+                  <div className="text-3xl font-bold" style={{ color: 'var(--zut-gold-1)' }}>{matchResult.msvGoals}</div>
+                  <div className="text-sm text-white/70">
+                    <span className="zut-stat-icon"><img src="/img/ball.svg" alt="" width="15" height="15" /></span>
+                    Tore geschossen
+                  </div>
+                </div>
+                <div className="zut-panel zut-panel--inset p-4">
+                  <div className="text-3xl font-bold text-white">{matchResult.accuracy}%</div>
+                  <div className="text-sm text-white/70">
+                    <span className="zut-stat-icon"><TargetGlyph /></span>
+                    Genauigkeit
+                  </div>
+                </div>
+                <div className="zut-panel zut-panel--xp p-4">
+                  <div className="text-3xl font-bold text-blue-300">+{xpGained} XP</div>
+                  <div className="text-sm text-white/70">
+                    <span className="zut-stat-icon"><StarGlyph /></span>
+                    Erfahrung gewonnen
+                  </div>
+                </div>
+                <div className="zut-panel zut-panel--inset p-4">
+                  <div className="text-3xl font-bold" style={{ color: 'var(--zut-gold-2)' }}>{postMatchLevel || progress.level || 1}</div>
+                  <div className="text-sm text-white/70">
+                    <span className="zut-stat-icon"><LevelGlyph /></span>
+                    Dein Level
+                  </div>
+                </div>
+              </div>
+
+              {/* Recap of missed words */}
+              {missed.length > 0 && (
+                <div className="zut-panel zut-panel--inset p-4 mb-6 text-left">
+                  <div className="font-bold text-white mb-1">
+                    Das übst du noch:
+                  </div>
+                  {matchResult.extraCorrect > 0 && (
+                    <div className="text-[13px] text-emerald-300 mb-2">
+                      {matchResult.extraCorrect} von {missed.length} in der Nachspielzeit wiedergutgemacht!
+                    </div>
+                  )}
+                  <ul className="space-y-1">
+                    {missed.map(vocab => (
+                      <li key={vocab.id} className="text-sm text-white/90 flex justify-between gap-3">
+                        <span className="font-semibold">{vocab.english}</span>
+                        <span className="text-white/70 text-right">{vocab.german}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Continue Button */}
               <button
-                onClick={() => onMatchEnd(matchResult)}
-                className="btn-secondary btn-secondary--soft w-full mt-3"
+                onClick={handleContinue}
+                className="btn-primary btn-primary--hero w-full"
               >
-                Direkt zum Stadion
+                {continueLabel()}
               </button>
-            )}
+              {(cardReward || newAchievements.length > 0) && (
+                <button
+                  onClick={() => onMatchEnd(matchResult)}
+                  className="btn-secondary btn-secondary--soft w-full mt-3"
+                >
+                  Direkt zum Stadion
+                </button>
+              )}
+            </div>
+
+            <ShareCard summary={shareSummary} reward={cardReward} />
           </div>
 
-          <ShareCard summary={shareSummary} reward={cardReward} />
+          {/* Achievement Unlocked Modal */}
+          {showingAchievement && newAchievements[showAchievementIndex] && (
+            <AchievementUnlocked
+              achievement={newAchievements[showAchievementIndex]}
+              onClose={handleAchievementClose}
+            />
+          )}
+
+          {/* Confetti for victories */}
+          <ConfettiExplosion trigger={showConfetti} />
+
+          {/* Level Up Notification */}
+          {showLevelUp && leveledUpTo && (
+            <LevelUpNotification
+              newLevel={leveledUpTo}
+              onClose={() => setShowLevelUp(false)}
+            />
+          )}
         </div>
-
-        {/* Achievement Unlocked Modal */}
-        {showingAchievement && newAchievements[showAchievementIndex] && (
-          <AchievementUnlocked
-            achievement={newAchievements[showAchievementIndex]}
-            onClose={handleAchievementClose}
-          />
-        )}
-
-        {/* Confetti for victories */}
-        <ConfettiExplosion trigger={showConfetti} />
-
-        {/* Level Up Notification */}
-        {showLevelUp && leveledUpTo && (
-          <LevelUpNotification
-            newLevel={leveledUpTo}
-            onClose={() => setShowLevelUp(false)}
-          />
-        )}
-      </div>
+      </StadiumScene>
     )
   }
 
@@ -545,71 +626,93 @@ function Match({ progress, onMatchEnd, filters, mode = 'training', seasonOpponen
   const activeIndex = isExtraTime ? extraIndex : currentVocabIndex
   const activeTotal = isExtraTime ? extraVocabs.length : vocabs.length
 
+  // Spielminute aus dem Fragen-Fortschritt (Nachspielzeit: 90+n)
+  const minuteLabel = isExtraTime
+    ? `90+${extraIndex + 1}′`
+    : `${Math.min(90, Math.round(((currentVocabIndex + 1) / Math.max(vocabs.length, 1)) * 90))}′`
+
+  // Kommentator-Zeile — nutzt nur vorhandene Logik/Strings (Anpfiff, TOR-Ruf,
+  // getStreakMessage, Nachspielzeit); dupliziert NICHT den Beispielsatz der Vokabel.
+  const commentary = (() => {
+    if (matchFeedback === 'success') {
+      return isExtraTime
+        ? 'Wiedergutgemacht! Das sitzt!'
+        : 'TOOOR! Der MSV trifft!'
+    }
+    if (matchFeedback === 'miss') {
+      // lange Vereinsnamen würden die einzeilige Zeile abschneiden
+      return `Abgefangen! ${opponent.name.length <= 16 ? opponent.name : 'Der Gegner'} kontert.`
+    }
+    if (isExtraTime) {
+      return `Nachspielzeit! Jede richtige Antwort macht einen Fehler wieder gut (+${EXTRA_TIME_XP} XP).`
+    }
+    if (streakMessage) {
+      return stripEmojis(streakMessage)
+    }
+    if (currentVocabIndex === 0 && msvGoals === 0 && opponentGoals === 0) {
+      return `Anpfiff! MSV Duisburg empfängt ${opponent.name}.`
+    }
+    return 'Der MSV bleibt in Ballbesitz – nächste Vokabel.'
+  })()
+
+  const showMetaRow = (isSeasonMatch && !isExtraTime && seasonMatchday) || (specialMatch && !isExtraTime) || isExtraTime
+
   return (
-    <div className={`min-h-screen flex flex-col p-4 pt-match stadium-scene field-pattern relative ${matchFeedback === 'success' ? 'match-success' : matchFeedback === 'miss' ? 'match-miss' : ''}`}>
-      <div className="goal-feedback-layer">
+    <div className={`min-h-screen flex flex-col p-4 pt-match stadium-scene field-pattern relative zut-focusables ${matchFeedback === 'miss' ? 'zut-shake' : ''}`}>
+      {/* EIN konsolidierter Tor-Beat: Flash (MSV-Blau) + Ball-Flug + Crowd-Welle */}
+      <div className="goal-feedback-layer" aria-hidden="true">
         {matchFeedback === 'success' && (
           <>
-            <div key={`ball-${goalAnimationKey}`} className="goal-ball ball-shoot-hero">
-              ⚽
+            <div key={`flash-${goalAnimationKey}`} className="zut-goal-flash" />
+            <div key={`ball-${goalAnimationKey}`} className="zut-goal-ball">
+              <img src="/img/ball.svg" alt="" />
             </div>
-            <div key={`cheer-${crowdAnimationKey}`} className="crowd-reaction crowd-cheer">
-              🙌🙌🙌
+            <div key={`crowd-${crowdAnimationKey}`} className="zut-crowd">
+              <i className="zut-crowd__glow" />
+              <i className="zut-crowd__heads" />
+              <i className="zut-crowd__wave" />
             </div>
           </>
         )}
         {matchFeedback === 'miss' && (
-          <div key={`groan-${crowdAnimationKey}`} className="crowd-reaction crowd-groan">
-            😬😬😬
-          </div>
+          <div key={`miss-${crowdAnimationKey}`} className="zut-missfx" />
         )}
       </div>
-      {/* Header with Score */}
-      <div className="fixed top-0 left-0 right-0 bg-night/95 backdrop-blur-sm p-4 pt-safe z-10 border-b border-white/10">
+
+      {/* Broadcast-Header: Score-Bar + Kommentator + Meta-Chips */}
+      <div ref={matchHeadRef} className="fixed top-0 left-0 right-0 z-10 pt-safe zut-matchhead">
         <ScoreDisplay
           msvGoals={msvGoals}
           opponentGoals={opponentGoals}
           opponent={opponent}
+          minute={minuteLabel}
+          streak={isExtraTime ? 0 : streak}
         />
-        {isSeasonMatch && !isExtraTime && seasonMatchday && (
-          <div className="mt-1 text-center text-xs text-white/60">
-            📅 Spieltag {seasonMatchday}/{MATCHDAYS}
-          </div>
-        )}
-        {specialMatch && !isExtraTime && (
-          <div className="mt-2 text-center animate-bounce-in">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-400/20 text-yellow-100 border border-yellow-300/40 font-semibold text-sm">
-              {isSeasonMatch ? '🔥 Derby! · +30 XP Bonus' : '⚡ Überraschungs-Derby · +30 XP Bonus'}
-            </div>
-          </div>
-        )}
 
-        {isExtraTime && (
-          <div className="mt-2 text-center animate-bounce-in">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-400/20 text-orange-100 border border-orange-300/40 font-semibold text-sm">
-              ⏱️ Nachspielzeit · Fehler wiedergutmachen (+{EXTRA_TIME_XP} XP)
-            </div>
-          </div>
-        )}
+        {/* Bewusst ohne aria-live: das role="status"-Banner in VocabCard meldet
+            das Antwort-Ergebnis bereits — doppelte Ansagen vermeiden */}
+        <div className="zut-commentary">
+          <span className="zut-commentary__lbl">Kommentator</span>
+          <span className="zut-commentary__txt">„{commentary}“</span>
+        </div>
 
-        {/* Streak Display */}
-        {!isExtraTime && streak > 0 && (
-          <div className="mt-2 text-center animate-fade-in">
-            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 ${getStreakStyle(getStreakTier(streak)).text} ${streak >= 5 ? 'streak-lightning' : streak >= 3 ? 'streak-fire' : ''}`}>
-              <span className="text-2xl">{getStreakStyle(getStreakTier(streak)).emoji}</span>
-              <span className="font-bold">{streak} in Folge!</span>
-              {streak >= 5 && <span className="text-2xl">⚡</span>}
-              {streak >= 3 && streak < 5 && <span className="text-2xl">🔥</span>}
-            </div>
-          </div>
-        )}
-
-        {/* Streak Message */}
-        {!isExtraTime && streakMessage && (
-          <div className="mt-2 text-center animate-bounce-in">
-            <div className="text-sm font-bold text-yellow-300">
-              {streakMessage}
-            </div>
+        {showMetaRow && (
+          <div className="zut-matchmeta">
+            {isSeasonMatch && !isExtraTime && seasonMatchday && (
+              <span className="zut-chip">Spieltag {seasonMatchday}/{MATCHDAYS}</span>
+            )}
+            {specialMatch && !isExtraTime && (
+              <span className="zut-chip zut-chip--gold">
+                <FlameGlyph />
+                {isSeasonMatch ? 'Derby! · +30 XP Bonus' : 'Überraschungs-Derby · +30 XP Bonus'}
+              </span>
+            )}
+            {isExtraTime && (
+              <span className="zut-chip zut-chip--extra">
+                <ClockGlyph />
+                Nachspielzeit · Fehler wiedergutmachen (+{EXTRA_TIME_XP} XP)
+              </span>
+            )}
           </div>
         )}
       </div>

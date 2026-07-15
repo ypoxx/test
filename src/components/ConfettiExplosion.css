@@ -1,0 +1,45 @@
+/* ============================================================
+   ConfettiExplosion — Konfetti-Rechtecke in Vereinsfarben
+   (Blau/Weiß/Gold) statt Emoji-Spans. ZUT Phase 4.
+   ============================================================ */
+
+.zut-confetti {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.zut-confetti__piece {
+  position: absolute;
+  top: -6%;
+  border-radius: 1px;
+  opacity: 0;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.18);
+  animation-name: zutConfettiFall;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes zutConfettiFall {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotateZ(var(--zut-rot0, 0deg)) rotateX(0deg);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--zut-drift, 0px), 108vh, 0) rotateZ(var(--zut-spin, 540deg)) rotateX(540deg);
+  }
+}
+
+/* Reduced Motion: gar kein Konfetti (Anzahl ist zusätzlich in JS 0) */
+@media (prefers-reduced-motion: reduce) {
+  .zut-confetti {
+    display: none;
+  }
+}

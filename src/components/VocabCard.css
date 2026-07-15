@@ -1,0 +1,354 @@
+/* ============================================================
+   VocabCard — Lern-Loop als Spielszene
+   ZUT Phase 4 · Richtung A "Flutlicht-Gold" (scratchpad/design/direction-a.html)
+   Alle Klassen mit vc-Präfix, nur von VocabCard.jsx verwendet.
+   ============================================================ */
+
+/* ---------- Fortschritt: VOKABEL n/m mit Gold-Segmenten ---------- */
+.vc-prog {
+  margin: 2px 2px 12px;
+}
+
+.vc-prog-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+
+.vc-prog-kicker {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: #AFC4E8;
+}
+
+.vc-prog-count {
+  font-size: 15px;
+  font-weight: 900;
+  color: #FFDD66;
+}
+
+.vc-segs {
+  display: flex;
+  gap: 5px;
+}
+
+.vc-seg {
+  flex: 1;
+  height: 9px;
+  border-radius: 3px;
+  transform: skewX(-14deg);
+  background: linear-gradient(180deg, #14264C, #0A1530);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.6), inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.vc-seg--on {
+  background: linear-gradient(180deg, var(--zut-gold-2) 0%, var(--zut-gold-1) 55%, #C8940E 100%);
+  box-shadow: 0 0 8px rgba(255, 203, 45, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* ---------- Frage-Bühne: poliertes Stadion-Schild ---------- */
+.vc-stage {
+  position: relative;
+  border-radius: 20px;
+  padding: 16px 16px 18px;
+  background: linear-gradient(175deg, rgba(20, 40, 86, 0.92) 0%, rgba(9, 20, 46, 0.94) 100%);
+  border: 1px solid rgba(150, 180, 230, 0.3);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 18px 34px rgba(0, 0, 0, 0.55);
+}
+
+.vc-stage::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 18%;
+  right: 18%;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255, 203, 45, 0), var(--zut-gold-2) 50%, rgba(255, 203, 45, 0));
+}
+
+.vc-coach {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vc-coach-pic {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex: none;
+  box-shadow: 0 0 0 2px var(--zut-gold-1), 0 0 14px rgba(255, 203, 45, 0.35), 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.vc-coach-pic img {
+  width: 100%;
+  height: 190%;
+  object-fit: cover;
+  object-position: 50% 0%;
+  display: block;
+}
+
+.vc-kicker {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  color: #AFC4E8;
+}
+
+.vc-word {
+  margin-top: 10px;
+  text-align: center;
+  font-weight: 900;
+  font-style: italic;
+  font-size: clamp(30px, 10vw, 44px);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  line-height: 1.05;
+  overflow-wrap: break-word;
+  background: linear-gradient(180deg, #FFF6D8 0%, var(--zut-gold-1) 60%, #C8940E 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.65));
+}
+
+.vc-word--long {
+  font-size: clamp(22px, 7.2vw, 32px);
+}
+
+.vc-rule {
+  margin: 12px auto 10px;
+  width: 60%;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(175, 196, 232, 0), rgba(175, 196, 232, 0.5), rgba(175, 196, 232, 0));
+}
+
+.vc-sentence {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 500;
+  font-style: italic;
+  color: #C9D8F4;
+  line-height: 1.45;
+}
+
+.vc-sentence b {
+  color: #FFDD66;
+  font-weight: 800;
+  font-style: italic;
+}
+
+/* ---------- Antwort-Buttons als Metallschilder ---------- */
+.vc-answers {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.vc-answer {
+  min-height: 56px;
+  width: 100%;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 8px 14px;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+  background: linear-gradient(180deg, #1E3866 0%, #10224A 55%, #0B1936 100%);
+  border: 1px solid rgba(150, 180, 230, 0.34);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 -3px 8px rgba(0, 0, 0, 0.5), 0 6px 14px rgba(0, 0, 0, 0.45);
+  transition: transform var(--zut-dur-fast) ease, box-shadow var(--zut-dur-fast) ease, border-color var(--zut-dur-fast) ease;
+}
+
+.vc-answer:not(:disabled):active {
+  transform: scale(0.965);
+  border-color: rgba(255, 203, 45, 0.75);
+  box-shadow: 0 0 18px rgba(255, 203, 45, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 -3px 8px rgba(0, 0, 0, 0.5);
+}
+
+.vc-answer:focus-visible {
+  outline: 3px solid var(--zut-gold-2);
+  outline-offset: 2px;
+}
+
+.vc-akey {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 900;
+  color: #2A1D04;
+  background: linear-gradient(160deg, var(--zut-gold-2) 0%, var(--zut-gold-1) 55%, #C8940E 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.vc-atext {
+  flex: 1;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #F2F6FF;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.vc-glyph {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Feedback: richtig — Gold/Grün-Folie + Check-Glyph */
+.vc-answer--correct {
+  border-color: rgba(134, 239, 172, 0.9);
+  background:
+    linear-gradient(160deg, rgba(255, 226, 122, 0.22) 0%, rgba(255, 226, 122, 0) 45%),
+    linear-gradient(180deg, #1E5C40 0%, #123D2C 55%, #0C2C20 100%);
+  box-shadow: 0 0 18px rgba(74, 222, 128, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.vc-answer--correct .vc-glyph {
+  background: linear-gradient(160deg, var(--zut-gold-2) 0%, #22C55E 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+/* kurzer Puls nur auf der selbst gewählten richtigen Antwort */
+@keyframes vcCorrectPulse {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+.vc-answer--picked.vc-answer--correct {
+  animation: vcCorrectPulse 0.45s ease-out;
+}
+
+/* Feedback: falsch — roter Rand + Kreuz-Glyph */
+.vc-answer--wrong {
+  border-color: rgba(248, 113, 113, 0.95);
+  background: linear-gradient(180deg, #4A1A22 0%, #33121A 55%, #260D13 100%);
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.vc-answer--wrong .vc-glyph {
+  background: #DC2626;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+/* übrige Optionen gedimmt, aber weiter lesbar (Kontrast >= 4.5:1) */
+.vc-answer--dim {
+  border-color: rgba(150, 180, 230, 0.16);
+  background: linear-gradient(180deg, #122241 0%, #0B1731 100%);
+  box-shadow: none;
+}
+
+.vc-answer--dim .vc-atext {
+  color: #8FA3C8;
+  text-shadow: none;
+}
+
+.vc-answer--dim .vc-akey {
+  background: linear-gradient(160deg, #3A4A6C, #232F4C);
+  color: #AFC4E8;
+  box-shadow: none;
+}
+
+/* ---------- Ergebnis-Banner (ersetzt die alte Feedback-Karte) ---------- */
+@keyframes vcBannerIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.vc-banner {
+  margin-top: 14px;
+  border-radius: 16px;
+  padding: 12px 16px 13px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  animation: vcBannerIn 0.35s ease-out;
+}
+
+.vc-banner--goal {
+  background: linear-gradient(175deg, rgba(28, 48, 34, 0.92), rgba(10, 26, 18, 0.94));
+  border: 1px solid rgba(255, 203, 45, 0.55);
+  box-shadow: 0 0 20px rgba(255, 203, 45, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.vc-banner--miss {
+  background: linear-gradient(175deg, rgba(56, 20, 26, 0.92), rgba(28, 10, 14, 0.94));
+  border: 1px solid rgba(248, 113, 113, 0.6);
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.vc-banner-title {
+  font-size: 30px;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+  text-transform: uppercase;
+  background: linear-gradient(180deg, #FFF6D8 0%, var(--zut-gold-1) 55%, #C8940E 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+}
+
+.vc-banner-title--miss {
+  background: linear-gradient(180deg, #FFE5E5 0%, #FCA5A5 60%, #E05252 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.vc-banner-sub {
+  font-size: 15px;
+  font-weight: 700;
+  color: #E7EEFB;
+}
+
+.vc-banner-vocab {
+  font-size: 13px;
+  font-weight: 600;
+  color: #AFC4E8;
+}
+
+/* ---------- Reduced Motion: statische Endzustände ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .vc-answer {
+    transition: none;
+  }
+
+  .vc-answer:not(:disabled):active {
+    transform: none;
+  }
+
+  .vc-answer--picked.vc-answer--correct {
+    animation: none;
+  }
+
+  .vc-banner {
+    animation: none;
+  }
+}

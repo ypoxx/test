@@ -1,23 +1,11 @@
-import { useState, useEffect, lazy, Suspense } from 'react'
+import { useState, useEffect } from 'react'
 import Welcome from './components/Welcome'
 import Stadium from './components/Stadium'
 import Match from './components/Match'
 import { loadProgress, loadSoundPreference, saveSoundPreference } from './utils/localStorage'
 import soundManager from './utils/sounds'
 
-// Dev-Galerie (Phase 3, ZUT-Umbau) — lazy, damit sie nicht ins Haupt-Bundle drückt
-const ZutGallery = lazy(() => import('./components/ZutGallery'))
-
 function App() {
-  // Dev-Galerie hinter Query-Param (?zut-gallery) — vor allen Hooks, der
-  // Query-Param ändert sich innerhalb einer Mount-Lebenszeit nie.
-  if (new URLSearchParams(window.location.search).has('zut-gallery')) {
-    return (
-      <Suspense fallback={null}>
-        <ZutGallery />
-      </Suspense>
-    )
-  }
 
   const [gameState, setGameState] = useState('welcome') // 'welcome', 'stadium', or 'match'
   const [progress, setProgress] = useState(null)

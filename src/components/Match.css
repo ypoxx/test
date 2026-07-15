@@ -1,0 +1,341 @@
+/* ============================================================
+   Match — Broadcast-Look + konsolidierter Tor-Beat (ZUT Phase 4)
+   Palette: Flutlicht-Gold (direction-a.html), Tokens --zut-* aus
+   src/index.css. Eigene Keyframes (keine Abhängigkeit von den
+   Alt-Keyframes in index.css).
+   ============================================================ */
+
+/* ---------- Fixed Broadcast-Header ---------- */
+.zut-matchhead {
+  background: linear-gradient(180deg, rgba(4, 13, 36, 0.97), rgba(6, 17, 40, 0.92));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 203, 45, 0.28);
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  padding-bottom: 0.5rem;
+}
+
+/* Kommentator-Zeile */
+.zut-commentary {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 10px;
+  min-height: 20px;
+}
+
+.zut-commentary__lbl {
+  flex: none;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--zut-gold-1, #FFCB2D);
+  border-left: 3px solid var(--zut-gold-1, #FFCB2D);
+  padding-left: 6px;
+}
+
+.zut-commentary__txt {
+  font-size: 13px;
+  font-weight: 600;
+  font-style: italic;
+  color: #C9D8F4;
+  letter-spacing: 0.02em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+
+/* Meta-Chips (Spieltag / Derby / Nachspielzeit) */
+.zut-matchmeta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.zut-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #E7EEFB;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.zut-chip svg {
+  flex: none;
+}
+
+.zut-chip--gold {
+  color: var(--zut-gold-2, #FFE27A);
+  background: rgba(255, 203, 45, 0.14);
+  border-color: rgba(255, 203, 45, 0.5);
+}
+
+.zut-chip--extra {
+  color: #FFD9A8;
+  background: rgba(255, 150, 60, 0.14);
+  border-color: rgba(255, 170, 90, 0.5);
+}
+
+/* ---------- Tor-Beat: EINE Choreografie ---------- */
+
+/* Screen-Flash in MSV-Blau (Token --zut-msv, NICHT grün) */
+.zut-goal-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background: radial-gradient(
+    120% 90% at 50% 30%,
+    rgba(var(--zut-msv-hi-rgb, 10 122 209), 0.55) 0%,
+    rgba(var(--zut-msv-rgb, 0 92 169), 0.3) 45%,
+    transparent 75%
+  );
+  opacity: 0;
+  animation: zutFlash 0.65s ease-out forwards;
+}
+
+@keyframes zutFlash {
+  0% { opacity: 0; }
+  25% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Ball (public/img/ball.svg) fliegt mit Motion-Blur-Trail über die Bühne */
+.zut-goal-ball {
+  position: absolute;
+  bottom: 20%;
+  left: 6%;
+  width: 54px;
+  height: 54px;
+  opacity: 0;
+  animation: zutBallFly 1.4s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* Trail: zeigt entgegen der Flugrichtung (nach unten links) */
+.zut-goal-ball::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 55%;
+  width: 150px;
+  height: 13px;
+  border-radius: 999px;
+  transform: translateY(-50%) rotate(-32deg);
+  transform-origin: right center;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(var(--zut-msv-hi-rgb, 10 122 209), 0.35) 45%,
+    rgba(255, 255, 255, 0.7)
+  );
+  filter: blur(3px);
+}
+
+.zut-goal-ball img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.5));
+  animation: zutBallSpin 1.4s linear;
+}
+
+@keyframes zutBallFly {
+  0% {
+    transform: translate(0, 0) scale(0.55);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  55% {
+    transform: translate(58vw, -38vh) scale(1.25);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(88vw, -62vh) scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes zutBallSpin {
+  to { transform: rotate(720deg); }
+}
+
+/* Crowd-Reaktion: Silhouetten-Band + Licht-Welle statt Emoji */
+.zut-crowd {
+  position: absolute;
+  top: 14%;
+  left: 0;
+  right: 0;
+  height: 96px;
+  overflow: hidden;
+  opacity: 0;
+  animation: zutCrowdPulse 1s ease-out forwards;
+  -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 55%, transparent 100%);
+}
+
+.zut-crowd__glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 130% at 50% 0%, rgba(255, 214, 110, 0.4), transparent 70%);
+}
+
+/* Zwei versetzte Kopf-Reihen als Silhouette */
+.zut-crowd__heads {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 9px 12px, rgba(6, 14, 33, 0.95) 7px, transparent 8px),
+    radial-gradient(circle at 27px 26px, rgba(9, 20, 44, 0.95) 8px, transparent 9px);
+  background-size: 36px 30px;
+}
+
+.zut-crowd__wave {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 25%,
+    rgba(255, 224, 122, 0.5) 45%,
+    rgba(255, 255, 255, 0.7) 50%,
+    rgba(255, 203, 45, 0.4) 55%,
+    transparent 75%
+  );
+  mix-blend-mode: screen;
+  transform: translateX(-70%);
+  animation: zutCrowdSweep 1s ease-out forwards;
+}
+
+@keyframes zutCrowdSweep {
+  to { transform: translateX(70%); }
+}
+
+@keyframes zutCrowdPulse {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  75% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ---------- Fehler-Feedback: roter Rand-Glow + Shake ---------- */
+.zut-missfx {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 0 3px rgba(239, 68, 68, 0.55),
+    inset 0 0 70px 12px rgba(239, 68, 68, 0.3);
+  opacity: 0;
+  animation: zutMissFade 0.7s ease-out forwards;
+}
+
+@keyframes zutMissFade {
+  0% { opacity: 0; }
+  25% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.zut-shake {
+  animation: zutShake 0.45s ease-in-out;
+}
+
+@keyframes zutShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+}
+
+/* ---------- Ergebnis-Screen: ZUT-Panels mit Gold-Hairlines ---------- */
+.zut-panel {
+  position: relative;
+  border-radius: var(--zut-radius-md, 1rem);
+  border: 1px solid rgba(255, 203, 45, 0.32);
+  background: linear-gradient(170deg, rgba(13, 26, 52, 0.88), rgba(6, 14, 31, 0.9));
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 226, 122, 0.14);
+}
+
+.zut-panel--main {
+  border-radius: var(--zut-radius-lg, 1.5rem);
+}
+
+.zut-panel--inset {
+  border-color: rgba(255, 203, 45, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: none;
+}
+
+.zut-panel--xp {
+  border-color: rgba(120, 190, 255, 0.55);
+  box-shadow:
+    var(--zut-glow-msv, 0 6px 20px rgba(0, 92, 169, 0.45)),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.zut-eyebrow {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--zut-gold-1, #FFCB2D);
+}
+
+.zut-result-title {
+  font-size: 2.1rem;
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+  text-shadow:
+    2px 2px 0 #051233,
+    0 0 18px rgba(255, 203, 45, 0.35);
+}
+
+.zut-stat-icon {
+  display: inline-flex;
+  vertical-align: -3px;
+  margin-right: 4px;
+  color: currentColor;
+}
+
+/* Sichtbarer Fokus-Ring für alle Interaktionen im Match-Flow */
+.zut-focusables button:focus-visible {
+  outline: 3px solid var(--zut-gold-1, #FFCB2D);
+  outline-offset: 2px;
+}
+
+/* ---------- Reduced Motion: statische Endzustände ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .zut-goal-flash,
+  .zut-goal-ball,
+  .zut-crowd {
+    display: none;
+  }
+
+  .zut-missfx {
+    animation: none;
+    opacity: 0.55;
+  }
+
+  .zut-shake {
+    animation: none;
+  }
+}
