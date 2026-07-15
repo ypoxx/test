@@ -10,7 +10,8 @@ import { selectVocabsForMatch, filterByCategory, filterByDifficulty } from '../u
 import { selectRandomOpponent, getDerbyOpponents, calculateMatchResult, getMatchSummaryMessage, ANSWER_DELAY_CORRECT, ANSWER_DELAY_WRONG } from '../utils/matchLogic'
 import { updateVocabProgress, updateGoalsAndLeague, addMatchToHistory, loadProgress, unlockAchievement, addXP, updateDailyStreak, loadLastOpponentName, saveLastOpponentName } from '../utils/localStorage'
 import { generateMultipleChoiceOptions } from '../utils/multipleChoice'
-import { calculateStreakBonus, getStreakMessage, getStreakEmoji, getStreakColor, triggerHapticFeedback } from '../utils/gameEffects'
+import { calculateStreakBonus, getStreakMessage, getStreakTier, triggerHapticFeedback } from '../utils/gameEffects'
+import { getZoneStyle, getStreakStyle } from './zoneStyles'
 import { checkNewAchievements } from '../utils/achievements'
 import { calculateXPReward } from '../utils/xpSystem'
 import CardReveal from './CardReveal'
@@ -438,9 +439,9 @@ function Match({ progress, onMatchEnd, filters, mode = 'training', seasonOpponen
                   Spieltag {matchResult.seasonInfo.matchday}/{MATCHDAYS}
                 </span>
                 <span className="font-bold">
-                  {getRankZone(matchResult.seasonInfo.rank).emoji} Platz {matchResult.seasonInfo.rank}
+                  Platz {matchResult.seasonInfo.rank}
                 </span>
-                <span className={`${getRankZone(matchResult.seasonInfo.rank).color} font-semibold`}>
+                <span className={`${getZoneStyle(getRankZone(matchResult.seasonInfo.rank).zone).text} font-semibold`}>
                   {getRankZone(matchResult.seasonInfo.rank).label}
                 </span>
               </div>
@@ -594,8 +595,8 @@ function Match({ progress, onMatchEnd, filters, mode = 'training', seasonOpponen
         {/* Streak Display */}
         {!isExtraTime && streak > 0 && (
           <div className="mt-2 text-center animate-fade-in">
-            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 ${getStreakColor(streak)} ${streak >= 5 ? 'streak-lightning' : streak >= 3 ? 'streak-fire' : ''}`}>
-              <span className="text-2xl">{getStreakEmoji(streak)}</span>
+            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 ${getStreakStyle(getStreakTier(streak)).text} ${streak >= 5 ? 'streak-lightning' : streak >= 3 ? 'streak-fire' : ''}`}>
+              <span className="text-2xl">{getStreakStyle(getStreakTier(streak)).emoji}</span>
               <span className="font-bold">{streak} in Folge!</span>
               {streak >= 5 && <span className="text-2xl">⚡</span>}
               {streak >= 3 && streak < 5 && <span className="text-2xl">🔥</span>}

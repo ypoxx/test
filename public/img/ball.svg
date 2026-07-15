@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Fußball">
+  <defs>
+    <radialGradient id="ballWhite" cx=".38" cy=".32" r=".85">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset=".65" stop-color="#EDF3FA"/>
+      <stop offset="1" stop-color="#C6D2E2"/>
+    </radialGradient>
+    <linearGradient id="goldRing" x1="0" y1="0" x2=".75" y2="1">
+      <stop offset="0" stop-color="#FFE27A"/>
+      <stop offset=".5" stop-color="#FFCB2D"/>
+      <stop offset="1" stop-color="#B8860B"/>
+    </linearGradient>
+    <clipPath id="ballClip"><circle cx="50" cy="50" r="45.5"/></clipPath>
+  </defs>
+
+  <!-- Korpus -->
+  <circle cx="50" cy="50" r="46" fill="url(#ballWhite)"/>
+
+  <g clip-path="url(#ballClip)">
+    <!-- Bodenschatten im Ball -->
+    <ellipse cx="50" cy="78" rx="52" ry="30" fill="#0A1F44" opacity=".10"/>
+
+    <!-- Nähte: von Pentagon-Ecken nach außen -->
+    <g stroke="#0F2247" stroke-width="2.4" stroke-linecap="round">
+      <path d="M50 33 L50 21.5"/>
+      <path d="M50 33 L50 21.5" transform="rotate(72 50 50)"/>
+      <path d="M50 33 L50 21.5" transform="rotate(144 50 50)"/>
+      <path d="M50 33 L50 21.5" transform="rotate(216 50 50)"/>
+      <path d="M50 33 L50 21.5" transform="rotate(288 50 50)"/>
+    </g>
+
+    <!-- Rand-Panels -->
+    <g fill="#0F2247">
+      <path d="M38.5 9 L50 0 L61.5 9 L57.5 22.5 L42.5 22.5 Z"/>
+      <path d="M38.5 9 L50 0 L61.5 9 L57.5 22.5 L42.5 22.5 Z" transform="rotate(72 50 50)"/>
+      <path d="M38.5 9 L50 0 L61.5 9 L57.5 22.5 L42.5 22.5 Z" transform="rotate(144 50 50)"/>
+      <path d="M38.5 9 L50 0 L61.5 9 L57.5 22.5 L42.5 22.5 Z" transform="rotate(216 50 50)"/>
+      <path d="M38.5 9 L50 0 L61.5 9 L57.5 22.5 L42.5 22.5 Z" transform="rotate(288 50 50)"/>
+    </g>
+
+    <!-- Zentrales Pentagon -->
+    <path d="M50 33 L66.2 44.8 L60 63.8 L40 63.8 L33.8 44.8 Z" fill="#0F2247"/>
+
+    <!-- Glanzlicht -->
+    <path d="M18 34 A 36 36 0 0 1 42 12" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" opacity=".35"/>
+  </g>
+
+  <!-- Gold-Kontur -->
+  <circle cx="50" cy="50" r="46" fill="none" stroke="url(#goldRing)" stroke-width="2.6"/>
+</svg>

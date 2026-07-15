@@ -1,4 +1,5 @@
 import { getSeasonReward, getRankZone } from '../utils/season'
+import { getZoneStyle } from './zoneStyles'
 
 /**
  * End-of-season overlay: final rank, reward, start of the next season.
@@ -11,7 +12,6 @@ function SeasonSummary({ season, onNextSeason }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
       <div className="w-full max-w-md card p-8 text-center animate-bounce-in">
-        <div className="text-6xl mb-3">{zone.emoji}</div>
         <div className="text-sm uppercase tracking-widest text-white/60 mb-1">
           Saison {season.seasonNumber} beendet
         </div>
@@ -19,7 +19,7 @@ function SeasonSummary({ season, onNextSeason }) {
         <p className="text-white/80 mb-6">{reward.message}</p>
 
         <div className="bg-white/10 rounded-lg p-4 mb-4">
-          <div className={`text-4xl font-bold mb-1 ${zone.color}`}>Platz {rank}</div>
+          <div className={`text-4xl font-bold mb-1 ${getZoneStyle(zone.zone).text}`}>Platz {rank}</div>
           <div className="text-white/70 text-sm">{points} Punkte · {gf}:{ga} Tore</div>
           <div className="text-white/60 text-xs mt-1">
             {wins} Siege · {draws} Unentschieden · {losses} Niederlagen

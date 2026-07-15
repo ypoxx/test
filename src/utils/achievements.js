@@ -1,6 +1,7 @@
 /**
  * Achievement and Badge System
  */
+import { getRarity } from './rarity'
 
 // matchHistory is capped at 20 entries, so lifetime counts must use the
 // dedicated counter (with the history length as fallback for old saves).
@@ -265,24 +266,15 @@ export const getUnlockedAchievements = (progress) => {
 }
 
 /**
- * Get rarity color
- * @param {string} rarity - Achievement rarity
- * @returns {string} - Tailwind color classes
+ * Get the semantic rarity tier (Single Source of Truth: utils/rarity.js).
+ *
+ * Liefert nur einen semantischen Key — das UI-Mapping (Badge-Klassen)
+ * liegt in src/components/zoneStyles.js (getRarityBadgeClass).
+ *
+ * @param {string} rarity - Achievement rarity ('common'|'rare'|'epic'|'legendary')
+ * @returns {'bronze'|'silver'|'gold'|'holo'} - Semantic tier key
  */
-export const getRarityColor = (rarity) => {
-  switch (rarity) {
-    case 'common':
-      return 'bg-gray-500 border-gray-400'
-    case 'rare':
-      return 'bg-blue-500 border-blue-400'
-    case 'epic':
-      return 'bg-purple-500 border-purple-400'
-    case 'legendary':
-      return 'bg-gradient-to-r from-yellow-400 to-orange-500 border-yellow-300'
-    default:
-      return 'bg-gray-500'
-  }
-}
+export const getRarityTier = (rarity) => getRarity(rarity).tier
 
 /**
  * Get rarity label

@@ -35,27 +35,19 @@ export const getStreakMessage = (streak) => {
 }
 
 /**
- * Get streak emoji based on current streak
+ * Get the semantic streak tier for the current streak.
+ *
+ * Liefert nur einen semantischen Key — kein Emoji, keine CSS-Klasse.
+ * Das UI-Mapping (Farbe/Emoji) liegt in src/components/zoneStyles.js.
+ *
  * @param {number} streak - Current streak count
- * @returns {string} - Emoji
+ * @returns {'fire'|'lightning'|'sparkle'|'base'} - Semantic tier key
  */
-export const getStreakEmoji = (streak) => {
-  if (streak >= 5) return '🔥'
-  if (streak >= 3) return '⚡'
-  if (streak >= 2) return '✨'
-  return '⚽'
-}
-
-/**
- * Get streak color based on current streak
- * @param {number} streak - Current streak count
- * @returns {string} - Tailwind color class
- */
-export const getStreakColor = (streak) => {
-  if (streak >= 5) return 'text-orange-500'
-  if (streak >= 3) return 'text-yellow-400'
-  if (streak >= 2) return 'text-blue-400'
-  return 'text-white'
+export const getStreakTier = (streak) => {
+  if (streak >= 5) return 'fire'
+  if (streak >= 3) return 'lightning'
+  if (streak >= 2) return 'sparkle'
+  return 'base'
 }
 
 /**

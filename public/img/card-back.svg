@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 350" role="img" aria-label="Kartenrückseite">
+  <defs>
+    <linearGradient id="navy" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0C1E44"/>
+      <stop offset=".5" stop-color="#071331"/>
+      <stop offset="1" stop-color="#040B20"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2=".75" y2="1">
+      <stop offset="0" stop-color="#FFE27A"/>
+      <stop offset=".45" stop-color="#FFCB2D"/>
+      <stop offset=".72" stop-color="#B8860B"/>
+      <stop offset="1" stop-color="#FFDF74"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".46" r=".6">
+      <stop offset="0" stop-color="#FFD66E" stop-opacity=".2"/>
+      <stop offset=".6" stop-color="#FFCB2D" stop-opacity=".05"/>
+      <stop offset="1" stop-color="#FFCB2D" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="zstripes" width="34" height="34" patternUnits="userSpaceOnUse" patternTransform="rotate(-28)">
+      <rect width="34" height="34" fill="none"/>
+      <rect width="14" height="34" fill="#FFFFFF" opacity=".04"/>
+    </pattern>
+    <clipPath id="cardClip"><rect x="3" y="3" width="244" height="344" rx="18"/></clipPath>
+    <clipPath id="shieldClip">
+      <path d="M60 11 L106 23 V61 C106 90 88 112 60 126 C32 112 14 90 14 61 V23 Z"/>
+    </clipPath>
+    <clipPath id="headClip">
+      <path d="M28 88 C24 84 23 78 25 73 C27 66 32 57 38 50 C43 43 48 37 54 33 L57 31 L60 16 L66 29 C74 32 80 39 84 50 C89 63 91 82 91 100 L91 130 L50 130 C50 112 46 99 39 94 C34 90 30 90 28 88 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- Grund -->
+  <rect x="3" y="3" width="244" height="344" rx="18" fill="url(#navy)"/>
+  <g clip-path="url(#cardClip)">
+    <rect x="3" y="3" width="244" height="344" fill="url(#zstripes)"/>
+    <ellipse cx="125" cy="165" rx="150" ry="160" fill="url(#glow)"/>
+  </g>
+
+  <!-- Gold-Hairline-Rahmen -->
+  <rect x="3.75" y="3.75" width="242.5" height="342.5" rx="17.5" fill="none" stroke="url(#gold)" stroke-width="1.5"/>
+  <rect x="12" y="12" width="226" height="326" rx="12" fill="none" stroke="#FFCB2D" stroke-opacity=".38" stroke-width=".8"/>
+
+  <!-- Ecken-Akzente -->
+  <g stroke="#FFCB2D" stroke-width="1.4" stroke-opacity=".8" fill="none" stroke-linecap="round">
+    <path d="M22 34 V24 Q22 22 24 22 H34"/>
+    <path d="M216 22 H226 Q228 22 228 24 V34"/>
+    <path d="M228 316 V326 Q228 328 226 328 H216"/>
+    <path d="M34 328 H24 Q22 328 22 326 V316"/>
+  </g>
+
+  <!-- Zebra-Wappen-Silhouette (einfarbig Gold) -->
+  <g transform="translate(58 98) scale(1.12)">
+    <path d="M60 4 L112 18 V62 C112 95 91 119 60 134 C29 119 8 95 8 62 V18 Z" fill="#FFCB2D" opacity=".07"/>
+    <path d="M60 4 L112 18 V62 C112 95 91 119 60 134 C29 119 8 95 8 62 V18 Z" fill="none" stroke="url(#gold)" stroke-width="2.4"/>
+    <path d="M60 11 L106 23 V61 C106 90 88 112 60 126 C32 112 14 90 14 61 V23 Z" fill="none" stroke="#FFCB2D" stroke-opacity=".4" stroke-width=".8"/>
+    <g clip-path="url(#shieldClip)">
+      <!-- Kopf gold -->
+      <path fill="#FFCB2D" opacity=".92" d="M28 88 C24 84 23 78 25 73 C27 66 32 57 38 50 C43 43 48 37 54 33 L57 31 L60 16 L66 29 C74 32 80 39 84 50 C89 63 91 82 91 100 L91 130 L50 130 C50 112 46 99 39 94 C34 90 30 90 28 88 Z"/>
+      <!-- Streifen in Grundfarbe -->
+      <g clip-path="url(#headClip)" fill="none" stroke="#071331" stroke-linecap="round">
+        <path d="M44 132 Q49 108 62 96" stroke-width="6.5"/>
+        <path d="M57 132 Q61 114 72 102" stroke-width="6.5"/>
+        <path d="M70 132 Q73 118 82 108" stroke-width="6.5"/>
+        <path d="M45 80 Q52 74 56 64" stroke-width="4.5"/>
+        <path d="M36 57 Q42 60 46 66" stroke-width="3.2"/>
+        <path d="M31 66 Q37 68 41 74" stroke-width="3.2"/>
+      </g>
+      <!-- Mähne -->
+      <path fill="#071331" d="M64 27 C72 31 78.5 40 82 51 C86.5 63.5 88.5 82 88.5 100 L88.5 130 L77 130 L80 112 L72 109 L77 96 L69 93 L74 80 L66 77 L71 64 L63 61 L68 49 L59 45 L64 36 L57 33 L57 31 L60 16 L66 29 Z"/>
+      <!-- Ohr innen -->
+      <path d="M58.5 28 L60.5 20 L64.5 27.5 Z" fill="#FFCB2D"/>
+      <!-- Maul -->
+      <path fill="#071331" d="M28 88 C24 84 23 78 25 73 C26 69 28 65 31 61 C36 63.5 40 69 41 75 C42 83 37 89 31.5 89 Z"/>
+      <!-- Auge -->
+      <circle cx="47.5" cy="47" r="2.7" fill="#071331"/>
+    </g>
+  </g>
+
+  <!-- Wortmarke unten -->
+  <path d="M85 302 H165" stroke="url(#gold)" stroke-width="1" opacity=".7"/>
+  <text x="126" y="322" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="11" font-weight="800" letter-spacing="5" fill="#D9C77E">MSV · VOKABEL</text>
+  <!-- Sterne oben -->
+  <g fill="#FFCB2D" opacity=".9">
+    <path d="M125 30 l2.4 5 5.4.7 -3.9 3.8 .9 5.4 -4.8 -2.5 -4.8 2.5 .9 -5.4 -3.9 -3.8 5.4 -.7 Z"/>
+  </g>
+</svg>

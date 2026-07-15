@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
-import { getRarityColor, getRarityLabel } from '../utils/achievements'
+import { getRarityTier, getRarityLabel } from '../utils/achievements'
+import { getRarityBadgeClass } from './zoneStyles'
 import { triggerHapticFeedback } from '../utils/gameEffects'
 import soundManager from '../utils/sounds'
 
@@ -29,7 +30,7 @@ function AchievementUnlocked({ achievement, onClose }) {
             <div className="text-sm font-bold uppercase tracking-wider text-white/60 mb-2">
               Trophäe freigeschaltet!
             </div>
-            <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${getRarityColor(achievement.rarity)}`}>
+            <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${getRarityBadgeClass(getRarityTier(achievement.rarity))}`}>
               {getRarityLabel(achievement.rarity)}
             </div>
           </div>

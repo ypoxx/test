@@ -11,6 +11,7 @@ import { getVocabStats } from '../utils/spacedRepetition'
 import vocabsData from '../data/vocabs.json'
 import { exportProgressData, getLeagueProgress, importProgressData, addXP } from '../utils/localStorage'
 import { loadSeason, getNextFixture, getRank, getRankZone, getSeasonReward, startNextSeason, MATCHDAYS } from '../utils/season'
+import { getZoneStyle } from './zoneStyles'
 import { OPPONENTS } from '../utils/matchLogic'
 import { CATEGORIES } from '../utils/categories'
 
@@ -192,8 +193,8 @@ function Stadium({ progress, onStartMatch, onProgressReset, onProgressRefresh })
               <div className="text-sm uppercase tracking-wide text-white/70">
                 📅 Saison {season.seasonNumber} · Spieltag {Math.min(season.currentMatchday, MATCHDAYS)}/{MATCHDAYS}
               </div>
-              <div className={`text-lg font-bold ${seasonZone.color}`}>
-                {seasonZone.emoji} Platz {seasonRank} · {seasonZone.label}
+              <div className={`text-lg font-bold ${getZoneStyle(seasonZone.zone).text}`}>
+                Platz {seasonRank} · {seasonZone.label}
               </div>
             </div>
             <button

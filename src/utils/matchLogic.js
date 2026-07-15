@@ -3,24 +3,26 @@
  */
 
 // Opponent clubs (17 opponents + MSV = 18 teams -> 34 season matchdays)
+// `short` (Kurzcode) + `badgeHue` (0-360, Grundfarbe für SVG-Badges) sind
+// additiv für das ZUT-Redesign; das `logo`-Emoji bleibt für Alt-Konsumenten.
 export const OPPONENTS = [
-  { name: 'Bayern München', logo: '🔴⚪', difficulty: 'hard' },
-  { name: 'Borussia Dortmund', logo: '🟡⚫', difficulty: 'hard', isDerby: true },
-  { name: 'RB Leipzig', logo: '🔴⚪', difficulty: 'hard' },
-  { name: 'Bayer Leverkusen', logo: '🔴⚫', difficulty: 'medium' },
-  { name: 'VfB Stuttgart', logo: '⚪🔴', difficulty: 'medium' },
-  { name: 'Eintracht Frankfurt', logo: '🔴⚫', difficulty: 'medium' },
-  { name: 'FC Köln', logo: '⚪🔴', difficulty: 'medium' },
-  { name: 'Schalke 04', logo: '🔵⚪', difficulty: 'medium', isDerby: true },
-  { name: 'Werder Bremen', logo: '🟢⚪', difficulty: 'medium' },
-  { name: 'Hamburger SV', logo: '🔵⚪', difficulty: 'medium' },
-  { name: 'Borussia Mönchengladbach', logo: '⚫⚪', difficulty: 'medium', isDerby: true },
-  { name: 'SC Freiburg', logo: '⚫🔴', difficulty: 'medium' },
-  { name: 'VfL Bochum', logo: '🔵⚪', difficulty: 'easy', isDerby: true },
-  { name: 'Fortuna Düsseldorf', logo: '🔴⚪', difficulty: 'easy', isDerby: true },
-  { name: 'FC St. Pauli', logo: '🟤⚪', difficulty: 'easy' },
-  { name: 'Hertha BSC', logo: '🔵⚪', difficulty: 'easy' },
-  { name: '1. FC Union Berlin', logo: '🔴⚪', difficulty: 'easy' }
+  { name: 'Bayern München', logo: '🔴⚪', difficulty: 'hard', short: 'FCB', badgeHue: 350 },
+  { name: 'Borussia Dortmund', logo: '🟡⚫', difficulty: 'hard', isDerby: true, short: 'BVB', badgeHue: 48 },
+  { name: 'RB Leipzig', logo: '🔴⚪', difficulty: 'hard', short: 'RBL', badgeHue: 356 },
+  { name: 'Bayer Leverkusen', logo: '🔴⚫', difficulty: 'medium', short: 'B04', badgeHue: 2 },
+  { name: 'VfB Stuttgart', logo: '⚪🔴', difficulty: 'medium', short: 'VFB', badgeHue: 348 },
+  { name: 'Eintracht Frankfurt', logo: '🔴⚫', difficulty: 'medium', short: 'SGE', badgeHue: 5 },
+  { name: 'FC Köln', logo: '⚪🔴', difficulty: 'medium', short: 'KOE', badgeHue: 352 },
+  { name: 'Schalke 04', logo: '🔵⚪', difficulty: 'medium', isDerby: true, short: 'S04', badgeHue: 217 },
+  { name: 'Werder Bremen', logo: '🟢⚪', difficulty: 'medium', short: 'SVW', badgeHue: 140 },
+  { name: 'Hamburger SV', logo: '🔵⚪', difficulty: 'medium', short: 'HSV', badgeHue: 210 },
+  { name: 'Borussia Mönchengladbach', logo: '⚫⚪', difficulty: 'medium', isDerby: true, short: 'BMG', badgeHue: 145 },
+  { name: 'SC Freiburg', logo: '⚫🔴', difficulty: 'medium', short: 'SCF', badgeHue: 10 },
+  { name: 'VfL Bochum', logo: '🔵⚪', difficulty: 'easy', isDerby: true, short: 'BOC', badgeHue: 222 },
+  { name: 'Fortuna Düsseldorf', logo: '🔴⚪', difficulty: 'easy', isDerby: true, short: 'F95', badgeHue: 358 },
+  { name: 'FC St. Pauli', logo: '🟤⚪', difficulty: 'easy', short: 'STP', badgeHue: 25 },
+  { name: 'Hertha BSC', logo: '🔵⚪', difficulty: 'easy', short: 'BSC', badgeHue: 205 },
+  { name: '1. FC Union Berlin', logo: '🔴⚪', difficulty: 'easy', short: 'FCU', badgeHue: 12 }
 ]
 
 /**
