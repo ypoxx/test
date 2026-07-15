@@ -1,0 +1,508 @@
+/* ============================================================
+   FutCard — FUT-Sammelkarte "Zebra Ultimate Team"
+   Portiert aus scratchpad/design/direction-a.html:
+   .fut/.fut-inner (Schulter-Silhouette), .foil-bronze/-silber/
+   -gold/-legend + .in-* (Folien), .ghost/.ghost-tag/.ghost-lock
+   (Fehlt-Zustand, Mechanik aus direction-b.html: .stk.missing).
+
+   Skalierung: Die Karte skaliert über ihre width — alle inneren
+   Maße in cqw (container-type: inline-size, iOS Safari 16+).
+   Alle Schriftgrößen haben einen 12px-Mindestwert via max().
+   ============================================================ */
+
+.fut-card {
+  position: relative;
+  container-type: inline-size;
+  aspect-ratio: 9 / 14;
+  width: 100%;
+  line-height: 1.2;
+}
+
+/* ---------- Schale (Folie) + Innenfläche — geschwungene Schulter ---------- */
+.fc-shell {
+  position: absolute;
+  inset: 0;
+  border-radius: 26% 26% 13% 13% / 8.5% 8.5% 5% 5%;
+  background: var(--fc-foil);
+  box-shadow: 0 4cqw 9cqw rgba(0, 0, 0, 0.5);
+}
+
+.fc-inner {
+  position: absolute;
+  inset: 1cqw;
+  border-radius: 25% 25% 12.5% 12.5% / 8% 8% 4.6% 4.6%;
+  overflow: hidden;
+  background: var(--fc-inner-bg);
+  color: var(--fc-ink);
+}
+
+/* ---------- Folien-Tiers (Farben aus direction-a.html) ----------
+   Bronze-Innenverlauf endet bewusst heller als im Mockup (#B5713B
+   statt #A05F29), damit die dunkle Schrift unten >= 4.5:1 erreicht. */
+.fc-bronze {
+  --fc-foil: linear-gradient(160deg, #F0B276 0%, #D08B4A 30%, #8A4E22 62%, #C67F3E 86%, #E9A968 100%);
+  --fc-inner-bg:
+    radial-gradient(120% 70% at 50% -14%, rgba(255, 235, 205, 0.55) 0%, rgba(255, 235, 205, 0) 55%),
+    linear-gradient(170deg, #E8A662 0%, #C57E3F 55%, #B5713B 100%);
+  --fc-ink: #231103;
+  --fc-serial: #3A2008;
+  --fc-badge-bg: linear-gradient(160deg, #F7C388 0%, #E9A968 55%, #C67F3E 100%);
+  --fc-badge-ink: #231103;
+  --fc-ring: rgba(90, 50, 15, 0.55);
+  --fc-divider: rgba(58, 30, 8, 0.45);
+}
+
+.fc-silver {
+  --fc-foil: linear-gradient(160deg, #F4F8FC 0%, #C6D2DF 30%, #7C8DA2 62%, #B3C1D1 86%, #E2EAF2 100%);
+  --fc-inner-bg:
+    radial-gradient(120% 70% at 50% -14%, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0) 55%),
+    linear-gradient(170deg, #E9F0F7 0%, #BECBD9 55%, #93A5B9 100%);
+  --fc-ink: #26313F;
+  --fc-serial: #33414F;
+  --fc-badge-bg: linear-gradient(160deg, #F4F8FC 0%, #D5DEE8 55%, #AEBCCC 100%);
+  --fc-badge-ink: #1D2733;
+  --fc-ring: rgba(45, 60, 78, 0.5);
+  --fc-divider: rgba(38, 49, 63, 0.4);
+}
+
+.fc-gold {
+  --fc-foil: linear-gradient(160deg, var(--zut-gold-2, #FFE27A) 0%, var(--zut-gold-1, #FFCB2D) 34%, var(--zut-gold-deep, #B8860B) 66%, #E8B93B 86%, #FFDF74 100%);
+  --fc-inner-bg:
+    radial-gradient(120% 70% at 50% -14%, rgba(255, 246, 214, 0.7) 0%, rgba(255, 246, 214, 0) 55%),
+    linear-gradient(170deg, #FFDD6E 0%, #F0BC33 55%, #C9920F 100%);
+  --fc-ink: #33220B;
+  --fc-serial: #452F0C;
+  --fc-badge-bg: linear-gradient(160deg, var(--zut-gold-2, #FFE27A) 0%, var(--zut-gold-1, #FFCB2D) 55%, #D89A12 100%);
+  --fc-badge-ink: #2A1D04;
+  --fc-ring: rgba(110, 75, 8, 0.55);
+  --fc-divider: rgba(90, 60, 8, 0.45);
+}
+
+.fc-holo {
+  --fc-foil: linear-gradient(160deg, #FFE9A0 0%, var(--zut-gold-1, #FFCB2D) 28%, #8A6210 55%, #FFD75E 78%, #FFF0B8 100%);
+  --fc-inner-bg:
+    conic-gradient(from 205deg at 50% 38%,
+      rgba(122, 162, 255, 0.20), rgba(255, 203, 45, 0.16) 14%, rgba(96, 224, 255, 0.13) 30%,
+      rgba(28, 40, 90, 0) 46%, rgba(255, 203, 45, 0.18) 62%, rgba(150, 120, 255, 0.14) 78%,
+      rgba(122, 162, 255, 0.20)),
+    radial-gradient(130% 80% at 50% -18%, rgba(255, 214, 110, 0.22) 0%, rgba(255, 214, 110, 0) 55%),
+    linear-gradient(172deg, #101B44 0%, #070D26 60%, #05081A 100%);
+  --fc-ink: #FFF3C8;
+  --fc-serial: #C9B87A;
+  --fc-badge-bg: linear-gradient(160deg, var(--zut-gold-2, #FFE27A) 0%, var(--zut-gold-1, #FFCB2D) 55%, #D89A12 100%);
+  --fc-badge-ink: #2A1D04;
+  --fc-ring: rgba(255, 203, 45, 0.55);
+  --fc-divider: rgba(255, 203, 45, 0.4);
+}
+
+/* ---------- Gemeinsame Anatomie ---------- */
+.fc-rating {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.fc-rating-num {
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 0.92;
+}
+
+.fc-rating-pos {
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.fc-crest {
+  position: absolute;
+  z-index: 2;
+  display: block;
+  box-shadow: 0 0 0 1px var(--fc-ring), 0 1cqw 2cqw rgba(0, 0, 0, 0.45);
+}
+
+.fc-art {
+  position: absolute;
+  z-index: 1;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--fc-ring), inset 0 0 8cqw rgba(0, 0, 0, 0.35);
+}
+
+.fc-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 30%;
+}
+
+.fc-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 226, 122, 0.12) 0%, rgba(0, 0, 0, 0) 30%, rgba(4, 8, 26, 0.35) 100%);
+}
+
+/* ================= Variante: REVEAL (große Bühnen-Karte) ================= */
+.fut-card--reveal .fc-rating {
+  top: 6.5cqw;
+  left: 8cqw;
+  align-items: center;
+  gap: 1cqw;
+}
+
+.fut-card--reveal .fc-rating-num { font-size: max(12px, 19cqw); }
+.fut-card--reveal .fc-rating-pos { font-size: max(12px, 6.6cqw); }
+
+.fut-card--reveal .fc-crest {
+  top: 7cqw;
+  right: 8cqw;
+  width: 12.5cqw;
+  height: 12.5cqw;
+  border-radius: 3cqw;
+}
+
+.fut-card--reveal .fc-rating {
+  /* über dem Artwork-Panel — Positions-Kürzel darf nie verdeckt werden */
+  z-index: 3;
+}
+
+.fut-card--reveal .fc-art {
+  /* 32cqw statt 29cqw: unter der vollen Höhe des Rating-Blocks (Zahl+Kürzel) */
+  top: 32cqw;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70cqw;
+  height: 53cqw;
+  border-radius: 5.5cqw;
+}
+
+.fut-card--reveal .fc-lower {
+  position: absolute;
+  z-index: 2;
+  left: 7cqw;
+  right: 7cqw;
+  top: 89cqw;
+  text-align: center;
+}
+
+.fc-divider {
+  height: 2px;
+  margin: 0 3cqw 4cqw;
+  background: linear-gradient(90deg, transparent, var(--fc-divider) 30%, var(--fc-divider) 70%, transparent);
+}
+
+.fut-card--reveal .fc-name {
+  font-size: max(12px, 8.2cqw);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.05;
+  overflow-wrap: break-word;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+/* Lange Namen: kleinere Typo, bis zu zwei Zeilen, kompakterer unterer Block —
+   Schrift darf grundsätzlich nie abgeschnitten werden */
+.fut-card--longname.fut-card--reveal .fc-name {
+  font-size: max(12px, 6.6cqw);
+  line-height: 1.12;
+  letter-spacing: 0.04em;
+}
+
+.fut-card--longname.fut-card--reveal .fc-lower { top: 86.5cqw; }
+.fut-card--longname.fut-card--reveal .fc-badge { margin-top: 1.8cqw; }
+
+.fc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2cqw;
+  margin-top: 2.6cqw;
+  padding: 1.7cqw 5cqw;
+  border-radius: 99px;
+  font-size: max(12px, 4.6cqw);
+  font-weight: 900;
+  letter-spacing: 0.22em;
+  text-indent: 0.22em; /* optischer Ausgleich fürs letter-spacing */
+  color: var(--fc-badge-ink);
+  background: var(--fc-badge-bg);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), 0 1cqw 2cqw rgba(0, 0, 0, 0.35);
+}
+
+.fc-badge svg { display: block; width: 4cqw; min-width: 10px; height: auto; }
+
+.fc-stats {
+  display: flex;
+  justify-content: center;
+  margin-top: 3cqw;
+}
+
+.fc-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6cqw;
+  padding: 0 4.5cqw;
+}
+
+.fc-stat + .fc-stat { border-left: 1px solid var(--fc-divider); }
+
+.fc-stat-k { font-size: max(12px, 4.6cqw); font-weight: 800; letter-spacing: 0.18em; }
+.fc-stat-v { font-size: max(12px, 8.4cqw); font-weight: 900; line-height: 1; }
+
+.fut-card--reveal .fc-serial {
+  position: absolute;
+  z-index: 2;
+  bottom: 3.6cqw;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: max(12px, 4.6cqw);
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  white-space: nowrap;
+  color: var(--fc-serial);
+}
+
+/* Holo-Reveal: Gold-Verlaufstext wie im Mockup (Artboard 2) */
+.fut-card--reveal.fc-holo .fc-rating-num,
+.fut-card--reveal.fc-holo .fc-name {
+  background: linear-gradient(180deg, #FFF6D8 0%, var(--zut-gold-1, #FFCB2D) 60%, #D89A12 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.7));
+}
+
+.fut-card--reveal.fc-holo .fc-stat-k { color: var(--fc-serial); }
+.fut-card--reveal.fc-holo .fc-rating-pos { color: #FFE9A0; }
+
+/* ================= Variante: TILE (Album-Kachel) ================= */
+.fut-card--tile .fc-rating {
+  top: 5cqw;
+  left: 8.5cqw;
+  align-items: flex-start;
+  gap: 1cqw;
+}
+
+.fut-card--tile .fc-rating-num { font-size: max(12px, 16cqw); }
+.fut-card--tile .fc-rating-pos { font-size: max(12px, 10.5cqw); letter-spacing: 0.1em; }
+
+.fut-card--tile .fc-crest {
+  top: 6cqw;
+  right: 8.5cqw;
+  width: 15cqw;
+  height: 15cqw;
+  border-radius: 3.5cqw;
+}
+
+.fut-card--tile .fc-art {
+  top: 36cqw;
+  left: 9cqw;
+  right: 9cqw;
+  height: 57cqw;
+  border-radius: 7cqw;
+}
+
+.fut-card--tile .fc-name {
+  position: absolute;
+  z-index: 2;
+  top: 98cqw;
+  left: 5cqw;
+  right: 5cqw;
+  text-align: center;
+  font-size: max(12px, 9.8cqw);
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  line-height: 1.12;
+  overflow-wrap: break-word;
+  -webkit-hyphens: auto; /* iOS Safari trennt deutsche Komposita (lang="de") */
+  hyphens: auto;
+}
+
+.fut-card--tile .fc-foot {
+  position: absolute;
+  z-index: 2;
+  bottom: 6cqw;
+  left: 6.5cqw;
+  right: 6.5cqw;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2cqw;
+  font-size: max(12px, 9.8cqw);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.fut-card--tile .fc-foot span { white-space: nowrap; }
+
+.fut-card--tile .fc-serial { font-weight: 700; color: var(--fc-serial); }
+.fut-card--tile.fc-holo .fc-foot { color: #FFE9A0; }
+.fut-card--tile.fc-holo .fc-serial { color: var(--fc-serial); }
+
+/* ================= Variante: GHOST (Fehlt-Zustand) =================
+   Panini-Mechanik aus direction-b.html (.stk.missing) im
+   Nachtstadion-Look aus direction-a.html (.ghost). */
+.fut-card--ghost .fc-shell {
+  background: none;
+  border: 2px dashed rgba(255, 203, 45, 0.6);
+  box-shadow: none;
+}
+
+.fut-card--ghost .fc-inner {
+  inset: 2cqw;
+  background: linear-gradient(172deg, rgba(14, 26, 56, 0.92) 0%, rgba(6, 11, 30, 0.96) 100%);
+}
+
+.fc-ghost-tag {
+  position: absolute;
+  z-index: 3;
+  top: 5.5cqw;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  padding: 1.6cqw 6cqw;
+  border-radius: 99px;
+  font-size: max(12px, 10cqw);
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-indent: 0.14em;
+  white-space: nowrap;
+  color: #0A1730;
+  background: linear-gradient(180deg, var(--zut-gold-2, #FFE27A), #E3AC1B);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.fc-ghost-art {
+  position: absolute;
+  z-index: 1;
+  top: 24cqw;
+  left: 9cqw;
+  right: 9cqw;
+  height: 55cqw;
+  border-radius: 7cqw;
+  overflow: hidden;
+}
+
+/* Abgedunkelte Silhouette des Artworks — begehrlich, nicht leer */
+.fc-ghost-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 30%;
+  filter: grayscale(1) brightness(0.48) saturate(0.35) blur(1px);
+}
+
+.fc-ghost-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(80% 80% at 50% 45%, rgba(10, 20, 50, 0.2), rgba(4, 8, 24, 0.6));
+}
+
+.fc-ghost-lock {
+  position: absolute;
+  z-index: 3;
+  top: 51cqw;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 26cqw;
+  height: 26cqw;
+  min-width: 30px;
+  min-height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 10, 28, 0.85);
+  box-shadow: 0 0 0 1px rgba(255, 203, 45, 0.55), 0 0 10cqw rgba(255, 203, 45, 0.3);
+}
+
+.fc-ghost-lock svg { display: block; width: 42%; height: auto; }
+
+.fc-ghost-name {
+  position: absolute;
+  z-index: 2;
+  top: 85cqw;
+  left: 0.5cqw;
+  right: 0.5cqw;
+  text-align: center;
+  font-size: max(12px, 9.5cqw);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  line-height: 1.15;
+  color: #93A6CC;
+  overflow-wrap: break-word;
+  -webkit-hyphens: auto; /* iOS Safari trennt deutsche Komposita (lang="de") */
+  hyphens: auto;
+}
+
+.fut-card--ghost .fc-foot {
+  position: absolute;
+  z-index: 2;
+  bottom: 6cqw;
+  left: 5cqw;
+  right: 5cqw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3cqw;
+  font-size: max(12px, 9.5cqw);
+  font-weight: 800;
+  letter-spacing: 0;
+  color: #93A6CC;
+}
+
+.fut-card--ghost .fc-foot span { white-space: nowrap; }
+
+/* ================= Sheen-Sweep (nur Gold & Holo) =================
+   z-index 1: über Folie/Artwork, unter Text (Lesbarkeit bleibt). */
+.fc-sheen {
+  position: absolute;
+  z-index: 1;
+  top: -25%;
+  bottom: -25%;
+  left: -10%;
+  width: 45%;
+  pointer-events: none;
+  background: linear-gradient(105deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.04) 32%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0.04) 68%,
+    transparent 100%);
+  transform: translateX(-140%) rotate(14deg);
+  animation: fc-sheen-sweep 5.2s ease-in-out infinite;
+}
+
+.fc-holo .fc-sheen {
+  background: linear-gradient(105deg,
+    transparent 0%,
+    rgba(122, 162, 255, 0.10) 30%,
+    rgba(255, 255, 255, 0.42) 48%,
+    rgba(96, 224, 255, 0.14) 62%,
+    transparent 100%);
+}
+
+@keyframes fc-sheen-sweep {
+  0%   { transform: translateX(-140%) rotate(14deg); }
+  55%  { transform: translateX(330%) rotate(14deg); }
+  100% { transform: translateX(330%) rotate(14deg); }
+}
+
+/* Reduced Motion: kein Sweep — stattdessen ein statischer, dezenter
+   Glanz auf der Kartenschulter (nicht bloß eingefrorene Animation). */
+@media (prefers-reduced-motion: reduce) {
+  .fc-sheen {
+    animation: none;
+    transform: translateX(115%) rotate(14deg);
+    opacity: 0.35;
+  }
+}

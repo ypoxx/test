@@ -1,0 +1,375 @@
+/* ============================================================
+   CardAlbum — Sammelalbum auf der Nachtstadion-Bühne
+   (Phase 4 ZUT-Umbau, Artboard "album" aus direction-a.html,
+   Fehlt-Mechanik aus direction-b.html via FutCard-Ghost).
+
+   A11y: Tap-Targets >= 44px, Schrift >= 13px (Nebenlabels >= 12px),
+   :focus-visible-Ring in Gold, Animationen mit reduced-motion-Guard.
+   ============================================================ */
+
+.card-album {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+}
+
+/* Die StadiumScene füllt das Overlay exakt; Deko bleibt viewport-fix,
+   gescrollt wird nur der Inhalt (.ca-scroll, absolut in der Scene). */
+.card-album .ca-scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: calc(18px + env(safe-area-inset-top, 0px)) 16px
+    calc(30px + env(safe-area-inset-bottom, 0px));
+}
+
+.ca-wrap {
+  max-width: 430px;
+  margin: 0 auto;
+  animation: ca-enter var(--zut-dur-base, 300ms) ease both;
+}
+
+@keyframes ca-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- Schließen (Album) ---------- */
+.ca-close {
+  position: absolute;
+  z-index: 5;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  right: 12px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(150, 180, 230, 0.3);
+  background: linear-gradient(180deg, rgba(24, 44, 90, 0.9), rgba(10, 22, 48, 0.95));
+  color: #e7eefb;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- Kopf: Titel + großer Zähler + Gold-Progressbar ---------- */
+.ca-head-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding-right: 52px; /* Platz für den Schließen-Button */
+}
+
+.ca-title {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  line-height: 1;
+  background: linear-gradient(180deg, #ffffff 0%, #c9d8f4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+}
+
+.ca-sub {
+  margin: 5px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #afc4e8;
+}
+
+/* Großer Zähler auf eigener Zeile (rechtsbündig), unterhalb des
+   viewport-fixen Schließen-Buttons — keine Überlappung. */
+.ca-count {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 10px 0 0;
+}
+
+.ca-count-n {
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  background: linear-gradient(
+    180deg,
+    #fff6d8 0%,
+    var(--zut-gold-1, #ffcb2d) 60%,
+    #d89a12 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.6));
+}
+
+.ca-count-l {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #afc4e8;
+}
+
+.ca-bar {
+  margin-top: 8px;
+  height: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #0b1834, #10224a);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.ca-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #c8940e, var(--zut-gold-1, #ffcb2d) 55%, #ffe27a);
+  box-shadow: 0 0 10px rgba(255, 203, 45, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  transition: width var(--zut-dur-slow, 600ms) ease;
+}
+
+/* ---------- Raritäts-Zähler (Chips mit Folien-Punkt) ---------- */
+.ca-rarities {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ca-rar {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 0 11px;
+  border-radius: 11px;
+  background: linear-gradient(180deg, rgba(24, 44, 90, 0.85), rgba(10, 22, 48, 0.9));
+  border: 1px solid rgba(150, 180, 230, 0.24);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 4px 10px rgba(0, 0, 0, 0.35);
+}
+
+.ca-gem {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  border-radius: 4px;
+  transform: rotate(45deg);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(0, 0, 0, 0.55);
+}
+
+.ca-gem--bronze {
+  background: linear-gradient(160deg, var(--zut-bronze-1, #f0b276), var(--zut-bronze-2, #8a4e22));
+}
+.ca-gem--silver {
+  background: linear-gradient(160deg, var(--zut-silver-1, #f4f8fc), var(--zut-silver-2, #7c8da2));
+}
+.ca-gem--gold {
+  background: linear-gradient(160deg, var(--zut-gold-2, #ffe27a), var(--zut-gold-deep, #b8860b));
+}
+.ca-gem--holo {
+  background: conic-gradient(
+    from 200deg,
+    var(--zut-gold-2, #ffe27a),
+    var(--zut-holo-blue, #7aa2ff),
+    var(--zut-gold-1, #ffcb2d),
+    var(--zut-gold-2, #ffe27a)
+  );
+}
+
+.ca-rar-name {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  color: #e7eefb;
+}
+
+.ca-rar-count {
+  margin-left: auto;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  color: #ffdd66;
+}
+
+/* ---------- Filter-Pills ---------- */
+.ca-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.ca-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 0 15px;
+  border-radius: 22px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #e7eefb;
+  background: linear-gradient(180deg, rgba(24, 44, 90, 0.85), rgba(10, 22, 48, 0.9));
+  border: 1px solid rgba(150, 180, 230, 0.28);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 4px 10px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: transform var(--zut-dur-fast, 200ms) ease;
+}
+
+.ca-pill:active {
+  transform: scale(0.96);
+}
+
+/* Aktiv: Punkt-Icon (Glyphe) + dickere Border + Gold — nicht nur Farbe */
+.ca-pill[aria-pressed='true'] {
+  border: 2px solid var(--zut-gold-1, #ffcb2d);
+  padding: 0 14px;
+  color: #ffe9a0;
+  background: linear-gradient(180deg, rgba(48, 66, 110, 0.92), rgba(16, 30, 60, 0.95));
+  box-shadow: 0 0 12px rgba(255, 203, 45, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.ca-pill-dot {
+  flex: none;
+  color: var(--zut-gold-1, #ffcb2d);
+  filter: drop-shadow(0 0 3px rgba(255, 203, 45, 0.7));
+}
+
+/* ---------- Karten-Grid (3 Spalten, Karten ~110px) ---------- */
+.ca-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ca-cell {
+  min-width: 0;
+}
+
+.ca-cardbtn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 14px;
+  transition: transform var(--zut-dur-fast, 200ms) ease;
+}
+
+.ca-cardbtn:active {
+  transform: scale(0.96);
+}
+
+/* ---------- Großansicht-Overlay ---------- */
+.ca-detail {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(3, 8, 22, 0.84);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  animation: ca-fade var(--zut-dur-fast, 200ms) ease both;
+}
+
+@keyframes ca-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ca-detail-card {
+  width: min(300px, 76vw);
+  animation: ca-pop var(--zut-dur-base, 300ms) cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+@keyframes ca-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.82) translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.ca-detail-close {
+  position: absolute;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  right: 12px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(150, 180, 230, 0.3);
+  background: linear-gradient(180deg, rgba(24, 44, 90, 0.9), rgba(10, 22, 48, 0.95));
+  color: #e7eefb;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- Fokus-Ring (sichtbar, Gold) ---------- */
+.ca-close:focus-visible,
+.ca-pill:focus-visible,
+.ca-cardbtn:focus-visible,
+.ca-detail-close:focus-visible {
+  outline: 3px solid var(--zut-gold-1, #ffcb2d);
+  outline-offset: 2px;
+}
+
+/* ---------- Reduced Motion: statische Endzustände, keine Loops ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .ca-wrap,
+  .ca-detail,
+  .ca-detail-card {
+    animation: none;
+  }
+
+  .ca-bar i,
+  .ca-pill,
+  .ca-cardbtn {
+    transition: none;
+  }
+
+  .ca-pill:active,
+  .ca-cardbtn:active {
+    transform: none;
+  }
+}

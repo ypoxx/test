@@ -1,4 +1,5 @@
 import { getStandings, getRankZone, MATCHDAYS } from '../utils/season'
+import { getZoneStyle } from './zoneStyles'
 
 /**
  * League table modal for the current season.
@@ -48,7 +49,7 @@ function SeasonTable({ season, onClose }) {
                     row.isMSV ? 'bg-msv-blue/40 font-bold' : ''
                   }`}
                 >
-                  <td className={`py-2 pr-2 ${zone.color}`}>{row.rank}</td>
+                  <td className={`py-2 pr-2 ${getZoneStyle(zone.zone).text}`}>{row.rank}</td>
                   <td className="py-2">
                     <span className="mr-1">{row.logo}</span>
                     <span className={row.isMSV ? 'text-goal' : 'text-white'}>{row.name}</span>

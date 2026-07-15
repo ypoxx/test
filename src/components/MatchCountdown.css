@@ -1,0 +1,242 @@
+/* ============================================================
+   MatchCountdown — VS-Walkout + inszenierter 3-2-1-LOS-Countdown
+   (ZUT Phase 4, Flutlicht-Gold). Eigene Keyframes, reduced-motion
+   mit statischen Endzuständen.
+   ============================================================ */
+
+.zut-cd {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(120% 55% at 50% -8%, rgba(255, 210, 100, 0.14) 0%, transparent 60%),
+    linear-gradient(180deg, #01040D 0%, #040D24 55%, #071630 100%);
+  animation: zutCdFade 0.3s ease-in;
+}
+
+@keyframes zutCdFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Tap-to-skip als echter Button (Fokus-Ring, ≥44px) */
+.zut-cd__skip {
+  position: absolute;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  min-height: 44px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.zut-cd__skip:focus-visible,
+.zut-cd:focus-visible {
+  outline: 3px solid var(--zut-gold-1, #FFCB2D);
+  outline-offset: 2px;
+}
+
+/* ---------- VS-Screen ---------- */
+.zut-cd__vs {
+  width: 100%;
+  max-width: 420px;
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.zut-cd__team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  animation: zutCdSlideUp 0.45s ease-out both;
+}
+
+.zut-cd__team--away {
+  animation-delay: 0.2s;
+}
+
+.zut-cd__team svg {
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.55));
+}
+
+.zut-cd__name {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: #F2F6FF;
+}
+
+.zut-cd__tag {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(199, 216, 244, 0.75);
+}
+
+@keyframes zutCdSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Gold-VS mit Hairlines links/rechts */
+.zut-cd__mid {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 2px 0;
+}
+
+.zut-cd__mid::before,
+.zut-cd__mid::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 203, 45, 0.65));
+}
+
+.zut-cd__mid::after {
+  background: linear-gradient(90deg, rgba(255, 203, 45, 0.65), transparent);
+}
+
+.zut-cd__mid span {
+  font-size: 44px;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  color: var(--zut-gold-1, #FFCB2D);
+  transform: skewX(-7deg);
+  text-shadow:
+    2px 2px 0 #051233,
+    0 0 24px rgba(255, 203, 45, 0.55);
+}
+
+/* ---------- Countdown-Ziffern ---------- */
+.zut-cd__digitwrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.zut-cd__ring {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 203, 45, 0.7);
+  box-shadow:
+    0 0 30px rgba(255, 203, 45, 0.35),
+    inset 0 0 20px rgba(255, 203, 45, 0.2);
+  animation: zutCdRing 0.8s ease-out forwards;
+}
+
+@keyframes zutCdRing {
+  0% {
+    transform: scale(0.45);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.zut-cd__digit {
+  font-size: clamp(10rem, 60vw, 15rem);
+  font-weight: 900;
+  font-style: italic;
+  line-height: 1;
+  color: var(--zut-gold-1, #FFCB2D);
+  text-shadow:
+    4px 4px 0 #051233,
+    -2px -2px 0 #051233,
+    0 0 40px rgba(255, 203, 45, 0.8),
+    0 0 90px rgba(255, 203, 45, 0.4);
+  animation: zutCdDigit 0.8s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+/* gestufte Skalierung: groß rein, kurz unterschwingen, sauber stehen */
+@keyframes zutCdDigit {
+  0% {
+    transform: scale(2.1) translateY(-6px);
+    opacity: 0;
+    filter: blur(6px);
+  }
+  45% {
+    transform: scale(0.94);
+    opacity: 1;
+    filter: blur(0);
+  }
+  70% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ---------- LOS! ---------- */
+.zut-cd__los {
+  font-size: clamp(6rem, 32vw, 9rem);
+  font-weight: 900;
+  font-style: italic;
+  line-height: 1;
+  color: #FFFFFF;
+  text-shadow:
+    4px 4px 0 #051233,
+    0 0 34px rgba(var(--zut-msv-hi-rgb, 10 122 209), 0.9),
+    0 0 80px rgba(255, 203, 45, 0.5);
+  animation: zutCdDigit 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.zut-cd__sub {
+  margin-top: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 226, 122, 0.9);
+  text-align: center;
+}
+
+/* ---------- Reduced Motion: statische Endzustände ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .zut-cd,
+  .zut-cd__team,
+  .zut-cd__digit,
+  .zut-cd__los {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .zut-cd__ring {
+    animation: none;
+    opacity: 0;
+  }
+}

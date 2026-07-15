@@ -1,16 +1,70 @@
 import { useState } from 'react'
-import GoalAnimation from './GoalAnimation'
 import soundManager from '../utils/sounds'
 import { ANSWER_DELAY_CORRECT, ANSWER_DELAY_WRONG } from '../utils/matchLogic'
+import './VocabCard.css'
 
-function VocabCard({ vocab, options, direction = 'en-de', onAnswer, currentIndex, total, extraTime = false }) {
-  const [selectedAnswer, setSelectedAnswer] = useState(null)
-  const [showFeedback, setShowFeedback] = useState(false)
-  const [isCorrect, setIsCorrect] = useState(false)
+const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F']
 
+/* Check-/Kreuz-Glyphen als Inline-SVG — richtig/falsch nie nur über Farbe */
+function CheckGlyph() {
+  return (
+    <svg width="15" height="12" viewBox="0 0 15 12" aria-hidden="true">
+      <path
+        d="M1.5 6.5 5.5 10.5 13.5 1.5"
+        fill="none"
+        stroke="#0B2C1C"
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+function CrossGlyph() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+      <path
+        d="M1.5 1.5 10.5 10.5 M10.5 1.5 1.5 10.5"
+        fill="none"
+        stroke="#FFFFFF"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
+/* Hebt das abgefragte Wort im Beispielsatz golden hervor (best effort:
+   Wortstamm-Präfix, damit auch flektierte Formen wie "scores" treffen). */
+function highlightSentence(sentence, word) {
+  if (!sentence || !word) return sentence
+  const stem = word.replace(/^to\s+/i, '').split(/[\s,/]/)[0]
+  if (stem.length < 3) return sentence
+  const prefix = stem.slice(0, Math.max(3, stem.length - 2)).toLowerCase()
+  return sentence.split(/(\s+)/).map((token, index) => {
+    const clean = token.replace(/[^A-Za-zÄÖÜäöüß]/g, '').toLowerCase()
+    return clean && clean.startsWith(prefix) ? <b key={index}>{token}</b> : token
+  })
+}
+
+/**
+ * VocabCard — der Lern-Loop als Spielszene (ZUT Phase 4, Flutlicht-Gold).
+ *
+ * Vertrag mit Match.jsx (unverändert):
+ *   { vocab, options, direction, onAnswer, currentIndex, total, extraTime }
+ *
+ * initialAnswer ist ein optionaler Dev-Prop (nur PreviewLoop): startet die
+ * Karte direkt im Feedback-Zustand, ohne den Produktions-Flow zu berühren.
+ */
+function VocabCard({ vocab, options, direction = 'en-de', onAnswer, currentIndex, total, extraTime = false, initialAnswer = null }) {
   const isDeEn = direction === 'de-en'
   const question = isDeEn ? vocab.german : vocab.english
   const correctOption = isDeEn ? vocab.english : vocab.german
+
+  const [selectedAnswer, setSelectedAnswer] = useState(initialAnswer)
+  const [showFeedback, setShowFeedback] = useState(initialAnswer !== null)
+  const [isCorrect, setIsCorrect] = useState(initialAnswer !== null && initialAnswer === correctOption)
 
   const handleSelectAnswer = (answer) => {
     if (showFeedback) return // Prevent multiple selections
@@ -35,102 +89,107 @@ function VocabCard({ vocab, options, direction = 'en-de', onAnswer, currentIndex
     }, correct ? ANSWER_DELAY_CORRECT : ANSWER_DELAY_WRONG)
   }
 
+  const wordClass = question.length > 14 ? 'vc-word vc-word--long' : 'vc-word'
+
   return (
     <div className="w-full max-w-2xl mx-auto px-3 py-2">
-      {/* Progress Indicator */}
-      <div className="mb-2 text-center">
-        <span className="text-white/70 text-xs">
-          {extraTime ? 'Nachspielzeit' : 'Vokabel'} {currentIndex + 1} / {total}
-        </span>
+      {/* Fortschritt: Gold-Segmente */}
+      <div className="vc-prog">
+        <div className="vc-prog-label">
+          <span className="vc-prog-kicker">{extraTime ? 'NACHSPIELZEIT' : 'VOKABEL'}</span>
+          <span className="vc-prog-count">
+            {currentIndex + 1}&thinsp;/&thinsp;{total}
+          </span>
+        </div>
+        <div className="vc-segs" aria-hidden="true">
+          {Array.from({ length: total }, (_, index) => (
+            <i key={index} className={index <= currentIndex ? 'vc-seg vc-seg--on' : 'vc-seg'} />
+          ))}
+        </div>
       </div>
 
-      {/* Vocab Card */}
-      <div className="card p-4 mb-3">
-        {/* Question Word */}
-        <div className="text-center mb-3">
-          <div className="text-white/70 text-xs mb-1">{isDeEn ? 'Deutsch:' : 'Englisch:'}</div>
-          <div className="text-2xl md:text-3xl font-bold text-white mb-2">
-            {question}
-          </div>
+      {/* Frage-Bühne: Stadion-Schild */}
+      <div className="vc-stage">
+        <div className="vc-coach">
+          <span className="vc-coach-pic">
+            <img src="/img/mascot.webp" alt="" />
+          </span>
+          <span className="vc-kicker">{isDeEn ? 'WIE HEISST AUF ENGLISCH …' : 'WAS BEDEUTET …'}</span>
         </div>
-
-        {/* Example Sentence (only helpful when the English word is shown) */}
-        {!isDeEn && (
-          <div className="bg-white/5 rounded-lg p-2 mb-3">
-            <div className="text-white/70 text-xs mb-1">Beispiel:</div>
-            <div className="text-white/90 italic text-xs md:text-sm">
-              "{vocab.exampleSentence}"
-            </div>
-          </div>
+        <div className={wordClass} lang={isDeEn ? 'de' : 'en'}>
+          {question}
+        </div>
+        {/* Beispielsatz nur, wenn das englische Wort gezeigt wird */}
+        {!isDeEn && vocab.exampleSentence && (
+          <>
+            <div className="vc-rule" />
+            <p className="vc-sentence" lang="en">
+              &bdquo;{highlightSentence(vocab.exampleSentence, vocab.english)}&ldquo;
+            </p>
+          </>
         )}
-
-        {/* Multiple Choice Options */}
-        <div className="space-y-2">
-          <div className="text-white/70 text-xs mb-1 text-center">
-            {isDeEn ? 'Wähle das richtige englische Wort:' : 'Wähle die richtige deutsche Übersetzung:'}
-          </div>
-          {options.map((option, index) => {
-            const isSelected = selectedAnswer === option
-            const isCorrectOption = option === correctOption
-
-            let buttonClass = 'w-full px-4 py-3 rounded-lg font-semibold text-sm md:text-base transition-all duration-200 '
-
-            if (!showFeedback) {
-              // Before answer
-              buttonClass += 'bg-white/10 hover:bg-white/20 border-2 border-white/30 hover:border-msv-blue text-white active:scale-95'
-            } else if (isSelected && isCorrect) {
-              // Selected and correct
-              buttonClass += 'bg-success border-2 border-success text-white scale-105 shadow-lg'
-            } else if (isSelected && !isCorrect) {
-              // Selected and wrong
-              buttonClass += 'bg-error border-2 border-error text-white'
-            } else if (isCorrectOption) {
-              // Show correct answer
-              buttonClass += 'bg-success/50 border-2 border-success text-white'
-            } else {
-              // Other options (dimmed)
-              buttonClass += 'bg-white/5 border-2 border-white/10 text-white/50'
-            }
-
-            return (
-              <button
-                key={index}
-                onClick={() => handleSelectAnswer(option)}
-                disabled={showFeedback}
-                className={buttonClass}
-              >
-                {option}
-              </button>
-            )
-          })}
-        </div>
       </div>
 
-      {/* Feedback */}
-      {showFeedback && (
-        <div
-          className={`card p-4 text-center animate-bounce-in ${
-            isCorrect ? 'bg-success/20 border-success' : 'bg-error/20 border-error'
-          }`}
-        >
-          <div className="text-4xl mb-2">
-            {isCorrect ? '⚽ TOR!' : '❌ Daneben!'}
-          </div>
-          <div className="text-base md:text-lg font-bold">
-            {isCorrect
-              ? 'Richtig! MSV Duisburg schießt ein Tor!'
-              : `Leider falsch. Richtig ist: "${correctOption}"`}
-          </div>
-          {!isCorrect && (
-            <div className="text-sm text-white/70 mt-2">
-              {isDeEn ? vocab.german : vocab.english} = {correctOption}
-            </div>
-          )}
-        </div>
-      )}
+      {/* Antworten: Metallschilder mit Letter-Chips */}
+      <div className="vc-answers">
+        {options.map((option, index) => {
+          const isSelected = selectedAnswer === option
+          const isCorrectOption = option === correctOption
 
-      {/* Goal Animation */}
-      <GoalAnimation isCorrect={showFeedback && isCorrect} />
+          let buttonClass = 'vc-answer'
+          let glyph = null
+          let srHint = null
+          if (showFeedback) {
+            if (isCorrectOption) {
+              buttonClass += ' vc-answer--correct'
+              if (isSelected) buttonClass += ' vc-answer--picked'
+              glyph = <CheckGlyph />
+              srHint = 'richtige Antwort'
+            } else if (isSelected) {
+              buttonClass += ' vc-answer--wrong'
+              glyph = <CrossGlyph />
+              srHint = 'falsche Antwort'
+            } else {
+              buttonClass += ' vc-answer--dim'
+            }
+          }
+
+          return (
+            <button
+              key={index}
+              type="button"
+              onClick={() => handleSelectAnswer(option)}
+              disabled={showFeedback}
+              className={buttonClass}
+            >
+              <span className="vc-akey" aria-hidden="true">{LETTERS[index] || index + 1}</span>
+              <span className="vc-atext">{option}</span>
+              {glyph && <span className="vc-glyph">{glyph}</span>}
+              {srHint && <span className="sr-only">({srHint})</span>}
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Ergebnis-Banner (kompakt, ohne Emoji) */}
+      <div role="status" aria-live="polite">
+        {showFeedback && (
+          isCorrect ? (
+            <div className="vc-banner vc-banner--goal">
+              <span className="vc-banner-title">Tor!</span>
+              <span className="vc-banner-sub">Volltreffer f&uuml;r den MSV!</span>
+            </div>
+          ) : (
+            <div className="vc-banner vc-banner--miss">
+              <span className="vc-banner-title vc-banner-title--miss">Daneben</span>
+              <span className="vc-banner-sub">Richtig w&auml;re: &bdquo;{correctOption}&ldquo;</span>
+              <span className="vc-banner-vocab">
+                {isDeEn ? vocab.german : vocab.english} = {correctOption}
+              </span>
+            </div>
+          )
+        )}
+      </div>
     </div>
   )
 }

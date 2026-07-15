@@ -184,14 +184,20 @@ export const getRank = (season) => {
 }
 
 /**
- * Season goal label for a rank (Bundesliga-style zones).
+ * Season goal zone for a rank (Bundesliga-style zones).
+ *
+ * Returns ONLY semantic data — no CSS classes, no emojis. The UI mapping
+ * (colors etc.) lives in src/components/zoneStyles.js.
+ *
+ * @param {number} rank - Final/current league rank (1-18)
+ * @returns {{ zone: 'champions'|'promotion'|'europa'|'midtable'|'relegation', label: string }}
  */
 export const getRankZone = (rank) => {
-  if (rank === 1) return { label: 'Meisterschaft', emoji: '🏆', color: 'text-yellow-300' }
-  if (rank <= 4) return { label: 'Champions League', emoji: '⭐', color: 'text-blue-300' }
-  if (rank <= 7) return { label: 'Europa League', emoji: '🌍', color: 'text-emerald-300' }
-  if (rank <= 15) return { label: 'Gesicherter Platz', emoji: '✅', color: 'text-white' }
-  return { label: 'Abstiegszone', emoji: '⚠️', color: 'text-red-300' }
+  if (rank === 1) return { zone: 'champions', label: 'Meisterschaft' }
+  if (rank <= 4) return { zone: 'promotion', label: 'Champions League' }
+  if (rank <= 7) return { zone: 'europa', label: 'Europa League' }
+  if (rank <= 15) return { zone: 'midtable', label: 'Gesicherter Platz' }
+  return { zone: 'relegation', label: 'Abstiegszone' }
 }
 
 /**

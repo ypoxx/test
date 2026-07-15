@@ -1,0 +1,173 @@
+/* ============================================================
+   ScoreDisplay — Broadcast-Lower-Third "Zebra Ultimate Team"
+   Angeschrägte Score-Bar nach dem "loop"-Artboard aus
+   direction-c.html, übersetzt in die Flutlicht-Gold-Palette
+   von direction-a.html (Gold-Hairlines statt Cyan/Magenta).
+   ============================================================ */
+
+.zut-sb {
+  position: relative;
+  filter: drop-shadow(0 6px 16px rgba(2, 8, 24, 0.9));
+}
+
+.zut-sb__bar {
+  display: flex;
+  align-items: stretch;
+  height: 52px;
+  transform: skewX(-7deg);
+}
+
+.zut-sb__seg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Kinder wieder entzerren */
+.zut-sb__seg > * {
+  transform: skewX(7deg);
+}
+
+.zut-sb__team {
+  flex: 1;
+  min-width: 0;
+  gap: 7px;
+  background: linear-gradient(180deg, #0F2E63, #081C42);
+  border-top: 1px solid rgba(255, 203, 45, 0.5);
+  border-bottom: 1px solid rgba(255, 203, 45, 0.18);
+  box-shadow: inset 0 0 22px rgba(0, 92, 169, 0.35);
+}
+
+.zut-sb__team:first-child {
+  clip-path: polygon(9px 0, 100% 0, 100% 100%, 0 100%, 0 9px);
+}
+
+.zut-sb__code {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #F2F6FF;
+  white-space: nowrap;
+}
+
+.zut-sb__score {
+  width: 92px;
+  flex: none;
+  gap: 5px;
+  background: linear-gradient(180deg, #071433, #03091E);
+  border-top: 1px solid var(--zut-gold-1, #FFCB2D);
+  border-bottom: 1px solid rgba(255, 203, 45, 0.4);
+  box-shadow:
+    inset 0 0 24px rgba(255, 203, 45, 0.14),
+    0 0 18px rgba(255, 203, 45, 0.22);
+}
+
+/* Score-Ziffern mit Doppelkontur (dunkle Kontur + Gold-Versatz) */
+.zut-sb__num {
+  font-size: 28px;
+  font-weight: 900;
+  font-style: italic;
+  line-height: 1;
+  color: #FFFFFF;
+  letter-spacing: -0.02em;
+  text-shadow:
+    2px 2px 0 #051233,
+    -1px -1px 0 #051233,
+    3px 3px 0 rgba(255, 203, 45, 0.55),
+    0 0 14px rgba(255, 203, 45, 0.35);
+}
+
+/* Punch-Skalierung beim Hochticken — der Span wird per key remounted */
+.zut-sb__num--tick {
+  animation: zutScoreTick 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes zutScoreTick {
+  0% {
+    transform: skewX(7deg) scale(1.7);
+    color: var(--zut-gold-2, #FFE27A);
+  }
+  60% {
+    transform: skewX(7deg) scale(0.92);
+  }
+  100% {
+    transform: skewX(7deg) scale(1);
+    color: #FFFFFF;
+  }
+}
+
+.zut-sb__colon {
+  font-size: 20px;
+  font-weight: 900;
+  color: rgba(255, 226, 122, 0.75);
+  transform: skewX(7deg) translateY(-2px);
+}
+
+/* Spielminuten-Chip in Gold */
+.zut-sb__min {
+  width: 60px;
+  flex: none;
+  background: linear-gradient(180deg, #FFDD66, #E9A912);
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+  box-shadow:
+    0 0 16px rgba(255, 203, 45, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.zut-sb__min b {
+  display: block;
+  font-size: 18px;
+  font-weight: 900;
+  font-style: italic;
+  color: #231A02;
+  letter-spacing: -0.02em;
+  text-align: center;
+  line-height: 1.05;
+}
+
+.zut-sb__min small {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  color: #4A3805;
+  letter-spacing: 0.1em;
+  text-align: center;
+}
+
+/* "SERIE ×N"-Chip mit Flamme — hängt unten rechts an der Bar */
+.zut-sb__streak {
+  position: absolute;
+  right: 72px; /* frei vom Gold-Minuten-Chip (60px + Fuge) */
+  bottom: -12px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px 2px 7px;
+  background: linear-gradient(180deg, #14295A, #0A1B3E);
+  border: 1px solid rgba(255, 203, 45, 0.7);
+  border-radius: 4px;
+  transform: skewX(-7deg);
+  color: var(--zut-gold-1, #FFCB2D);
+  font-weight: 900;
+  font-style: italic;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  box-shadow:
+    0 0 10px rgba(255, 203, 45, 0.35),
+    inset 0 0 8px rgba(255, 203, 45, 0.15);
+}
+
+.zut-sb__streak > * {
+  transform: skewX(7deg);
+}
+
+.zut-sb__streak svg {
+  flex: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zut-sb__num--tick {
+    animation: none;
+  }
+}

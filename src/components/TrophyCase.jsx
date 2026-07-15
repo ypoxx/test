@@ -1,4 +1,5 @@
-import { ACHIEVEMENTS, getRarityColor, getRarityLabel } from '../utils/achievements'
+import { ACHIEVEMENTS, getRarityTier, getRarityLabel } from '../utils/achievements'
+import { getRarityBadgeClass } from './zoneStyles'
 
 /**
  * Trophy Case - displays all achievements (locked and unlocked)
@@ -52,7 +53,7 @@ function TrophyCase({ unlockedAchievementIds, onClose }) {
                   key={achievement.id}
                   className={`relative rounded-xl p-4 transition-all duration-300 ${
                     isUnlocked
-                      ? `${getRarityColor(achievement.rarity)} hover:scale-105 cursor-pointer`
+                      ? `${getRarityBadgeClass(getRarityTier(achievement.rarity))} hover:scale-105 cursor-pointer`
                       : 'bg-white/5 opacity-50 grayscale'
                   }`}
                 >
@@ -75,7 +76,7 @@ function TrophyCase({ unlockedAchievementIds, onClose }) {
 
                     {/* Rarity Badge */}
                     {isUnlocked && (
-                      <div className={`inline-block px-2 py-1 rounded-full text-xs font-bold ${getRarityColor(achievement.rarity)}`}>
+                      <div className={`inline-block px-2 py-1 rounded-full text-xs font-bold ${getRarityBadgeClass(getRarityTier(achievement.rarity))}`}>
                         {getRarityLabel(achievement.rarity)}
                       </div>
                     )}

@@ -6,6 +6,7 @@ import { loadProgress, loadSoundPreference, saveSoundPreference } from './utils/
 import soundManager from './utils/sounds'
 
 function App() {
+
   const [gameState, setGameState] = useState('welcome') // 'welcome', 'stadium', or 'match'
   const [progress, setProgress] = useState(null)
   const [matchOptions, setMatchOptions] = useState(null)

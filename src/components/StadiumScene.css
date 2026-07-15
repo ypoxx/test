@@ -1,0 +1,114 @@
+/* ============================================================
+   StadiumScene — Nachtstadion-Bühne "Zebra Ultimate Team"
+   Portiert aus scratchpad/design/direction-a.html:
+   .artboard-Hintergrund (Nachtblau-Verlauf), .beam (Flutlicht-
+   Kegel), .haze (Lichtnebel), .grain (Körnung) + Rasenandeutung.
+
+   Varianten steuern die Lichtfarbe über Custom Properties:
+   default = kühles Flutlicht · walkout = dramatisch dunkel,
+   zwei harte Beams · gold = goldene Lichtkegel (Mockup-Werte).
+   ============================================================ */
+
+.zut-scene {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  isolation: isolate;
+  color: #F2F6FF;
+
+  /* default: kühles Flutlicht */
+  --zut-scene-bg: linear-gradient(180deg, var(--zut-night-1, #040D24) 0%, #071630 38%, var(--zut-night-2, #0A1F44) 100%);
+  --zut-scene-beam-1: rgba(205, 228, 255, 0.3);
+  --zut-scene-beam-2: rgba(150, 195, 255, 0.09);
+  --zut-scene-haze-top: rgba(180, 210, 255, 0.15);
+  --zut-scene-haze-bottom: rgba(30, 80, 170, 0.3);
+  --zut-scene-turf: rgba(23, 88, 55, 0.45);
+  --zut-scene-beam-width: 60%;
+  --zut-scene-beam-tilt: 24deg;
+
+  background: var(--zut-scene-bg);
+}
+
+/* walkout: dramatisch dunkler, zwei steile, harte Beams */
+.zut-scene--walkout {
+  --zut-scene-bg: linear-gradient(180deg, #01040D 0%, #030A1C 55%, #061128 100%);
+  --zut-scene-beam-1: rgba(235, 245, 255, 0.38);
+  --zut-scene-beam-2: rgba(170, 205, 255, 0.1);
+  --zut-scene-haze-top: rgba(160, 195, 255, 0.08);
+  --zut-scene-haze-bottom: rgba(15, 40, 95, 0.35);
+  --zut-scene-turf: rgba(14, 55, 35, 0.3);
+  --zut-scene-beam-width: 36%;
+  --zut-scene-beam-tilt: 13deg;
+}
+
+/* gold: goldene Lichtkegel (Beam-/Haze-Werte aus direction-a.html) */
+.zut-scene--gold {
+  --zut-scene-beam-1: rgba(255, 214, 110, 0.34);
+  --zut-scene-beam-2: rgba(255, 203, 45, 0.1);
+  --zut-scene-haze-top: rgba(255, 210, 100, 0.16);
+  --zut-scene-haze-bottom: rgba(30, 80, 170, 0.3);
+}
+
+/* ---------- Deko-Layer (rein dekorativ, nie klickbar) ---------- */
+.zut-scene__deco {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.zut-scene__beam {
+  position: absolute;
+  top: -16%;
+  width: var(--zut-scene-beam-width);
+  height: 78%;
+  background: linear-gradient(180deg, var(--zut-scene-beam-1) 0%, var(--zut-scene-beam-2) 45%, transparent 78%);
+  filter: blur(6px);
+}
+
+.zut-scene__beam--l {
+  left: -24%;
+  transform: rotate(var(--zut-scene-beam-tilt));
+  transform-origin: top right;
+}
+
+.zut-scene__beam--r {
+  right: -24%;
+  transform: rotate(calc(-1 * var(--zut-scene-beam-tilt)));
+  transform-origin: top left;
+}
+
+.zut-scene__haze {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 55% at 50% -8%, var(--zut-scene-haze-top) 0%, transparent 60%),
+    radial-gradient(80% 40% at 50% 108%, var(--zut-scene-haze-bottom) 0%, transparent 60%);
+}
+
+.zut-scene__grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.5;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1.2px);
+  background-size: 5px 5px;
+}
+
+/* Rasenandeutung am unteren Rand */
+.zut-scene__turf {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 24%;
+  background: radial-gradient(120% 100% at 50% 105%, var(--zut-scene-turf) 0%, transparent 70%);
+}
+
+/* ---------- Inhalt über der Bühne ---------- */
+.zut-scene__content {
+  position: relative;
+  z-index: 1;
+  min-height: inherit;
+}

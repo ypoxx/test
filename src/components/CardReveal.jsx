@@ -1,120 +1,227 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import soundManager from '../utils/sounds'
-
-const RARITY_STYLES = {
-  Common: {
-    badge: 'bg-white/20 text-white',
-    glow: 'card-glow-common',
-    border: 'border-white/30'
-  },
-  Rare: {
-    badge: 'bg-blue-500/30 text-blue-100',
-    glow: 'card-glow-rare',
-    border: 'border-blue-300/50'
-  },
-  Epic: {
-    badge: 'bg-purple-500/30 text-purple-100',
-    glow: 'card-glow-epic',
-    border: 'border-purple-300/50'
-  },
-  Legendary: {
-    badge: 'bg-yellow-500/30 text-yellow-100',
-    glow: 'card-glow-legendary',
-    border: 'border-yellow-300/60'
-  }
-}
+import { getRarity } from '../utils/rarity'
+import StadiumScene from './StadiumScene'
+import FutCard from './FutCard'
+import cards from '../data/cards.json'
+import './CardReveal.css'
 
 /**
- * Pack-opening screen shown after a rewarded match:
- * one collectible card plus (optionally) a new football fact.
+ * CardReveal — Pack-Opening mit Raritäts-Dramaturgie
+ * (Design-Richtung A "Flutlicht-Gold", Artboard "pack").
+ *
+ * State-Machine: closed → opening → revealed.
+ * Die Rarität "leakt" während des Openings über das Licht:
+ *   bronze/silver  ~700ms — Pack reißt auf, kühler Blitz, direkt zur Karte.
+ *   gold          ~1500ms — goldene Beams (Scene-Variante 'gold') + Funken.
+ *   holo          ~3000ms — volles Walkout: Bühne dunkelt ab, Kartenrücken
+ *                  fährt hoch, Beams schwenken, Fanfare am Höhepunkt, Flip.
+ *
+ * Props (abwärtskompatibel zu Match.jsx — neue Props sind optional):
+ * @param {Object}   props.card      - Eintrag aus src/data/cards.json
+ * @param {boolean}  [props.isNew]   - Karte ist neu im Album
+ * @param {Object}   [props.fact]    - optionaler Fußball-Fact ({ text })
+ * @param {Function} props.onClose   - Weiter-Callback ("In die Sammlung")
+ * @param {boolean}  [props.isVictory=false] - Sieg-Kontext (Gold-Pack-Asset)
+ * @param {number}   [props.serial]  - Serien-Nr.; Default: 1-basierte Position
+ *                                     der Karte in cards.json
  */
-function CardReveal({ card, isNew, fact, onClose }) {
+
+const OPEN_MS = { bronze: 700, silver: 700, gold: 1500, holo: 3000 }
+const HOLO_FANFARE_MS = 2100
+
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' &&
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+/* Serien-Nr.-Konvention: 1-basierte Position in cards.json */
+const serialFor = (card) => {
+  const index = cards.findIndex((entry) => entry.id === card.id)
+  return index >= 0 ? index + 1 : undefined
+}
+
+const ArrowIcon = () => (
+  <svg width="16" height="14" viewBox="0 0 16 14" aria-hidden="true" focusable="false">
+    <path
+      d="M1 7h12M9 2l5 5-5 5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+)
+
+const CheckIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+    <path
+      d="M1.5 6.5l3 3 6-7"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+)
+
+function CardReveal({ card, isNew, fact, onClose, isVictory = false, serial }) {
   const [stage, setStage] = useState('closed')
+  const timersRef = useRef([])
+
+  useEffect(() => {
+    const timers = timersRef.current
+    return () => timers.forEach(clearTimeout)
+  }, [])
 
   if (!card) return null
 
-  const styles = RARITY_STYLES[card.rarity] || RARITY_STYLES.Common
+  const rarity = getRarity(card.rarity)
+  const tier = rarity.tier
+  const serialNumber = serial ?? serialFor(card)
+
+  const isGoldPack = isVictory || tier === 'holo'
+  // Nano-Banana-Artwork zuerst, handgebautes SVG als Fallback (onError)
+  const packSrc = isGoldPack ? '/img/pack-gold-art.webp' : '/img/pack-blue-art.webp'
+  const packFallback = isGoldPack ? '/img/pack-gold.svg' : '/img/pack-blue.svg'
+  const packLine = `${isGoldPack ? 'GOLD-PACK' : 'MSV-PACK'} · SPIELTAG-BELOHNUNG`
+
+  const sceneVariant =
+    stage === 'revealed'
+      ? tier === 'gold' || tier === 'holo'
+        ? 'gold'
+        : 'default'
+      : stage === 'opening' && tier === 'gold'
+        ? 'gold'
+        : 'walkout'
 
   const openPack = () => {
     if (stage !== 'closed') return
+    // WICHTIG: playPack() bleibt direkt im Tap-Handler (iOS-Audio-Unlock).
     soundManager.playPack()
+
+    if (prefersReducedMotion()) {
+      // Reduced Motion: kein Walkout-Zwang — sofort statischer Endzustand.
+      if (tier === 'holo') soundManager.playAchievement('legendary')
+      setStage('revealed')
+      return
+    }
+
     setStage('opening')
-    setTimeout(() => setStage('revealed'), 900)
+    if (tier === 'holo') {
+      // Walkout: Riser baut Spannung auf, Fanfare am Höhepunkt
+      timersRef.current.push(
+        setTimeout(() => soundManager.playWalkoutRiser(), 150),
+        setTimeout(() => soundManager.playAchievement('legendary'), HOLO_FANFARE_MS)
+      )
+    }
+    const openMs = OPEN_MS[tier] ?? OPEN_MS.bronze
+    timersRef.current.push(
+      // Folien-Whoosh kurz vor dem Umdrehen der Karte
+      setTimeout(() => soundManager.playCardFlip(), Math.max(0, openMs - 250)),
+      setTimeout(() => setStage('revealed'), openMs)
+    )
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 stadium-scene field-pattern relative overflow-hidden">
-      <div className="floodlight top-10 left-10" />
-      <div className="floodlight top-10 right-10" />
+    <StadiumScene variant={sceneVariant} className="cr-scene">
+      <div className="cr-wrap">
+        {stage === 'closed' && (
+          <div className="cr-stage cr-stage--closed">
+            <header className="cr-head">
+              <p className="cr-kicker">SPIELTAG-BELOHNUNG</p>
+              <h2 className="cr-title">KARTENPACK</h2>
+              <p className="cr-sub">Ziehe deine Belohnung!</p>
+            </header>
 
-      <div className="relative z-10 w-full max-w-md text-center">
-        <h2 className="text-3xl font-bold mb-2">🎁 Kartenpack</h2>
-        <p className="text-white/80 mb-8">Ziehe deine Belohnung!</p>
-
-        {stage !== 'revealed' ? (
-          <div className="flex flex-col items-center gap-6">
-            <div className={`pack-shell ${stage === 'opening' ? 'pack-opening' : ''}`}>
-              <div className="pack-glow" />
-              <div className="text-6xl">📦</div>
-              <div className="text-sm mt-2 uppercase tracking-[0.2em] text-white/70">
-                MSV Pack
+            <div className="cr-pack-zone">
+              <div className="cr-pack cr-pack--float">
+                <i className="cr-pack-glow" aria-hidden="true" />
+                <img className="cr-pack-img" src={packSrc} alt="" draggable="false" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = packFallback }} />
               </div>
+              <i className="cr-ground-glow" aria-hidden="true" />
             </div>
-            <button
-              onClick={openPack}
-              className="btn-primary w-full"
-            >
+
+            <button type="button" className="cr-cta" onClick={openPack}>
               Pack öffnen
+              <ArrowIcon />
             </button>
           </div>
-        ) : (
-          <>
-            <div className={`card-reveal ${styles.glow} ${styles.border} animate-bounce-in border-2 rounded-2xl p-4 relative overflow-hidden`}>
-              <div className="card-shine" />
-              <div className="flex items-center justify-between mb-3">
-                <span className={`text-xs px-3 py-1 rounded-full uppercase tracking-widest ${styles.badge}`}>
-                  {card.rarity}
-                </span>
-                {isNew && (
-                  <span className="text-xs px-3 py-1 rounded-full bg-emerald-500/30 text-emerald-100 uppercase tracking-widest">
-                    Neu
-                  </span>
-                )}
-              </div>
-              {card.image ? (
-                <img
-                  src={card.image}
-                  alt={card.name}
-                  className="w-full aspect-square object-cover rounded-xl mb-3 border border-white/20"
-                  onError={(event) => { event.currentTarget.style.display = 'none' }}
-                />
-              ) : (
-                <div className="text-7xl mb-4">{card.art || '🎴'}</div>
-              )}
-              <h3 className="text-2xl font-bold mb-1">{card.name}</h3>
-              <p className="text-white/80 text-sm mb-1">{card.description}</p>
-              <div className="glimmer-particles" />
-            </div>
+        )}
 
-            {fact && (
-              <div className="mt-4 text-sm text-white/80 bg-white/5 rounded-lg p-3 text-left animate-fade-in">
-                <div className="font-semibold mb-1">⚡ Fußball-Fact</div>
-                <div>{fact.text}</div>
+        {stage === 'opening' && (
+          <div className={`cr-stage cr-stage--opening cr-open--${tier}`}>
+            <p className="cr-sr-only" role="status">
+              Pack wird geöffnet …
+            </p>
+
+            {tier !== 'holo' ? (
+              <div className="cr-pack-zone" aria-hidden="true">
+                <div className="cr-pack cr-pack--rip">
+                  <img className="cr-pack-half cr-pack-half--top" src={packSrc} alt="" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = packFallback }} />
+                  <img className="cr-pack-half cr-pack-half--bot" src={packSrc} alt="" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = packFallback }} />
+                </div>
+                <i className="cr-flash" />
+                {tier === 'gold' && <i className="cr-sparks" />}
+              </div>
+            ) : (
+              <div className="cr-walkout" aria-hidden="true">
+                <i className="cr-dim" />
+                <i className="cr-wbeam cr-wbeam--l" />
+                <i className="cr-wbeam cr-wbeam--r" />
+                <i className="cr-sparks cr-sparks--holo" />
+                <div className="cr-cardback-rise">
+                  <img className="cr-cardback" src="/img/card-back-art.webp" alt="" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = '/img/card-back.svg' }} />
+                </div>
+                <i className="cr-ground-glow cr-ground-glow--holo" />
               </div>
             )}
-          </>
+          </div>
         )}
 
         {stage === 'revealed' && (
-          <button
-            onClick={onClose}
-            className="btn-secondary w-full mt-8"
-          >
-            Zurück ins Stadion
-          </button>
+          <div className="cr-stage cr-stage--revealed">
+            <header className="cr-head">
+              <p className="cr-kicker">NEUE KARTE GEZOGEN</p>
+              <h2 className={`cr-headline${tier === 'holo' ? ' cr-headline--holo' : ''}`}>
+                {rarity.label.toUpperCase()}!
+              </h2>
+              <p className="cr-sub">{packLine}</p>
+            </header>
+
+            <div className="cr-card-zone">
+              {isNew && (
+                <span className="cr-new">
+                  <CheckIcon />
+                  NEU IM ALBUM
+                </span>
+              )}
+              <div className={`cr-card ${tier === 'holo' ? 'cr-card--flip' : 'cr-card--pop'}`}>
+                <FutCard variant="reveal" card={card} serial={serialNumber} />
+              </div>
+              <i className="cr-ground-glow" aria-hidden="true" />
+            </div>
+
+            {fact && (
+              <div className="cr-fact">
+                <div className="cr-fact-head">
+                  <img className="cr-fact-icon" src="/img/ball.svg" alt="" />
+                  <span>Fußball-Fact</span>
+                </div>
+                <p className="cr-fact-text">{fact.text}</p>
+              </div>
+            )}
+
+            <button type="button" className="cr-cta" onClick={onClose}>
+              In die Sammlung
+              <ArrowIcon />
+            </button>
+          </div>
         )}
       </div>
-    </div>
+    </StadiumScene>
   )
 }
 
