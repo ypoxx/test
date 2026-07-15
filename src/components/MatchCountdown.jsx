@@ -9,41 +9,49 @@ function MatchCountdown({ opponent, onComplete }) {
   const [showVS, setShowVS] = useState(true)
 
   useEffect(() => {
-    // Show VS screen for 1 second
-    const vsTimer = setTimeout(() => {
+    const timers = []
+
+    // Show VS screen briefly, then count down 3-2-1-LOS
+    timers.push(setTimeout(() => {
       setShowVS(false)
-      // Start countdown
-      startCountdown()
-    }, 1500)
 
-    return () => clearTimeout(vsTimer)
+      let currentCount = 3
+      const interval = setInterval(() => {
+        if (currentCount > 0) {
+          setCount(currentCount)
+          soundManager.playTone(400 + (currentCount * 100), 0.1, 'square', 0.3)
+          currentCount--
+        } else {
+          clearInterval(interval)
+          // Play final "LOS!" sound — referee kickoff whistle
+          soundManager.playWhistle()
+          setCount(0)
+
+          // Complete after showing LOS
+          timers.push(setTimeout(() => {
+            onComplete()
+          }, 800))
+        }
+      }, 800)
+      timers.push(interval)
+    }, 1500))
+
+    // Cleanup so a tap-to-skip doesn't leave timers/sounds running
+    return () => timers.forEach(timer => {
+      clearTimeout(timer)
+      clearInterval(timer)
+    })
   }, [])
-
-  const startCountdown = () => {
-    let currentCount = 3
-
-    const interval = setInterval(() => {
-      if (currentCount > 0) {
-        setCount(currentCount)
-        soundManager.playTone(400 + (currentCount * 100), 0.1, 'square', 0.3)
-        currentCount--
-      } else {
-        clearInterval(interval)
-        // Play final "LOS!" sound
-        soundManager.playTone(800, 0.2, 'square', 0.4)
-        setCount(0)
-
-        // Complete after showing LOS
-        setTimeout(() => {
-          onComplete()
-        }, 800)
-      }
-    }, 800)
-  }
 
   if (showVS) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 animate-fade-in">
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 animate-fade-in"
+        onClick={onComplete}
+      >
+        <div className="absolute bottom-8 left-0 right-0 text-center text-white/50 text-sm">
+          Tippen zum Überspringen
+        </div>
         {/* VS Screen */}
         <div className="w-full max-w-4xl px-4">
           <div className="grid grid-cols-3 gap-4 items-center">
@@ -78,7 +86,13 @@ function MatchCountdown({ opponent, onComplete }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
+      onClick={onComplete}
+    >
+      <div className="absolute bottom-8 left-0 right-0 text-center text-white/50 text-sm">
+        Tippen zum Überspringen
+      </div>
       {/* Countdown */}
       {count > 0 ? (
         <div className="text-center animate-bounce-in" key={count}>

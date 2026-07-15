@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
   <!-- PWA Meta Tags -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -11,9 +11,9 @@
   <meta name="theme-color" content="#005CA9">
   <meta name="description" content="Englisch-Vokabeln lernen mit Fußball-Gamification für Maurice">
 
-  <!-- Icons -->
+  <!-- Icons (iOS does not support SVG touch icons) -->
   <link rel="icon" type="image/svg+xml" href="/icon-192.svg">
-  <link rel="apple-touch-icon" href="/icon-192.svg">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
   <!-- Manifest -->
   <link rel="manifest" href="/manifest.json">
@@ -22,7 +22,6 @@
 </head>
 <body>
   <div id="root"></div>
-  <script src="https://unpkg.com/howler@2.2.4/dist/howler.min.js"></script>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>

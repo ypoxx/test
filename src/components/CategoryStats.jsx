@@ -1,11 +1,12 @@
 import vocabsData from '../data/vocabs.json'
+import { CATEGORIES, getCategoryLabel, getCategoryEmoji } from '../utils/categories'
 
 /**
  * Category Stats - Shows progress per vocabulary category
  */
 function CategoryStats({ progress }) {
   // Calculate stats per category
-  const categories = ['sport', 'school', 'family', 'everyday', 'nature']
+  const categories = CATEGORIES.map(c => c.value)
   const categoryData = categories.map(category => {
     const categoryVocabs = vocabsData.filter(v => v.category === category)
     const totalCount = categoryVocabs.length
@@ -37,7 +38,7 @@ function CategoryStats({ progress }) {
 
     return {
       category,
-      name: getCategoryName(category),
+      name: getCategoryLabel(category),
       emoji: getCategoryEmoji(category),
       totalCount,
       masteredCount,
@@ -92,28 +93,6 @@ function CategoryStats({ progress }) {
       </div>
     </div>
   )
-}
-
-function getCategoryName(category) {
-  const names = {
-    sport: 'Sport',
-    school: 'Schule',
-    family: 'Familie',
-    everyday: 'Alltag',
-    nature: 'Natur'
-  }
-  return names[category] || category
-}
-
-function getCategoryEmoji(category) {
-  const emojis = {
-    sport: '⚽',
-    school: '🏫',
-    family: '👨‍👩‍👧',
-    everyday: '🌍',
-    nature: '🌳'
-  }
-  return emojis[category] || '📚'
 }
 
 export default CategoryStats

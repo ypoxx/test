@@ -41,27 +41,21 @@ const pickRandomCard = (cards) => {
   return pool[Math.floor(Math.random() * pool.length)]
 }
 
-const pickRarity = () => rollRarity(cardsData)
-
-const pickCardForRarity = (rarity, unlockedCards) => {
-  const available = cardsData.filter(card => card.rarity === rarity)
-  const locked = available.filter(card => !unlockedCards.includes(card.id))
-  const pool = locked.length > 0 ? locked : available
-  if (pool.length === 0) return null
-  return pool[Math.floor(Math.random() * pool.length)]
-}
-
 const pickFact = (unlockedFacts) => {
   const lockedFacts = factsData.filter(fact => !unlockedFacts.includes(fact.id))
-  const pool = lockedFacts.length > 0 ? lockedFacts : factsData
-  if (pool.length === 0) return null
-  return pool[Math.floor(Math.random() * pool.length)]
+  if (lockedFacts.length === 0) return null
+  return lockedFacts[Math.floor(Math.random() * lockedFacts.length)]
 }
 
 export const shouldGrantCardReward = ({ resultStatus, streak }) => {
   return resultStatus === 'win' || streak >= 4
 }
 
+/**
+ * The single card reward per match: one card for a win (or a strong streak
+ * in a lost match), plus one new football fact as long as there are locked
+ * facts left. Returns null when no reward was earned.
+ */
 export const rollCardReward = ({ resultStatus, streak }) => {
   if (!shouldGrantCardReward({ resultStatus, streak })) {
     return null
@@ -79,7 +73,12 @@ export const rollCardReward = ({ resultStatus, streak }) => {
     unlockCard(card.id)
   }
 
-  return { card, isNew }
+  const fact = pickFact(progress.unlockedFacts || [])
+  if (fact) {
+    unlockFact(fact.id)
+  }
+
+  return { card, isNew, fact }
 }
 
 export const getCardCompletion = (progress) => {
@@ -87,26 +86,5 @@ export const getCardCompletion = (progress) => {
   return {
     unlockedCount: unlockedCards.length,
     totalCount: cardsData.length
-  }
-}
-
-export const awardMatchRewards = ({ wonMatch, streak }) => {
-  const progress = loadProgress()
-  const rarity = streak >= 5 ? 'Epic' : wonMatch ? pickRarity() : 'Common'
-  const card = pickCardForRarity(rarity, progress.unlockedCards || [])
-  const fact = pickFact(progress.unlockedFacts || [])
-
-  if (card) {
-    unlockCard(card.id)
-  }
-
-  if (fact) {
-    unlockFact(fact.id)
-  }
-
-  return {
-    card,
-    fact,
-    rarity
   }
 }

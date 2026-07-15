@@ -205,6 +205,8 @@ function ShareCard({ summary, reward }) {
         link.click()
         URL.revokeObjectURL(downloadUrl)
       }
+    } catch (error) {
+      // User cancelled the share sheet or sharing failed — not a problem
     } finally {
       setSharing(false)
     }

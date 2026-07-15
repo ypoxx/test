@@ -1,8 +1,26 @@
 /**
  * Sound System for Maurice's Vocab Trainer
- * Uses Howler.js for richer sampled game sounds
+ * Uses Howler.js (bundled, works offline) for richer sampled game sounds.
+ * The samples are high-quality stadium MP3s served from /sounds/ and
+ * precached by the service worker, so they work offline after the first visit.
  */
-import soundData from './soundData'
+import { Howl, Howler } from 'howler'
+
+// Sampled stadium sounds shipped as static assets in public/sounds/.
+// Served from the site root and precached by the PWA service worker.
+const SOUND_FILES = {
+  goal: '/sounds/goal.mp3',
+  wrong: '/sounds/wrong.mp3',
+  streak: '/sounds/streak.mp3',
+  achievement: '/sounds/achievement.mp3',
+  legendary: '/sounds/legendary.mp3',
+  victory: '/sounds/victory.mp3',
+  defeat: '/sounds/defeat.mp3',
+  crowd: '/sounds/crowd.mp3',
+  whistle: '/sounds/whistle.mp3',
+  pack: '/sounds/pack.mp3',
+  ambient: '/sounds/ambient.mp3'
+}
 
 class SoundManager {
   constructor() {
@@ -12,6 +30,7 @@ class SoundManager {
     this.masterVolume = 0.3
     this.useHowler = false
     this.lastStreakAt = 0
+    this.initPromise = null
 
     // Initialize on user interaction (required by browsers)
     this.initialized = false
@@ -21,52 +40,56 @@ class SoundManager {
    * Initialize audio context (must be called after user interaction)
    */
   init() {
-    const shouldResume = this.audioContext && this.audioContext.state === 'suspended'
-    if (this.initialized && !shouldResume) {
-      console.log('🔊 Sound already initialized')
-      return Promise.resolve()
+    if (this.initPromise) {
+      // Re-resume the context if iOS suspended it in the meantime
+      if (this.audioContext && this.audioContext.state === 'suspended') {
+        return this.audioContext.resume().catch(() => {})
+      }
+      return this.initPromise
     }
 
-    try {
-      const hasHowler = typeof window !== 'undefined' && window.Howler && window.Howl
-
-      if (hasHowler) {
-        this.audioContext = window.Howler.ctx
-        window.Howler.volume(this.masterVolume)
+    this.initPromise = (async () => {
+      try {
+        Howler.volume(this.masterVolume)
 
         this.sounds = {
-          goal: new window.Howl({ src: [soundData.goal] }),
-          wrong: new window.Howl({ src: [soundData.wrong] }),
-          streak: new window.Howl({ src: [soundData.streak] }),
-          achievement: new window.Howl({ src: [soundData.achievement] }),
-          legendary: new window.Howl({ src: [soundData.legendary] }),
-          victory: new window.Howl({ src: [soundData.victory] }),
-          defeat: new window.Howl({ src: [soundData.defeat] }),
-          crowd: new window.Howl({ src: [soundData.crowd] }),
-          ambient: new window.Howl({ src: [soundData.ambient], loop: true })
+          goal: new Howl({ src: [SOUND_FILES.goal] }),
+          wrong: new Howl({ src: [SOUND_FILES.wrong] }),
+          streak: new Howl({ src: [SOUND_FILES.streak] }),
+          achievement: new Howl({ src: [SOUND_FILES.achievement] }),
+          legendary: new Howl({ src: [SOUND_FILES.legendary] }),
+          victory: new Howl({ src: [SOUND_FILES.victory] }),
+          defeat: new Howl({ src: [SOUND_FILES.defeat] }),
+          crowd: new Howl({ src: [SOUND_FILES.crowd] }),
+          whistle: new Howl({ src: [SOUND_FILES.whistle] }),
+          pack: new Howl({ src: [SOUND_FILES.pack] }),
+          ambient: new Howl({ src: [SOUND_FILES.ambient], loop: true })
         }
 
         this.useHowler = true
-      } else {
-        this.audioContext = new (window.AudioContext || window.webkitAudioContext)()
-      }
+        this.audioContext = Howler.ctx
 
-      if (this.audioContext && this.audioContext.state === 'suspended') {
-        console.log('🔊 AudioContext suspended, resuming...')
-        return this.audioContext.resume().then(() => {
-          console.log('✅ AudioContext resumed!')
+        if (this.audioContext && this.audioContext.state === 'suspended') {
+          await this.audioContext.resume()
+        }
+
+        this.initialized = true
+      } catch (error) {
+        // Fall back to plain Web Audio synth sounds
+        try {
+          this.audioContext = new (window.AudioContext || window.webkitAudioContext)()
+          if (this.audioContext.state === 'suspended') {
+            await this.audioContext.resume()
+          }
           this.initialized = true
-        })
+        } catch (fallbackError) {
+          console.error('Web Audio API not supported:', fallbackError)
+          this.enabled = false
+        }
       }
+    })()
 
-      this.initialized = true
-      console.log('🔊 Sound System initialized!')
-      return Promise.resolve()
-    } catch (error) {
-      console.error('❌ Web Audio API not supported:', error)
-      this.enabled = false
-      return Promise.resolve()
-    }
+    return this.initPromise
   }
 
   /**
@@ -223,6 +246,23 @@ class SoundManager {
   }
 
   /**
+   * Play referee whistle (kickoff / "LOS!")
+   */
+  playWhistle() {
+    if (this.playSample('whistle')) return
+    // Synth fallback: short sharp high tone
+    this.playTone(2000, 0.15, 'square', 0.3)
+  }
+
+  /**
+   * Play card-pack opening shimmer
+   */
+  playPack() {
+    if (this.playSample('pack')) return
+    this.playPackSynth()
+  }
+
+  /**
    * Start ambient loop (optional background atmosphere)
    */
   startAmbient() {
@@ -244,7 +284,6 @@ class SoundManager {
 
   playSample(key) {
     if (!this.enabled || !this.initialized) {
-      console.warn('🔇 Sound not playing - not initialized yet')
       return false
     }
 
@@ -489,15 +528,48 @@ class SoundManager {
     noise.stop(now + 0.5)
   }
 
+  playPackSynth() {
+    if (!this.audioContext) return
+
+    const now = this.audioContext.currentTime
+    const notes = [659.25, 987.77, 1318.51]
+
+    notes.forEach((freq, i) => {
+      const oscillator = this.audioContext.createOscillator()
+      const gainNode = this.audioContext.createGain()
+
+      oscillator.connect(gainNode)
+      gainNode.connect(this.audioContext.destination)
+
+      oscillator.frequency.value = freq
+      oscillator.type = 'triangle'
+
+      const startTime = now + (i * 0.06)
+      gainNode.gain.setValueAtTime(0, startTime)
+      gainNode.gain.linearRampToValueAtTime(0.2 * this.masterVolume, startTime + 0.01)
+      gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 0.25)
+
+      oscillator.start(startTime)
+      oscillator.stop(startTime + 0.25)
+    })
+  }
+
+  /**
+   * Enable or disable sound explicitly
+   */
+  setEnabled(enabled) {
+    this.enabled = Boolean(enabled)
+    if (!this.enabled && this.useHowler) {
+      Howler.stop()
+    }
+    return this.enabled
+  }
+
   /**
    * Toggle sound on/off
    */
   toggle() {
-    this.enabled = !this.enabled
-    if (!this.enabled && this.useHowler && window.Howler) {
-      window.Howler.stop()
-    }
-    return this.enabled
+    return this.setEnabled(!this.enabled)
   }
 
   /**
@@ -505,8 +577,8 @@ class SoundManager {
    */
   setVolume(volume) {
     this.masterVolume = Math.max(0, Math.min(1, volume))
-    if (this.useHowler && window.Howler) {
-      window.Howler.volume(this.masterVolume)
+    if (this.useHowler) {
+      Howler.volume(this.masterVolume)
     }
   }
 }

@@ -5,42 +5,12 @@ function Welcome({ onStart }) {
   const [funFact] = useState(getRandomFunFact())
   const [greeting] = useState(getPersonalGreeting())
   const [prompt] = useState(getRandomPrompt())
-  const [showFunFact, setShowFunFact] = useState(true)
   const [answered, setAnswered] = useState(false)
   const [selectedAnswer, setSelectedAnswer] = useState(null)
 
   const handleAnswer = (answer) => {
     setSelectedAnswer(answer)
     setAnswered(true)
-
-    // Wait 3 seconds before showing "ready" screen
-    setTimeout(() => {
-      setShowFunFact(false)
-    }, 3000)
-  }
-
-  if (!showFunFact) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6 stadium-bg">
-        <div className="w-full max-w-2xl animate-slide-up">
-          <div className="card p-8 text-center">
-            <div className="text-6xl mb-6 animate-bounce-in">⚽</div>
-            <h2 className="text-3xl font-bold text-white mb-4">
-              Super, Maurice!
-            </h2>
-            <p className="text-xl text-white/80 mb-8">
-              Bist du bereit für ein kleines Spiel?
-            </p>
-            <button
-              onClick={onStart}
-              className="btn-primary btn-primary--hero w-full animate-pulse-glow"
-            >
-              Los geht's! 🚀
-            </button>
-          </div>
-        </div>
-      </div>
-    )
   }
 
   return (
@@ -48,8 +18,13 @@ function Welcome({ onStart }) {
       <div className="w-full max-w-2xl">
         {/* Greeting Card */}
         <div className="card p-8 text-center mb-6 animate-slide-up">
-          <div className="text-5xl mb-4">👋</div>
-          <h1 className="text-4xl font-bold text-white mb-2">
+          <img
+            src="/img/mascot.webp"
+            alt="Zebra-Maskottchen"
+            className="w-32 h-32 mx-auto mb-4 rounded-full object-cover border-2 border-msv-blue-bright shadow-lg"
+            onError={(event) => { event.currentTarget.style.display = 'none' }}
+          />
+          <h1 className="text-4xl font-extrabold text-white mb-2 uppercase tracking-wide">
             {greeting} Maurice!
           </h1>
           <p className="text-xl text-white/70">
@@ -88,27 +63,45 @@ function Welcome({ onStart }) {
               </button>
             </div>
           ) : (
-            <div
-              className={`p-6 rounded-lg text-center animate-bounce-in ${
-                selectedAnswer === funFact.isTrue
-                  ? 'bg-success/20 border-2 border-success'
-                  : 'bg-error/20 border-2 border-error'
-              }`}
-            >
-              <div className="text-5xl mb-3">
-                {selectedAnswer === funFact.isTrue ? '🎉' : '🤔'}
+            <>
+              <div
+                className={`p-6 rounded-lg text-center animate-bounce-in ${
+                  selectedAnswer === funFact.isTrue
+                    ? 'bg-success/20 border-2 border-success'
+                    : 'bg-error/20 border-2 border-error'
+                }`}
+              >
+                <div className="text-5xl mb-3">
+                  {selectedAnswer === funFact.isTrue ? '🎉' : '🤔'}
+                </div>
+                <div className="text-xl font-bold text-white mb-3">
+                  {selectedAnswer === funFact.isTrue
+                    ? 'Genau richtig!'
+                    : 'Nicht ganz!'}
+                </div>
+                <p className="text-white/90 leading-relaxed">
+                  {funFact.explanation}
+                </p>
               </div>
-              <div className="text-xl font-bold text-white mb-3">
-                {selectedAnswer === funFact.isTrue
-                  ? 'Genau richtig!'
-                  : 'Nicht ganz!'}
-              </div>
-              <p className="text-white/90 leading-relaxed">
-                {funFact.explanation}
-              </p>
-            </div>
+              <button
+                onClick={onStart}
+                className="btn-primary btn-primary--hero w-full mt-4 animate-pulse-glow"
+              >
+                Los geht's! 🚀
+              </button>
+            </>
           )}
         </div>
+
+        {/* Skip straight into the stadium */}
+        {!answered && (
+          <button
+            onClick={onStart}
+            className="w-full mt-4 text-white/60 hover:text-white text-sm py-2"
+          >
+            Überspringen und direkt loslegen →
+          </button>
+        )}
       </div>
     </div>
   )

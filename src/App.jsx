@@ -2,33 +2,54 @@ import { useState, useEffect } from 'react'
 import Welcome from './components/Welcome'
 import Stadium from './components/Stadium'
 import Match from './components/Match'
-import { loadProgress } from './utils/localStorage'
+import { loadProgress, loadSoundPreference, saveSoundPreference } from './utils/localStorage'
 import soundManager from './utils/sounds'
 
 function App() {
   const [gameState, setGameState] = useState('welcome') // 'welcome', 'stadium', or 'match'
   const [progress, setProgress] = useState(null)
-  const [soundPromptVisible, setSoundPromptVisible] = useState(true)
+  const [matchOptions, setMatchOptions] = useState(null)
+  // Ask about sound only once — afterwards the stored preference applies
+  // (it can still be changed anytime in the settings menu).
+  const [soundPromptVisible, setSoundPromptVisible] = useState(() => loadSoundPreference() === null)
 
   useEffect(() => {
     // Load user progress on mount
     const savedProgress = loadProgress()
     setProgress(savedProgress)
+
+    // Apply stored sound preference. iOS still requires a user gesture to
+    // unlock audio — soundManager.init() runs on the first tap in a match.
+    const soundPreference = loadSoundPreference()
+    if (soundPreference !== null) {
+      soundManager.setEnabled(soundPreference)
+    }
   }, [])
 
   const startStadium = () => {
     setGameState('stadium')
   }
 
-  const startMatch = () => {
+  const startMatch = (options) => {
+    setMatchOptions(options || null)
     setGameState('match')
   }
 
-  const endMatch = (matchResult) => {
+  const endMatch = () => {
     setGameState('stadium')
     // Progress will be updated by Match component
     const updatedProgress = loadProgress()
     setProgress(updatedProgress)
+  }
+
+  const refreshProgress = () => {
+    setProgress(loadProgress())
+  }
+
+  const handleProgressReset = () => {
+    const freshProgress = loadProgress()
+    setProgress(freshProgress)
+    setGameState('welcome')
   }
 
   if (!progress) {
@@ -46,12 +67,14 @@ function App() {
           <div className="w-full max-w-sm rounded-2xl bg-white/95 p-6 text-center shadow-xl">
             <h2 className="text-xl font-bold text-gray-900">Sound aktivieren?</h2>
             <p className="mt-2 text-sm text-gray-600">
-              Safari benötigt eine Nutzeraktion, damit Sound abgespielt werden darf.
+              Du kannst das später jederzeit in den Einstellungen ⚙️ ändern.
             </p>
             <div className="mt-5 flex flex-col gap-3">
               <button
                 className="rounded-full bg-blue-600 px-6 py-3 text-white shadow-md transition hover:bg-blue-700"
                 onClick={() => {
+                  soundManager.setEnabled(true)
+                  saveSoundPreference(true)
                   soundManager.init().then(() => {
                     soundManager.playIntro()
                   })
@@ -63,7 +86,8 @@ function App() {
               <button
                 className="rounded-full bg-gray-100 px-6 py-3 text-gray-700 shadow-sm transition hover:bg-gray-200"
                 onClick={() => {
-                  soundManager.toggle()
+                  soundManager.setEnabled(false)
+                  saveSoundPreference(false)
                   setSoundPromptVisible(false)
                 }}
               >
@@ -76,9 +100,21 @@ function App() {
       {gameState === 'welcome' ? (
         <Welcome onStart={startStadium} />
       ) : gameState === 'stadium' ? (
-        <Stadium progress={progress} onStartMatch={startMatch} />
+        <Stadium
+          progress={progress}
+          onStartMatch={startMatch}
+          onProgressReset={handleProgressReset}
+          onProgressRefresh={refreshProgress}
+        />
       ) : (
-        <Match progress={progress} onMatchEnd={endMatch} />
+        <Match
+          progress={progress}
+          onMatchEnd={endMatch}
+          filters={matchOptions ? { category: matchOptions.category, difficulty: matchOptions.difficulty } : null}
+          mode={matchOptions?.mode || 'training'}
+          seasonOpponent={matchOptions?.opponent || null}
+          seasonMatchday={matchOptions?.matchday || null}
+        />
       )}
     </div>
   )

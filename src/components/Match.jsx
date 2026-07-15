@@ -6,21 +6,44 @@ import ConfettiExplosion from './ConfettiExplosion'
 import LevelUpNotification from './LevelUpNotification'
 import MatchCountdown from './MatchCountdown'
 import vocabsData from '../data/vocabs.json'
-import { selectVocabsForMatch } from '../utils/spacedRepetition'
-import { selectRandomOpponent, getDerbyOpponents, checkAnswer, calculateMatchResult, getMatchSummaryMessage } from '../utils/matchLogic'
+import { selectVocabsForMatch, filterByCategory, filterByDifficulty } from '../utils/spacedRepetition'
+import { selectRandomOpponent, getDerbyOpponents, calculateMatchResult, getMatchSummaryMessage, ANSWER_DELAY_CORRECT, ANSWER_DELAY_WRONG } from '../utils/matchLogic'
 import { updateVocabProgress, updateGoalsAndLeague, addMatchToHistory, loadProgress, unlockAchievement, addXP, updateDailyStreak, loadLastOpponentName, saveLastOpponentName } from '../utils/localStorage'
 import { generateMultipleChoiceOptions } from '../utils/multipleChoice'
 import { calculateStreakBonus, getStreakMessage, getStreakEmoji, getStreakColor, triggerHapticFeedback } from '../utils/gameEffects'
 import { checkNewAchievements } from '../utils/achievements'
 import { calculateXPReward } from '../utils/xpSystem'
 import CardReveal from './CardReveal'
-import { awardMatchRewards, rollCardReward } from '../utils/cardRewards'
+import { rollCardReward } from '../utils/cardRewards'
+import { recordSeasonResult, getRankZone, MATCHDAYS } from '../utils/season'
 import soundManager from '../utils/sounds'
 import ShareCard from './ShareCard'
 
-function Match({ progress, onMatchEnd }) {
-  const [specialMatch] = useState(() => Math.random() < 0.2)
+const EXTRA_TIME_XP = 5
+
+// Ask German→English (active recall) for words Maurice has seen before
+const DE_EN_SHARE = 0.4
+
+const prepareVocab = (vocab, progressData) => {
+  const seenBefore = Boolean(progressData?.vocabProgress?.[vocab.id])
+  const direction = seenBefore && Math.random() < DE_EN_SHARE ? 'de-en' : 'en-de'
+  return {
+    ...vocab,
+    direction,
+    options: generateMultipleChoiceOptions(vocab, vocabsData, direction)
+  }
+}
+
+function Match({ progress, onMatchEnd, filters, mode = 'training', seasonOpponent = null, seasonMatchday = null }) {
+  const isSeasonMatch = mode === 'season' && Boolean(seasonOpponent)
+  // Season: derby fixtures pay a bonus. Training: 20% surprise derby.
+  const [specialMatch] = useState(() =>
+    isSeasonMatch ? Boolean(seasonOpponent.isDerby) : Math.random() < 0.2
+  )
   const [opponent] = useState(() => {
+    if (isSeasonMatch) {
+      return seasonOpponent
+    }
     const lastOpponent = loadLastOpponentName()
     const derbyPool = getDerbyOpponents()
     const nextOpponent = specialMatch && derbyPool.length > 0
@@ -38,6 +61,7 @@ function Match({ progress, onMatchEnd }) {
   const [matchFinished, setMatchFinished] = useState(false)
   const [matchResult, setMatchResult] = useState(null)
   const [streak, setStreak] = useState(0)
+  const [maxStreak, setMaxStreak] = useState(0)
   const [streakMessage, setStreakMessage] = useState(null)
   const [newAchievements, setNewAchievements] = useState([])
   const [showAchievementIndex, setShowAchievementIndex] = useState(0)
@@ -46,35 +70,51 @@ function Match({ progress, onMatchEnd }) {
   const [xpGained, setXPGained] = useState(0)
   const [showLevelUp, setShowLevelUp] = useState(false)
   const [leveledUpTo, setLeveledUpTo] = useState(null)
+  const [postMatchLevel, setPostMatchLevel] = useState(null)
   const [showCountdown, setShowCountdown] = useState(true)
-  const [matchStarted, setMatchStarted] = useState(false)
   const [matchFeedback, setMatchFeedback] = useState(null)
   const [goalAnimationKey, setGoalAnimationKey] = useState(0)
   const [crowdAnimationKey, setCrowdAnimationKey] = useState(0)
   const [cardReward, setCardReward] = useState(null)
   const [showCardReveal, setShowCardReveal] = useState(false)
-  const [reward, setReward] = useState(null)
-  const [showReward, setShowReward] = useState(false)
+
+  // "Nachspielzeit": wrong answers get replayed at the end of the match
+  const [phase, setPhase] = useState('regular') // 'regular' | 'extraTime'
+  const [missedVocabs, setMissedVocabs] = useState([])
+  const [extraVocabs, setExtraVocabs] = useState([])
+  const [extraIndex, setExtraIndex] = useState(0)
+  const [extraCorrectCount, setExtraCorrectCount] = useState(0)
 
   useEffect(() => {
     // Initialize sound system on component mount
     soundManager.init()
 
+    // Optional training filters from the stadium screen
+    let pool = vocabsData
+    if (filters?.category && filters.category !== 'all') {
+      pool = filterByCategory(pool, [filters.category])
+    }
+    if (filters?.difficulty && filters.difficulty !== 'all') {
+      pool = filterByDifficulty(pool, [filters.difficulty])
+    }
+    if (pool.length === 0) {
+      pool = vocabsData
+    }
+
     // Select vocabs for this match using spaced repetition
-    const selectedVocabs = selectVocabsForMatch(vocabsData, progress, 10)
+    const selectedVocabs = selectVocabsForMatch(pool, progress, 10)
 
-    // Generate multiple choice options for each vocab
-    const vocabsWithOptions = selectedVocabs.map(vocab => ({
-      ...vocab,
-      options: generateMultipleChoiceOptions(vocab, vocabsData)
-    }))
-
-    setVocabs(vocabsWithOptions)
-  }, [progress])
+    setVocabs(selectedVocabs.map(vocab => prepareVocab(vocab, progress)))
+  }, [progress, filters])
 
   const handleAnswer = (userAnswer) => {
+    if (phase === 'extraTime') {
+      return handleExtraTimeAnswer(userAnswer)
+    }
+
     const currentVocab = vocabs[currentVocabIndex]
-    const isCorrect = checkAnswer(userAnswer, currentVocab.german)
+    const correctTarget = currentVocab.direction === 'de-en' ? currentVocab.english : currentVocab.german
+    const isCorrect = userAnswer === correctTarget
 
     // Update vocab progress
     updateVocabProgress(currentVocab.id, isCorrect)
@@ -85,12 +125,14 @@ function Match({ progress, onMatchEnd }) {
     let nextCorrectAnswers = correctAnswers
     let nextWasDownThree = wasDownThree
     let nextXPGained = xpGained
+    let nextMissedVocabs = missedVocabs
     let streakBonus = 0
 
     // Update streak
     if (isCorrect) {
       nextStreak = streak + 1
       setStreak(nextStreak)
+      setMaxStreak(prev => Math.max(prev, nextStreak))
       setMatchFeedback('success')
       setGoalAnimationKey(prev => prev + 1)
       setCrowdAnimationKey(prev => prev + 1)
@@ -135,6 +177,9 @@ function Match({ progress, onMatchEnd }) {
         setWasDownThree(true)
       }
 
+      nextMissedVocabs = [...missedVocabs, currentVocab]
+      setMissedVocabs(nextMissedVocabs)
+
       // Trigger haptic feedback for wrong answer
       triggerHapticFeedback('error')
 
@@ -142,22 +187,83 @@ function Match({ progress, onMatchEnd }) {
       soundManager.playWrong()
     }
 
+    const advanceDelay = isCorrect ? ANSWER_DELAY_CORRECT : ANSWER_DELAY_WRONG
+
     // Move to next vocab after a delay
     setTimeout(() => {
       if (currentVocabIndex < vocabs.length - 1) {
         setCurrentVocabIndex(prev => prev + 1)
+      } else if (nextMissedVocabs.length > 0) {
+        startExtraTime(nextMissedVocabs)
       } else {
         // Match finished
         finishMatch({
           finalMsvGoals: nextMsvGoals,
           finalCorrectAnswers: nextCorrectAnswers,
           finalOpponentGoals: nextOpponentGoals,
-          finalStreak: nextStreak,
           finalWasDownThree: nextWasDownThree,
-          finalXpGained: nextXPGained
+          finalXpGained: nextXPGained,
+          finalMissedVocabs: nextMissedVocabs
         })
       }
-    }, 2000)
+    }, advanceDelay)
+
+    setTimeout(() => {
+      setMatchFeedback(null)
+    }, 700)
+
+    return isCorrect
+  }
+
+  const startExtraTime = (missed) => {
+    // Re-ask every missed word once — fresh options, same direction
+    setExtraVocabs(missed.map(vocab => ({
+      ...vocab,
+      options: generateMultipleChoiceOptions(vocab, vocabsData, vocab.direction)
+    })))
+    setExtraIndex(0)
+    setPhase('extraTime')
+    setStreakMessage(null)
+  }
+
+  const handleExtraTimeAnswer = (userAnswer) => {
+    const currentVocab = extraVocabs[extraIndex]
+    const correctTarget = currentVocab.direction === 'de-en' ? currentVocab.english : currentVocab.german
+    const isCorrect = userAnswer === correctTarget
+
+    // Extra time counts for learning progress, but not for the score
+    updateVocabProgress(currentVocab.id, isCorrect)
+
+    let nextXPGained = xpGained
+    let nextExtraCorrect = extraCorrectCount
+
+    if (isCorrect) {
+      setMatchFeedback('success')
+      setGoalAnimationKey(prev => prev + 1)
+      setCrowdAnimationKey(prev => prev + 1)
+      triggerHapticFeedback('success')
+      soundManager.playGoal()
+      nextXPGained += EXTRA_TIME_XP
+      nextExtraCorrect += 1
+      setXPGained(nextXPGained)
+      setExtraCorrectCount(nextExtraCorrect)
+    } else {
+      triggerHapticFeedback('error')
+      soundManager.playWrong()
+    }
+
+    const advanceDelay = isCorrect ? ANSWER_DELAY_CORRECT : ANSWER_DELAY_WRONG
+
+    setTimeout(() => {
+      if (extraIndex < extraVocabs.length - 1) {
+        setExtraIndex(prev => prev + 1)
+      } else {
+        finishMatch({
+          finalXpGained: nextXPGained,
+          finalExtraCorrect: nextExtraCorrect
+        })
+      }
+    }, advanceDelay)
 
     setTimeout(() => {
       setMatchFeedback(null)
@@ -170,9 +276,10 @@ function Match({ progress, onMatchEnd }) {
     finalMsvGoals = msvGoals,
     finalCorrectAnswers = correctAnswers,
     finalOpponentGoals = opponentGoals,
-    finalStreak = streak,
     finalWasDownThree = wasDownThree,
-    finalXpGained = xpGained
+    finalXpGained = xpGained,
+    finalMissedVocabs = missedVocabs,
+    finalExtraCorrect = extraCorrectCount
   } = {}) => {
     const result = calculateMatchResult(finalMsvGoals, finalCorrectAnswers, vocabs.length)
     const bonusXp = specialMatch ? 30 : 0
@@ -191,20 +298,24 @@ function Match({ progress, onMatchEnd }) {
       comebackWin: finalWasDownThree && result.status === 'win'
     })
 
-    // Check for new achievements
-    const newProgress = loadProgress()
-    const unlockedAchievements = checkNewAchievements(oldProgress, newProgress)
-
-    // Unlock achievements
-    unlockedAchievements.forEach(achievement => {
-      unlockAchievement(achievement.id)
-    })
-
-    setNewAchievements(unlockedAchievements)
+    // Season: record the matchday, simulate the rest of the league
+    let seasonInfo = null
+    if (isSeasonMatch) {
+      const update = recordSeasonResult({
+        msvGoals: finalMsvGoals,
+        opponentGoals: finalOpponentGoals
+      })
+      seasonInfo = {
+        matchday: update.matchday,
+        rank: update.rank,
+        finished: update.finished
+      }
+    }
 
     // Add XP and check for level up
     setXPGained(totalXpGained)
     const xpResult = addXP(totalXpGained)
+    setPostMatchLevel(xpResult.newLevel)
     if (xpResult.leveledUp) {
       setLeveledUpTo(xpResult.newLevel)
       setShowLevelUp(true)
@@ -213,15 +324,17 @@ function Match({ progress, onMatchEnd }) {
     // Update daily streak
     updateDailyStreak()
 
-    const reward = rollCardReward({ resultStatus: result.status, streak: finalStreak })
+    // One card pack per rewarded match (win or strong streak)
+    const reward = rollCardReward({ resultStatus: result.status, streak: maxStreak })
     setCardReward(reward)
-    // Award collectible card + fact
-    const rewardResult = awardMatchRewards({
-      wonMatch: result.status === 'win',
-      streak: finalStreak
+
+    // Check for new achievements (after all progress updates)
+    const newProgress = loadProgress()
+    const unlockedAchievements = checkNewAchievements(oldProgress, newProgress)
+    unlockedAchievements.forEach(achievement => {
+      unlockAchievement(achievement.id)
     })
-    setReward(rewardResult)
-    setShowReward(true)
+    setNewAchievements(unlockedAchievements)
 
     // Trigger victory haptic feedback and sounds
     if (result.status === 'win') {
@@ -229,21 +342,16 @@ function Match({ progress, onMatchEnd }) {
       soundManager.playVictory()
       soundManager.playCrowd()
       setShowConfetti(true)
-    } else if (result.status === 'loss') {
+    } else if (result.status === 'lose') {
       soundManager.playDefeat()
     }
 
-    setMatchResult(result)
+    setMatchResult({ ...result, extraCorrect: finalExtraCorrect, missedVocabs: finalMissedVocabs, seasonInfo })
     setMatchFinished(true)
   }
 
   const handleContinue = () => {
-    if (showReward) {
-      setShowReward(false)
-      return
-    }
-    // Simplified: Check if we have achievements to show
-    if (newAchievements.length > 0 && !showingAchievement) {
+    if (newAchievements.length > 0 && showAchievementIndex < newAchievements.length) {
       setShowingAchievement(true)
     } else if (cardReward && !showCardReveal) {
       setShowCardReveal(true)
@@ -254,50 +362,21 @@ function Match({ progress, onMatchEnd }) {
 
   const handleAchievementClose = () => {
     const nextIndex = showAchievementIndex + 1
-    if (nextIndex < newAchievements.length) {
-      setShowAchievementIndex(nextIndex)
-    } else {
+    setShowAchievementIndex(nextIndex)
+    if (nextIndex >= newAchievements.length) {
+      // All achievements shown — back to the result screen
       setShowingAchievement(false)
-      // Go to stadium after all achievements shown
-      onMatchEnd(matchResult)
     }
   }
 
-  const handleShare = async () => {
-    if (shareBusy || !matchResult) return
-
-    setShareStatus('loading')
-
-    try {
-      const summary = getMatchSummaryMessage(matchResult, opponent)
-      const shareBlob = await createShareCardBlob({
-        summary,
-        matchResult,
-        opponent,
-        streak,
-        achievement: newAchievements[0],
-        xpGained,
-        level: progress.level || 1
-      })
-
-      const filename = `msv-match-${Date.now()}.png`
-      const { shared } = await shareImage({
-        title: 'Mein MSV Match',
-        text: `${summary.title} – ${matchResult.score}`,
-        blob: shareBlob,
-        filename
-      })
-
-      if (!shared) {
-        downloadImage(shareBlob, filename)
-      }
-
-      setShareStatus('success')
-      setTimeout(() => setShareStatus('idle'), 1500)
-    } catch (error) {
-      setShareStatus('error')
-      setTimeout(() => setShareStatus('idle'), 2000)
+  const continueLabel = () => {
+    if (newAchievements.length > 0 && showAchievementIndex < newAchievements.length) {
+      return '🏆 Trophäe ansehen'
     }
+    if (cardReward && !showCardReveal) {
+      return '🎁 Kartenpack öffnen'
+    }
+    return 'Zurück zum Stadion'
   }
 
   // Show countdown before match starts
@@ -305,10 +384,7 @@ function Match({ progress, onMatchEnd }) {
     return (
       <MatchCountdown
         opponent={opponent}
-        onComplete={() => {
-          setShowCountdown(false)
-          setMatchStarted(true)
-        }}
+        onComplete={() => setShowCountdown(false)}
       />
     )
   }
@@ -329,23 +405,21 @@ function Match({ progress, onMatchEnd }) {
       accuracy: matchResult.accuracy,
       score: matchResult.score
     }
+    const missed = matchResult.missedVocabs || []
 
     if (showCardReveal && cardReward) {
       return (
         <CardReveal
           card={cardReward.card}
           isNew={cardReward.isNew}
+          fact={cardReward.fact}
           onClose={() => onMatchEnd(matchResult)}
         />
       )
     }
 
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 stadium-scene field-pattern relative overflow-hidden">
-        <CardReveal
-          reward={reward}
-          onClose={() => setShowReward(false)}
-        />
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 pt-safe stadium-scene field-pattern relative overflow-hidden">
         {/* Floodlights */}
         <div className="floodlight top-10 left-10" />
         <div className="floodlight top-10 right-10" />
@@ -356,6 +430,21 @@ function Match({ progress, onMatchEnd }) {
             <div className="text-6xl mb-4">{summary.emoji}</div>
             <h2 className="text-3xl font-bold mb-2">{summary.title}</h2>
             <p className="text-xl mb-6">{summary.message}</p>
+
+            {/* Season standing after this matchday */}
+            {matchResult.seasonInfo && (
+              <div className="bg-white/10 rounded-lg p-3 mb-6 flex items-center justify-center gap-3 text-sm">
+                <span className="text-white/70">
+                  Spieltag {matchResult.seasonInfo.matchday}/{MATCHDAYS}
+                </span>
+                <span className="font-bold">
+                  {getRankZone(matchResult.seasonInfo.rank).emoji} Platz {matchResult.seasonInfo.rank}
+                </span>
+                <span className={`${getRankZone(matchResult.seasonInfo.rank).color} font-semibold`}>
+                  {getRankZone(matchResult.seasonInfo.rank).label}
+                </span>
+              </div>
+            )}
 
             {/* Final Score */}
             <div className="bg-white/10 rounded-lg p-6 mb-6">
@@ -381,19 +470,41 @@ function Match({ progress, onMatchEnd }) {
                 <div className="text-sm text-white/70">⭐ Erfahrung gewonnen</div>
               </div>
               <div className="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-all">
-                <div className="text-3xl font-bold text-yellow-300">{progress.level || 1}</div>
+                <div className="text-3xl font-bold text-yellow-300">{postMatchLevel || progress.level || 1}</div>
                 <div className="text-sm text-white/70">💪 Dein Level</div>
               </div>
             </div>
+
+            {/* Recap of missed words */}
+            {missed.length > 0 && (
+              <div className="bg-white/5 rounded-lg p-4 mb-6 text-left">
+                <div className="font-bold text-white mb-1">
+                  📝 Das übst du noch:
+                </div>
+                {matchResult.extraCorrect > 0 && (
+                  <div className="text-xs text-emerald-300 mb-2">
+                    ⏱️ {matchResult.extraCorrect} von {missed.length} in der Nachspielzeit wiedergutgemacht!
+                  </div>
+                )}
+                <ul className="space-y-1">
+                  {missed.map(vocab => (
+                    <li key={vocab.id} className="text-sm text-white/80 flex justify-between gap-3">
+                      <span className="font-semibold">{vocab.english}</span>
+                      <span className="text-white/60 text-right">{vocab.german}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {/* Continue Button */}
             <button
               onClick={handleContinue}
               className="btn-primary btn-primary--hero w-full"
             >
-              {cardReward ? 'Kartenpack öffnen' : 'Zurück zum Stadion'}
+              {continueLabel()}
             </button>
-            {cardReward && (
+            {(cardReward || newAchievements.length > 0) && (
               <button
                 onClick={() => onMatchEnd(matchResult)}
                 className="btn-secondary btn-secondary--soft w-full mt-3"
@@ -403,14 +514,38 @@ function Match({ progress, onMatchEnd }) {
             )}
           </div>
 
-          <ShareCard summary={shareSummary} reward={reward} />
+          <ShareCard summary={shareSummary} reward={cardReward} />
         </div>
+
+        {/* Achievement Unlocked Modal */}
+        {showingAchievement && newAchievements[showAchievementIndex] && (
+          <AchievementUnlocked
+            achievement={newAchievements[showAchievementIndex]}
+            onClose={handleAchievementClose}
+          />
+        )}
+
+        {/* Confetti for victories */}
+        <ConfettiExplosion trigger={showConfetti} />
+
+        {/* Level Up Notification */}
+        {showLevelUp && leveledUpTo && (
+          <LevelUpNotification
+            newLevel={leveledUpTo}
+            onClose={() => setShowLevelUp(false)}
+          />
+        )}
       </div>
     )
   }
 
+  const isExtraTime = phase === 'extraTime'
+  const activeVocab = isExtraTime ? extraVocabs[extraIndex] : vocabs[currentVocabIndex]
+  const activeIndex = isExtraTime ? extraIndex : currentVocabIndex
+  const activeTotal = isExtraTime ? extraVocabs.length : vocabs.length
+
   return (
-    <div className={`min-h-screen flex flex-col p-4 pt-28 stadium-scene field-pattern relative ${matchFeedback === 'success' ? 'match-success' : matchFeedback === 'miss' ? 'match-miss' : ''}`}>
+    <div className={`min-h-screen flex flex-col p-4 pt-match stadium-scene field-pattern relative ${matchFeedback === 'success' ? 'match-success' : matchFeedback === 'miss' ? 'match-miss' : ''}`}>
       <div className="goal-feedback-layer">
         {matchFeedback === 'success' && (
           <>
@@ -429,22 +564,35 @@ function Match({ progress, onMatchEnd }) {
         )}
       </div>
       {/* Header with Score */}
-      <div className="fixed top-0 left-0 right-0 bg-field-green/95 backdrop-blur-sm p-4 z-10 border-b border-white/10">
+      <div className="fixed top-0 left-0 right-0 bg-night/95 backdrop-blur-sm p-4 pt-safe z-10 border-b border-white/10">
         <ScoreDisplay
           msvGoals={msvGoals}
           opponentGoals={opponentGoals}
           opponent={opponent}
         />
-        {specialMatch && (
+        {isSeasonMatch && !isExtraTime && seasonMatchday && (
+          <div className="mt-1 text-center text-xs text-white/60">
+            📅 Spieltag {seasonMatchday}/{MATCHDAYS}
+          </div>
+        )}
+        {specialMatch && !isExtraTime && (
           <div className="mt-2 text-center animate-bounce-in">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-400/20 text-yellow-100 border border-yellow-300/40 font-semibold text-sm">
-              ⚡ Überraschungs-Derby · +30 XP Bonus
+              {isSeasonMatch ? '🔥 Derby! · +30 XP Bonus' : '⚡ Überraschungs-Derby · +30 XP Bonus'}
+            </div>
+          </div>
+        )}
+
+        {isExtraTime && (
+          <div className="mt-2 text-center animate-bounce-in">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-400/20 text-orange-100 border border-orange-300/40 font-semibold text-sm">
+              ⏱️ Nachspielzeit · Fehler wiedergutmachen (+{EXTRA_TIME_XP} XP)
             </div>
           </div>
         )}
 
         {/* Streak Display */}
-        {streak > 0 && (
+        {!isExtraTime && streak > 0 && (
           <div className="mt-2 text-center animate-fade-in">
             <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 ${getStreakColor(streak)} ${streak >= 5 ? 'streak-lightning' : streak >= 3 ? 'streak-fire' : ''}`}>
               <span className="text-2xl">{getStreakEmoji(streak)}</span>
@@ -456,7 +604,7 @@ function Match({ progress, onMatchEnd }) {
         )}
 
         {/* Streak Message */}
-        {streakMessage && (
+        {!isExtraTime && streakMessage && (
           <div className="mt-2 text-center animate-bounce-in">
             <div className="text-sm font-bold text-yellow-300">
               {streakMessage}
@@ -468,32 +616,16 @@ function Match({ progress, onMatchEnd }) {
       {/* Vocab Card */}
       <div className="flex-1 flex items-center justify-center">
         <VocabCard
-          vocab={vocabs[currentVocabIndex]}
-          options={vocabs[currentVocabIndex].options}
+          key={`${phase}-${activeVocab.id}`}
+          vocab={activeVocab}
+          options={activeVocab.options}
+          direction={activeVocab.direction}
           onAnswer={handleAnswer}
-          currentIndex={currentVocabIndex}
-          total={vocabs.length}
+          currentIndex={activeIndex}
+          total={activeTotal}
+          extraTime={isExtraTime}
         />
       </div>
-
-      {/* Achievement Unlocked Modal */}
-      {showingAchievement && newAchievements[showAchievementIndex] && (
-        <AchievementUnlocked
-          achievement={newAchievements[showAchievementIndex]}
-          onClose={handleAchievementClose}
-        />
-      )}
-
-      {/* Confetti for victories */}
-      <ConfettiExplosion trigger={showConfetti} />
-
-      {/* Level Up Notification */}
-      {showLevelUp && leveledUpTo && (
-        <LevelUpNotification
-          newLevel={leveledUpTo}
-          onClose={() => setShowLevelUp(false)}
-        />
-      )}
     </div>
   )
 }

@@ -74,7 +74,7 @@
   {
     "id": "vocab_010",
     "english": "to tackle",
-    "german": "tackling machen, grätschen",
+    "german": "angreifen, grätschen",
     "exampleSentence": "The defender tackles the opponent",
     "category": "sport",
     "difficulty": 2
@@ -1081,9 +1081,9 @@
   },
   {
     "id": "vocab_136",
-    "english": "to practice",
-    "german": "üben",
-    "exampleSentence": "Practice makes perfect",
+    "english": "to repeat",
+    "german": "wiederholen",
+    "exampleSentence": "Please repeat the question",
     "category": "school",
     "difficulty": 1
   },
@@ -1449,9 +1449,9 @@
   },
   {
     "id": "vocab_182",
-    "english": "to celebrate",
-    "german": "feiern",
-    "exampleSentence": "We celebrate Christmas together",
+    "english": "to hug",
+    "german": "umarmen",
+    "exampleSentence": "I hug my little brother",
     "category": "family",
     "difficulty": 1
   },
@@ -1531,7 +1531,7 @@
     "id": "vocab_192",
     "english": "to grow up",
     "german": "aufwachsen",
-    "exampleSentence": "I grow up in Duisburg",
+    "exampleSentence": "I grew up in Duisburg",
     "category": "family",
     "difficulty": 2
   },
@@ -1985,9 +1985,9 @@
   },
   {
     "id": "vocab_249",
-    "english": "music",
-    "german": "Musik",
-    "exampleSentence": "Music makes me happy",
+    "english": "headphones",
+    "german": "Kopfhörer",
+    "exampleSentence": "I listen to music with my headphones",
     "category": "everyday",
     "difficulty": 1
   },
@@ -2601,9 +2601,9 @@
   },
   {
     "id": "vocab_326",
-    "english": "season",
-    "german": "Jahreszeit",
-    "exampleSentence": "Summer is my favorite season",
+    "english": "shadow",
+    "german": "Schatten",
+    "exampleSentence": "The tree gives a big shadow",
     "category": "nature",
     "difficulty": 1
   },
@@ -2797,6 +2797,822 @@
     "german": "Umwelt",
     "exampleSentence": "We must protect the environment",
     "category": "nature",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_351",
+    "english": "be – was/were – been",
+    "german": "sein",
+    "exampleSentence": "I was ill yesterday",
+    "category": "verbs",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_352",
+    "english": "become – became – become",
+    "german": "werden",
+    "exampleSentence": "He became a professional player",
+    "category": "verbs",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_353",
+    "english": "begin – began – begun",
+    "german": "beginnen, anfangen",
+    "exampleSentence": "The match began at three o'clock",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_354",
+    "english": "break – broke – broken",
+    "german": "brechen, kaputt machen",
+    "exampleSentence": "He broke his leg in the derby",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_355",
+    "english": "bring – brought – brought",
+    "german": "bringen",
+    "exampleSentence": "She brought her boots to training",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_356",
+    "english": "buy – bought – bought",
+    "german": "kaufen",
+    "exampleSentence": "We bought tickets for the match",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_357",
+    "english": "catch – caught – caught",
+    "german": "fangen",
+    "exampleSentence": "The keeper caught the ball",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_358",
+    "english": "choose – chose – chosen",
+    "german": "wählen, aussuchen",
+    "exampleSentence": "The coach chose a new captain",
+    "category": "verbs",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_359",
+    "english": "come – came – come",
+    "german": "kommen",
+    "exampleSentence": "Many fans came to the stadium",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_360",
+    "english": "do – did – done",
+    "german": "tun, machen",
+    "exampleSentence": "We did our homework after training",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_361",
+    "english": "draw – drew – drawn",
+    "german": "zeichnen",
+    "exampleSentence": "She drew a picture of the stadium",
+    "category": "verbs",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_362",
+    "english": "drink – drank – drunk",
+    "german": "trinken",
+    "exampleSentence": "He drank water at half-time",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_363",
+    "english": "drive – drove – driven",
+    "german": "fahren (Auto)",
+    "exampleSentence": "Dad drove us to the away game",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_364",
+    "english": "eat – ate – eaten",
+    "german": "essen",
+    "exampleSentence": "We ate pizza after the match",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_365",
+    "english": "fall – fell – fallen",
+    "german": "fallen, hinfallen",
+    "exampleSentence": "The striker fell in the box",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_366",
+    "english": "feel – felt – felt",
+    "german": "fühlen",
+    "exampleSentence": "I felt great after the win",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_367",
+    "english": "find – found – found",
+    "german": "finden",
+    "exampleSentence": "She found her lucky scarf",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_368",
+    "english": "fly – flew – flown",
+    "german": "fliegen",
+    "exampleSentence": "The ball flew into the top corner",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_369",
+    "english": "forget – forgot – forgotten",
+    "german": "vergessen",
+    "exampleSentence": "He forgot his shin pads",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_370",
+    "english": "get – got – got",
+    "german": "bekommen, kriegen",
+    "exampleSentence": "She got a yellow card",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_371",
+    "english": "give – gave – given",
+    "german": "geben",
+    "exampleSentence": "The referee gave a penalty",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_372",
+    "english": "go – went – gone",
+    "german": "gehen",
+    "exampleSentence": "We went to the stadium on Saturday",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_373",
+    "english": "have – had – had",
+    "german": "haben",
+    "exampleSentence": "We had a great season",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_374",
+    "english": "hear – heard – heard",
+    "german": "hören",
+    "exampleSentence": "I heard the fans singing",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_375",
+    "english": "keep – kept – kept",
+    "german": "behalten",
+    "exampleSentence": "He kept the match ball",
+    "category": "verbs",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_376",
+    "english": "know – knew – known",
+    "german": "wissen, kennen",
+    "exampleSentence": "I knew the answer at once",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_377",
+    "english": "leave – left – left",
+    "german": "verlassen, weggehen",
+    "exampleSentence": "The player left the club in summer",
+    "category": "verbs",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_378",
+    "english": "lose – lost – lost",
+    "german": "verlieren",
+    "exampleSentence": "We lost the final last year",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_379",
+    "english": "make – made – made",
+    "german": "machen, herstellen",
+    "exampleSentence": "The keeper made a great save",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_380",
+    "english": "read – read – read",
+    "german": "lesen",
+    "exampleSentence": "I read a book about football",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_381",
+    "english": "run – ran – run",
+    "german": "rennen, laufen",
+    "exampleSentence": "He ran faster than everyone else",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_382",
+    "english": "see – saw – seen",
+    "german": "sehen",
+    "exampleSentence": "We saw a fantastic goal",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_383",
+    "english": "sing – sang – sung",
+    "german": "singen",
+    "exampleSentence": "The fans sang the club song",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_384",
+    "english": "speak – spoke – spoken",
+    "german": "sprechen",
+    "exampleSentence": "She spoke English with the new player",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_385",
+    "english": "swim – swam – swum",
+    "german": "schwimmen",
+    "exampleSentence": "We swam in the lake last summer",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_386",
+    "english": "take – took – taken",
+    "german": "nehmen",
+    "exampleSentence": "He took the free kick",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_387",
+    "english": "teach – taught – taught",
+    "german": "unterrichten, beibringen",
+    "exampleSentence": "My coach taught me a new trick",
+    "category": "verbs",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_388",
+    "english": "think – thought – thought",
+    "german": "denken",
+    "exampleSentence": "I thought we would win",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_389",
+    "english": "throw – threw – thrown",
+    "german": "werfen",
+    "exampleSentence": "The keeper threw the ball out",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_390",
+    "english": "wear – wore – worn",
+    "german": "tragen (Kleidung)",
+    "exampleSentence": "He wore the number ten shirt",
+    "category": "verbs",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_391",
+    "english": "win – won – won",
+    "german": "gewinnen",
+    "exampleSentence": "We won the derby three-nil",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_392",
+    "english": "write – wrote – written",
+    "german": "schreiben",
+    "exampleSentence": "She wrote a report about the match",
+    "category": "verbs",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_393",
+    "english": "headache",
+    "german": "Kopfschmerzen",
+    "exampleSentence": "I have a headache today",
+    "category": "body",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_394",
+    "english": "stomach ache",
+    "german": "Bauchschmerzen",
+    "exampleSentence": "Too much pizza gives you a stomach ache",
+    "category": "body",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_395",
+    "english": "sore throat",
+    "german": "Halsschmerzen",
+    "exampleSentence": "I can't sing, I have a sore throat",
+    "category": "body",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_396",
+    "english": "to catch a cold",
+    "german": "sich erkälten",
+    "exampleSentence": "Don't catch a cold before the final!",
+    "category": "body",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_397",
+    "english": "shoulder",
+    "german": "Schulter",
+    "exampleSentence": "The keeper hurt his shoulder",
+    "category": "body",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_398",
+    "english": "knee",
+    "german": "Knie",
+    "exampleSentence": "He wears a bandage on his knee",
+    "category": "body",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_399",
+    "english": "elbow",
+    "german": "Ellbogen",
+    "exampleSentence": "She hit her elbow on the door",
+    "category": "body",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_400",
+    "english": "ankle",
+    "german": "Knöchel, Fußgelenk",
+    "exampleSentence": "The striker twisted his ankle",
+    "category": "body",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_401",
+    "english": "muscle",
+    "german": "Muskel",
+    "exampleSentence": "Warm up your muscles before the match",
+    "category": "body",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_402",
+    "english": "bone",
+    "german": "Knochen",
+    "exampleSentence": "Milk is good for your bones",
+    "category": "body",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_403",
+    "english": "skin",
+    "german": "Haut",
+    "exampleSentence": "Sun cream protects your skin",
+    "category": "body",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_404",
+    "english": "blood",
+    "german": "Blut",
+    "exampleSentence": "Blood is red",
+    "category": "body",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_405",
+    "english": "lungs",
+    "german": "Lunge",
+    "exampleSentence": "Running is good for your lungs",
+    "category": "body",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_406",
+    "english": "stomach",
+    "german": "Magen, Bauch",
+    "exampleSentence": "My stomach hurts before big matches",
+    "category": "body",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_407",
+    "english": "throat",
+    "german": "Hals, Kehle",
+    "exampleSentence": "My throat hurts from cheering",
+    "category": "body",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_408",
+    "english": "forehead",
+    "german": "Stirn",
+    "exampleSentence": "He headed the ball with his forehead",
+    "category": "body",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_409",
+    "english": "chest",
+    "german": "Brust, Brustkorb",
+    "exampleSentence": "He controlled the ball with his chest",
+    "category": "body",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_410",
+    "english": "wrist",
+    "german": "Handgelenk",
+    "exampleSentence": "The keeper taped his wrist",
+    "category": "body",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_411",
+    "english": "thumb",
+    "german": "Daumen",
+    "exampleSentence": "I hurt my thumb playing goalkeeper",
+    "category": "body",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_412",
+    "english": "ill",
+    "german": "krank",
+    "exampleSentence": "I stayed at home because I was ill",
+    "category": "body",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_413",
+    "english": "healthy",
+    "german": "gesund",
+    "exampleSentence": "Fruit and sport keep you healthy",
+    "category": "body",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_414",
+    "english": "pain",
+    "german": "Schmerz",
+    "exampleSentence": "He played on despite the pain",
+    "category": "body",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_415",
+    "english": "to hurt",
+    "german": "wehtun, verletzen",
+    "exampleSentence": "Does your foot still hurt?",
+    "category": "body",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_416",
+    "english": "medicine",
+    "german": "Medikament, Medizin",
+    "exampleSentence": "Take your medicine twice a day",
+    "category": "body",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_417",
+    "english": "fever",
+    "german": "Fieber",
+    "exampleSentence": "She stayed in bed with a fever",
+    "category": "body",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_418",
+    "english": "cough",
+    "german": "Husten",
+    "exampleSentence": "He has a bad cough",
+    "category": "body",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_419",
+    "english": "to sneeze",
+    "german": "niesen",
+    "exampleSentence": "Pepper makes me sneeze",
+    "category": "body",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_420",
+    "english": "plaster",
+    "german": "Pflaster",
+    "exampleSentence": "Put a plaster on that cut",
+    "category": "body",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_421",
+    "english": "dizzy",
+    "german": "schwindelig",
+    "exampleSentence": "I feel dizzy after spinning around",
+    "category": "body",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_422",
+    "english": "to breathe",
+    "german": "atmen",
+    "exampleSentence": "Breathe deeply before the penalty",
+    "category": "body",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_423",
+    "english": "screen",
+    "german": "Bildschirm",
+    "exampleSentence": "Don't sit too close to the screen",
+    "category": "media",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_424",
+    "english": "keyboard",
+    "german": "Tastatur",
+    "exampleSentence": "I type fast on my keyboard",
+    "category": "media",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_425",
+    "english": "password",
+    "german": "Passwort",
+    "exampleSentence": "Never share your password",
+    "category": "media",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_426",
+    "english": "to download",
+    "german": "herunterladen",
+    "exampleSentence": "I downloaded the new football app",
+    "category": "media",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_427",
+    "english": "to upload",
+    "german": "hochladen",
+    "exampleSentence": "She uploaded a video of the goal",
+    "category": "media",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_428",
+    "english": "website",
+    "german": "Webseite, Internetseite",
+    "exampleSentence": "The club has a new website",
+    "category": "media",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_429",
+    "english": "headline",
+    "german": "Schlagzeile",
+    "exampleSentence": "The derby win made the headlines",
+    "category": "media",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_430",
+    "english": "news",
+    "german": "Nachrichten",
+    "exampleSentence": "I watch the sports news every evening",
+    "category": "media",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_431",
+    "english": "newspaper",
+    "german": "Zeitung",
+    "exampleSentence": "Grandpa reads the newspaper at breakfast",
+    "category": "media",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_432",
+    "english": "magazine",
+    "german": "Zeitschrift",
+    "exampleSentence": "This magazine is about football",
+    "category": "media",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_433",
+    "english": "channel",
+    "german": "Kanal, Sender",
+    "exampleSentence": "Which channel shows the match?",
+    "category": "media",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_434",
+    "english": "remote control",
+    "german": "Fernbedienung",
+    "exampleSentence": "Who has the remote control?",
+    "category": "media",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_435",
+    "english": "to record",
+    "german": "aufnehmen",
+    "exampleSentence": "We recorded the match to watch it later",
+    "category": "media",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_436",
+    "english": "video game",
+    "german": "Videospiel",
+    "exampleSentence": "We played a football video game",
+    "category": "media",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_437",
+    "english": "console",
+    "german": "Konsole",
+    "exampleSentence": "The console is in the living room",
+    "category": "media",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_438",
+    "english": "charger",
+    "german": "Ladegerät",
+    "exampleSentence": "My phone needs its charger",
+    "category": "media",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_439",
+    "english": "battery",
+    "german": "Akku, Batterie",
+    "exampleSentence": "The battery is almost empty",
+    "category": "media",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_440",
+    "english": "message",
+    "german": "Nachricht (Handy)",
+    "exampleSentence": "Send me a message after school",
+    "category": "media",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_441",
+    "english": "to share",
+    "german": "teilen",
+    "exampleSentence": "He shared the photo with the team",
+    "category": "media",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_442",
+    "english": "social media",
+    "german": "soziale Medien",
+    "exampleSentence": "The club posts goals on social media",
+    "category": "media",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_443",
+    "english": "advertisement",
+    "german": "Werbung",
+    "exampleSentence": "There is too much advertisement on TV",
+    "category": "media",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_444",
+    "english": "screen time",
+    "german": "Bildschirmzeit",
+    "exampleSentence": "My parents check my screen time",
+    "category": "media",
+    "difficulty": 3
+  },
+  {
+    "id": "vocab_445",
+    "english": "to print",
+    "german": "drucken",
+    "exampleSentence": "Please print the match schedule",
+    "category": "media",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_446",
+    "english": "file",
+    "german": "Datei",
+    "exampleSentence": "Save the file before you close it",
+    "category": "media",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_447",
+    "english": "to save (a file)",
+    "german": "speichern",
+    "exampleSentence": "Don't forget to save your homework",
+    "category": "media",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_448",
+    "english": "app",
+    "german": "App",
+    "exampleSentence": "This app helps me learn English",
+    "category": "media",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_449",
+    "english": "email",
+    "german": "E-Mail",
+    "exampleSentence": "I wrote an email to my teacher",
+    "category": "media",
+    "difficulty": 1
+  },
+  {
+    "id": "vocab_450",
+    "english": "to type",
+    "german": "tippen",
+    "exampleSentence": "She types with ten fingers",
+    "category": "media",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_451",
+    "english": "wifi",
+    "german": "WLAN",
+    "exampleSentence": "The wifi is not working again",
+    "category": "media",
+    "difficulty": 2
+  },
+  {
+    "id": "vocab_452",
+    "english": "headphones (wireless)",
+    "german": "kabellose Kopfhörer",
+    "exampleSentence": "He listens with wireless headphones",
+    "category": "media",
     "difficulty": 3
   }
 ]

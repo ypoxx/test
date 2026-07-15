@@ -69,7 +69,11 @@ export const getXPForNextLevel = (currentLevel) => {
  */
 export const getXPForCurrentLevel = (currentLevel) => {
   if (currentLevel <= 1) return 0
-  return XP_PER_LEVEL[currentLevel - 2]
+  if (currentLevel >= XP_PER_LEVEL.length) {
+    return XP_PER_LEVEL[XP_PER_LEVEL.length - 1]
+  }
+  // XP_PER_LEVEL[i] is the threshold for level i+1
+  return XP_PER_LEVEL[currentLevel - 1]
 }
 
 /**
