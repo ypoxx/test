@@ -154,7 +154,7 @@
 
 .cr-pack {
   position: relative;
-  width: clamp(11rem, 52vw, 14rem);
+  width: clamp(13rem, 62vw, 17rem);
 }
 
 .cr-pack-img {

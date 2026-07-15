@@ -83,7 +83,9 @@ function CardReveal({ card, isNew, fact, onClose, isVictory = false, serial }) {
   const serialNumber = serial ?? serialFor(card)
 
   const isGoldPack = isVictory || tier === 'holo'
-  const packSrc = isGoldPack ? '/img/pack-gold.svg' : '/img/pack-blue.svg'
+  // Nano-Banana-Artwork zuerst, handgebautes SVG als Fallback (onError)
+  const packSrc = isGoldPack ? '/img/pack-gold-art.webp' : '/img/pack-blue-art.webp'
+  const packFallback = isGoldPack ? '/img/pack-gold.svg' : '/img/pack-blue.svg'
   const packLine = `${isGoldPack ? 'GOLD-PACK' : 'MSV-PACK'} · SPIELTAG-BELOHNUNG`
 
   const sceneVariant =
@@ -109,12 +111,17 @@ function CardReveal({ card, isNew, fact, onClose, isVictory = false, serial }) {
 
     setStage('opening')
     if (tier === 'holo') {
+      // Walkout: Riser baut Spannung auf, Fanfare am Höhepunkt
       timersRef.current.push(
+        setTimeout(() => soundManager.playWalkoutRiser(), 150),
         setTimeout(() => soundManager.playAchievement('legendary'), HOLO_FANFARE_MS)
       )
     }
+    const openMs = OPEN_MS[tier] ?? OPEN_MS.bronze
     timersRef.current.push(
-      setTimeout(() => setStage('revealed'), OPEN_MS[tier] ?? OPEN_MS.bronze)
+      // Folien-Whoosh kurz vor dem Umdrehen der Karte
+      setTimeout(() => soundManager.playCardFlip(), Math.max(0, openMs - 250)),
+      setTimeout(() => setStage('revealed'), openMs)
     )
   }
 
@@ -132,7 +139,7 @@ function CardReveal({ card, isNew, fact, onClose, isVictory = false, serial }) {
             <div className="cr-pack-zone">
               <div className="cr-pack cr-pack--float">
                 <i className="cr-pack-glow" aria-hidden="true" />
-                <img className="cr-pack-img" src={packSrc} alt="" draggable="false" />
+                <img className="cr-pack-img" src={packSrc} alt="" draggable="false" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = packFallback }} />
               </div>
               <i className="cr-ground-glow" aria-hidden="true" />
             </div>
@@ -153,8 +160,8 @@ function CardReveal({ card, isNew, fact, onClose, isVictory = false, serial }) {
             {tier !== 'holo' ? (
               <div className="cr-pack-zone" aria-hidden="true">
                 <div className="cr-pack cr-pack--rip">
-                  <img className="cr-pack-half cr-pack-half--top" src={packSrc} alt="" />
-                  <img className="cr-pack-half cr-pack-half--bot" src={packSrc} alt="" />
+                  <img className="cr-pack-half cr-pack-half--top" src={packSrc} alt="" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = packFallback }} />
+                  <img className="cr-pack-half cr-pack-half--bot" src={packSrc} alt="" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = packFallback }} />
                 </div>
                 <i className="cr-flash" />
                 {tier === 'gold' && <i className="cr-sparks" />}
@@ -166,7 +173,7 @@ function CardReveal({ card, isNew, fact, onClose, isVictory = false, serial }) {
                 <i className="cr-wbeam cr-wbeam--r" />
                 <i className="cr-sparks cr-sparks--holo" />
                 <div className="cr-cardback-rise">
-                  <img className="cr-cardback" src="/img/card-back.svg" alt="" />
+                  <img className="cr-cardback" src="/img/card-back-art.webp" alt="" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = '/img/card-back.svg' }} />
                 </div>
                 <i className="cr-ground-glow cr-ground-glow--holo" />
               </div>

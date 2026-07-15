@@ -1,0 +1,257 @@
+/* ============================================================
+   CategoryStats — Kategorien-Fortschritt als ZUT-Panel
+   ("Zebra Ultimate Team", Richtung A "Flutlicht-Gold";
+   Optik analog Stadium.css-Panels + CardAlbum-Goldbar).
+
+   Alle Klassen mit cs-Präfix, nur von CategoryStats.jsx verwendet.
+   A11y: Schrift >= 13px (Nebenlabels >= 12px), Kontrast >= 4.5:1,
+   Fortschritt nie nur über Farbe (Zahlen + Stern-Glyphe),
+   Bar-Transition mit reduced-motion-Guard.
+   ============================================================ */
+
+.cs-panel {
+  position: relative;
+  border-radius: 20px;
+  padding: 16px 14px;
+  background: linear-gradient(175deg, rgba(20, 40, 86, 0.92) 0%, rgba(9, 20, 46, 0.94) 100%);
+  border: 1px solid rgba(150, 180, 230, 0.3);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 14px 28px rgba(0, 0, 0, 0.5);
+}
+
+/* Gold-Hairline oben (ZUT-Panel-Signatur) */
+.cs-panel::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 18%;
+  right: 18%;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255, 203, 45, 0), var(--zut-gold-2, #FFE27A) 50%, rgba(255, 203, 45, 0));
+}
+
+/* ---------- Kopf: Gold-Icon + Kicker + Titel ---------- */
+.cs-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cs-head-icon {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2A1D04;
+  background: linear-gradient(160deg, var(--zut-gold-2, #FFE27A) 0%, var(--zut-gold-1, #FFCB2D) 55%, #C8940E 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 0 12px rgba(255, 203, 45, 0.3), 0 3px 6px rgba(0, 0, 0, 0.5);
+}
+
+.cs-head-icon svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.cs-kicker {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #AFC4E8;
+}
+
+.cs-title {
+  margin: 2px 0 0;
+  font-size: 18px;
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  color: #F2F6FF;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Legende: Bedeutung von Schraffur/Gold, nicht nur über Farbe */
+.cs-legend {
+  margin: 10px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.45;
+  color: #C9D8F4;
+}
+
+.cs-legend b {
+  color: #FFDD66;
+}
+
+/* ---------- Kategorie-Zeilen ---------- */
+.cs-list {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cs-row {
+  padding: 10px 12px 11px;
+  border-radius: 13px;
+  background: linear-gradient(180deg, rgba(24, 44, 90, 0.7), rgba(10, 22, 48, 0.8));
+  border: 1px solid rgba(150, 180, 230, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+/* Alles gemeistert: Gold-Glow (zusätzlich Stern-Glyphe im Markup) */
+.cs-row--complete {
+  border-color: rgba(255, 203, 45, 0.55);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 14px rgba(255, 203, 45, 0.22);
+}
+
+.cs-row-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.cs-icon {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFDD66;
+  background: rgba(255, 203, 45, 0.12);
+  border: 1px solid rgba(255, 203, 45, 0.4);
+}
+
+.cs-icon svg {
+  width: 15px;
+  height: 15px;
+  display: block;
+}
+
+.cs-icon--gold {
+  color: #2A1D04;
+  border-color: rgba(255, 226, 122, 0.9);
+  background: linear-gradient(160deg, var(--zut-gold-2, #FFE27A) 0%, var(--zut-gold-1, #FFCB2D) 55%, #C8940E 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 0 10px rgba(255, 203, 45, 0.4);
+}
+
+.cs-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #F2F6FF;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.cs-star {
+  flex: none;
+  color: var(--zut-gold-1, #FFCB2D);
+  filter: drop-shadow(0 0 4px rgba(255, 203, 45, 0.6));
+}
+
+.cs-star svg {
+  width: 15px;
+  height: 15px;
+  display: block;
+}
+
+/* Zähler rechts: "X/Y" in Gold + Label */
+.cs-count {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.cs-count b {
+  font-size: 16px;
+  font-weight: 900;
+  font-style: italic;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  background: linear-gradient(180deg, #FFF6D8 0%, var(--zut-gold-1, #FFCB2D) 60%, #D89A12 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.6));
+}
+
+.cs-count small {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #AFC4E8;
+}
+
+/* ---------- Doppel-Progressbar: Schraffur (geübt) + Gold (gemeistert) ---------- */
+.cs-bar {
+  position: relative;
+  margin-top: 9px;
+  height: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  /* leerer Track ≥3:1 gegen Panel-Grund (Gemini-Design-Abnahme) */
+  background: linear-gradient(180deg, #1A2E5C, #22396E);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 1px rgba(175, 196, 232, 0.28),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.cs-bar i {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: 5px;
+  transition: width var(--zut-dur-slow, 600ms) ease;
+}
+
+.cs-bar-attempted {
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(175, 196, 232, 0.4),
+    rgba(175, 196, 232, 0.4) 5px,
+    rgba(175, 196, 232, 0.14) 5px,
+    rgba(175, 196, 232, 0.14) 10px
+  );
+}
+
+.cs-bar-mastered {
+  background: linear-gradient(90deg, #C8940E, var(--zut-gold-1, #FFCB2D) 55%, var(--zut-gold-2, #FFE27A));
+  box-shadow: 0 0 10px rgba(255, 203, 45, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+/* ---------- Meta-Zeile: Prozente + Genauigkeit ---------- */
+.cs-meta {
+  margin: 7px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 6px;
+  row-gap: 2px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: #AFC4E8;
+}
+
+/* ---------- Reduced Motion: statische Endzustände ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .cs-bar i {
+    transition: none;
+  }
+}

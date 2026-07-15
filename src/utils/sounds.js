@@ -19,7 +19,13 @@ const SOUND_FILES = {
   crowd: '/sounds/crowd.mp3',
   whistle: '/sounds/whistle.mp3',
   pack: '/sounds/pack.mp3',
-  ambient: '/sounds/ambient.mp3'
+  ambient: '/sounds/ambient.mp3',
+  // ZUT-Erweiterung (ElevenLabs): Countdown, neuer Tor-Jubel, Walkout, Karten-Flip
+  countdownTick: '/sounds/countdown_tick.mp3',
+  countdownGo: '/sounds/countdown_go.mp3',
+  goalNew: '/sounds/goal_new.mp3',
+  walkoutRiser: '/sounds/walkout_riser.mp3',
+  cardFlip: '/sounds/card_flip.mp3'
 }
 
 class SoundManager {
@@ -63,7 +69,12 @@ class SoundManager {
           crowd: new Howl({ src: [SOUND_FILES.crowd] }),
           whistle: new Howl({ src: [SOUND_FILES.whistle] }),
           pack: new Howl({ src: [SOUND_FILES.pack] }),
-          ambient: new Howl({ src: [SOUND_FILES.ambient], loop: true })
+          ambient: new Howl({ src: [SOUND_FILES.ambient], loop: true }),
+          countdownTick: new Howl({ src: [SOUND_FILES.countdownTick] }),
+          countdownGo: new Howl({ src: [SOUND_FILES.countdownGo] }),
+          goalNew: new Howl({ src: [SOUND_FILES.goalNew] }),
+          walkoutRiser: new Howl({ src: [SOUND_FILES.walkoutRiser] }),
+          cardFlip: new Howl({ src: [SOUND_FILES.cardFlip] })
         }
 
         this.useHowler = true
@@ -152,6 +163,8 @@ class SoundManager {
    * Play goal celebration sound (ascending melody)
    */
   playGoal() {
+    // Neuer ElevenLabs-Jubel zuerst, dann Alt-Sample, dann Synth
+    if (this.playSample('goalNew')) return
     if (this.playSample('goal')) return
     this.playGoalSynth()
   }
@@ -260,6 +273,38 @@ class SoundManager {
   playPack() {
     if (this.playSample('pack')) return
     this.playPackSynth()
+  }
+
+  /**
+   * Countdown-Tick (3-2-1) — Stadion-Drum statt Beep; Synth-Fallback wie zuvor
+   */
+  playCountdownTick(step = 0) {
+    if (this.playSample('countdownTick')) return
+    this.playTone(400 + step * 100, 0.1, 'square', 0.3)
+  }
+
+  /**
+   * Anpfiff-Moment (LOS!) — Pfiff + Crowd-Surge; Fallback: einfacher Pfiff
+   */
+  playCountdownGo() {
+    if (this.playSample('countdownGo')) return
+    this.playWhistle()
+  }
+
+  /**
+   * Walkout-Riser (Spannungsaufbau vor legendärem Reveal) — rein dekorativ,
+   * ohne Sample bewusst still (kein Synth-Ersatz nötig)
+   */
+  playWalkoutRiser() {
+    this.playSample('walkoutRiser')
+  }
+
+  /**
+   * Karten-Flip beim Reveal — kurzer Folien-Whoosh; dezenter Synth-Fallback
+   */
+  playCardFlip() {
+    if (this.playSample('cardFlip')) return
+    this.playTone(900, 0.08, 'triangle', 0.2)
   }
 
   /**

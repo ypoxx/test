@@ -116,8 +116,10 @@
   position: absolute;
   bottom: 20%;
   left: 6%;
-  width: 54px;
-  height: 54px;
+  /* etwas kleiner + steilere Flugbahn: kreuzt den Beispielsatz nur noch kurz
+     (Gemini-Design-Abnahme: Ball verdeckte Text) */
+  width: 46px;
+  height: 46px;
   opacity: 0;
   animation: zutBallFly 1.4s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
   will-change: transform, opacity;
@@ -160,11 +162,11 @@
     opacity: 1;
   }
   55% {
-    transform: translate(58vw, -38vh) scale(1.25);
+    transform: translate(52vw, -50vh) scale(1.15);
     opacity: 1;
   }
   100% {
-    transform: translate(88vw, -62vh) scale(0.3);
+    transform: translate(88vw, -74vh) scale(0.3);
     opacity: 0;
   }
 }

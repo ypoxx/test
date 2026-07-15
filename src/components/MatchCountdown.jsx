@@ -27,12 +27,12 @@ function MatchCountdown({ opponent, onComplete }) {
       const interval = setInterval(() => {
         if (currentCount > 0) {
           setCount(currentCount)
-          soundManager.playTone(400 + (currentCount * 100), 0.1, 'square', 0.3)
+          soundManager.playCountdownTick(currentCount)
           currentCount--
         } else {
           clearInterval(interval)
-          // Play final "LOS!" sound — referee kickoff whistle
-          soundManager.playWhistle()
+          // "LOS!" — Anpfiff-Moment (Pfiff + Crowd-Surge, Fallback: Pfiff)
+          soundManager.playCountdownGo()
           setCount(0)
 
           // Complete after showing LOS
