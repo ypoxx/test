@@ -246,6 +246,14 @@ function Stadium({ progress, onStartMatch, onProgressReset, onProgressRefresh })
   const [difficulty, setDifficulty] = useState('all')
   const fileInputRef = useRef(null)
 
+  // Wörter, die exakt zur gewählten Filter-Kombination passen. Unter 10
+  // füllt das Match mit ähnlichen Wörtern derselben Kategorie auf
+  // (padPoolToMinimum) — der Hinweis unten sagt das ehrlich an.
+  const exactPoolCount = vocabsData.filter(vocab =>
+    (category === 'all' || vocab.category === category) &&
+    (difficulty === 'all' || vocab.difficulty === difficulty)
+  ).length
+
   // Season state (lazily created on first visit)
   const [season, setSeason] = useState(() => loadSeason())
   const [showTable, setShowTable] = useState(false)
@@ -485,6 +493,14 @@ function Stadium({ progress, onStartMatch, onProgressReset, onProgressRefresh })
                 </button>
               ))}
             </div>
+
+            {difficulty !== 'all' && exactPoolCount < 10 && (
+              <p className="st-training-note" role="note">
+                {exactPoolCount === 0
+                  ? 'Auf dieser Stufe gibt es hier noch keine Wörter — du bekommst ähnliche aus der Kategorie.'
+                  : `Nur ${exactPoolCount} ${exactPoolCount === 1 ? 'Wort' : 'Wörter'} auf dieser Stufe — der Rest kommt aus derselben Kategorie.`}
+              </p>
+            )}
 
             <button onClick={startTrainingMatch} className="st-cta st-cta--navy">
               <TargetIcon />

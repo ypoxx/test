@@ -6,24 +6,60 @@
  */
 
 /**
- * Split a vocab value like "rennen, laufen" or "Saison/Spielzeit"
- * into normalized alternatives.
+ * Split a vocab value like "rennen, laufen" or "Saison/Spielzeit" into
+ * normalized alternatives. Verb triples are reduced to their base form
+ * BEFORE the alternative split, so the slash inside
+ * "be – was/were – been" doesn't leak past-tense forms as alternatives.
  */
 const splitAlternatives = (value) =>
   String(value)
+    .split('–')[0]
     .split(/[,/]/)
     .map(part => part.trim().toLowerCase())
     .filter(Boolean)
 
 /**
+ * Reduce an alternative to its core word, so that different spellings of
+ * the same word count as equal: "tragen (Kleidung)" → "tragen",
+ * "to save" → "save".
+ */
+const toLemma = (alternative) =>
+  alternative
+    .replace(/\s*\([^)]*\)/g, '')
+    .trim()
+    .replace(/^to\s+/, '')
+
+/**
  * Two answers collide if they share at least one alternative
- * (e.g. "schießen" collides with "treten, schießen"). Colliding
- * distractors would be a second "correct" option in disguise.
+ * (e.g. "schießen" collides with "treten, schießen"). Comparison happens
+ * on lemma level, so "to wear", "wear – wore – worn" and
+ * "tragen (Kleidung)" vs. "tragen" collide too. Colliding distractors
+ * would be a second "correct" option in disguise.
  */
 const collides = (a, b) => {
-  const alternativesA = splitAlternatives(a)
-  return splitAlternatives(b).some(alt => alternativesA.includes(alt))
+  const lemmasA = splitAlternatives(a).map(toLemma).filter(Boolean)
+  return splitAlternatives(b)
+    .map(toLemma)
+    .filter(Boolean)
+    .some(lemma => lemmasA.includes(lemma))
 }
+
+/**
+ * Synonym pairs that share no word string, so collides() cannot detect
+ * them — but for a question about one of them the other would also be a
+ * correct answer (e.g. "Prüfung" → "exam" AND "test"). These pairs must
+ * never appear together in one question.
+ */
+const CONFLICT_PAIRS = [
+  ['vocab_087', 'vocab_107'], // test / exam — beide "Prüfung"
+  ['vocab_105', 'vocab_140'], // timetable / schedule — beide "Stundenplan/Zeitplan"
+  ['vocab_268', 'vocab_269'], // city / town — beide "Stadt"
+  ['vocab_307', 'vocab_308'], // lake / sea — "See" ist beides
+  ['vocab_308', 'vocab_309'], // sea / ocean — beide "Meer"
+]
+
+const inConflict = (idA, idB) =>
+  CONFLICT_PAIRS.some(([x, y]) => (x === idA && y === idB) || (x === idB && y === idA))
 
 /**
  * Shuffle an array (Fisher-Yates algorithm)
@@ -55,6 +91,7 @@ export const generateWrongAnswers = (correctVocab, allVocabs, count = 3, field =
   // option, because both share the German meaning.
   const otherVocabs = allVocabs.filter(
     v => v.id !== correctVocab.id
+      && !inConflict(v.id, correctVocab.id)
       && !collides(v[field], correctValue)
       && !collides(v[otherField], correctVocab[otherField])
   )

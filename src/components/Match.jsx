@@ -6,7 +6,7 @@ import ConfettiExplosion from './ConfettiExplosion'
 import LevelUpNotification from './LevelUpNotification'
 import MatchCountdown from './MatchCountdown'
 import vocabsData from '../data/vocabs.json'
-import { selectVocabsForMatch, filterByCategory, filterByDifficulty } from '../utils/spacedRepetition'
+import { selectVocabsForMatch, filterByCategory, filterByDifficulty, padPoolToMinimum } from '../utils/spacedRepetition'
 import { selectRandomOpponent, getDerbyOpponents, calculateMatchResult, getMatchSummaryMessage, ANSWER_DELAY_CORRECT, ANSWER_DELAY_WRONG } from '../utils/matchLogic'
 import { updateVocabProgress, updateGoalsAndLeague, addMatchToHistory, loadProgress, unlockAchievement, addXP, updateDailyStreak, loadLastOpponentName, saveLastOpponentName } from '../utils/localStorage'
 import { generateMultipleChoiceOptions } from '../utils/multipleChoice'
@@ -157,7 +157,12 @@ function Match({ progress, onMatchEnd, filters, mode = 'training', seasonOpponen
       pool = filterByCategory(pool, [filters.category])
     }
     if (filters?.difficulty && filters.difficulty !== 'all') {
+      // Sparse combos (e.g. Alltag + Schwer) get padded with words from the
+      // same category, closest difficulty first — the category choice always
+      // wins over the difficulty choice.
+      const categoryPool = pool
       pool = filterByDifficulty(pool, [filters.difficulty])
+      pool = padPoolToMinimum(pool, categoryPool, filters.difficulty, 10)
     }
     if (pool.length === 0) {
       pool = vocabsData

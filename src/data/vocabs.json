@@ -74,7 +74,7 @@
   {
     "id": "vocab_010",
     "english": "to tackle",
-    "german": "angreifen, grätschen",
+    "german": "angehen, grätschen",
     "exampleSentence": "The defender tackles the opponent",
     "category": "sport",
     "difficulty": 2
@@ -99,7 +99,7 @@
     "id": "vocab_013",
     "english": "team",
     "german": "Mannschaft, Team",
-    "exampleSentence": "MSV Duisburg is my favorite team",
+    "exampleSentence": "MSV Duisburg is my favourite team",
     "category": "sport",
     "difficulty": 1
   },
@@ -377,9 +377,9 @@
   },
   {
     "id": "vocab_048",
-    "english": "to practice",
+    "english": "to practise",
     "german": "üben",
-    "exampleSentence": "We practice free kicks after training",
+    "exampleSentence": "We practise free kicks after training",
     "category": "sport",
     "difficulty": 1
   },
@@ -554,7 +554,7 @@
   {
     "id": "vocab_070",
     "english": "to score a hat-trick",
-    "german": "drei Tore schießen",
+    "german": "einen Hattrick erzielen",
     "exampleSentence": "The striker scores a hat-trick",
     "category": "sport",
     "difficulty": 3
@@ -763,7 +763,7 @@
     "id": "vocab_096",
     "english": "subject",
     "german": "Schulfach",
-    "exampleSentence": "My favorite subject is PE",
+    "exampleSentence": "My favourite subject is PE",
     "category": "school",
     "difficulty": 2
   },
@@ -977,9 +977,9 @@
   },
   {
     "id": "vocab_123",
-    "english": "principal",
+    "english": "headteacher",
     "german": "Schulleiter",
-    "exampleSentence": "The principal talks to all students",
+    "exampleSentence": "The headteacher talks to all students",
     "category": "school",
     "difficulty": 3
   },
@@ -1145,9 +1145,9 @@
   },
   {
     "id": "vocab_144",
-    "english": "report card",
+    "english": "school report",
     "german": "Zeugnis",
-    "exampleSentence": "I get my report card in summer",
+    "exampleSentence": "I get my school report in summer",
     "category": "school",
     "difficulty": 2
   },
@@ -1313,9 +1313,9 @@
   },
   {
     "id": "vocab_165",
-    "english": "apartment",
+    "english": "flat",
     "german": "Wohnung",
-    "exampleSentence": "They live in an apartment",
+    "exampleSentence": "They live in a flat",
     "category": "family",
     "difficulty": 2
   },
@@ -1457,9 +1457,9 @@
   },
   {
     "id": "vocab_183",
-    "english": "vacation",
-    "german": "Urlaub",
-    "exampleSentence": "We go on vacation in summer",
+    "english": "holiday",
+    "german": "Urlaub, Ferien",
+    "exampleSentence": "We go on holiday in summer",
     "category": "family",
     "difficulty": 2
   },
@@ -1539,7 +1539,7 @@
     "id": "vocab_193",
     "english": "to marry",
     "german": "heiraten",
-    "exampleSentence": "My parents married 15 years ago",
+    "exampleSentence": "My parents got married 15 years ago",
     "category": "family",
     "difficulty": 2
   },
@@ -1561,9 +1561,9 @@
   },
   {
     "id": "vocab_196",
-    "english": "neighbor",
+    "english": "neighbour",
     "german": "Nachbar",
-    "exampleSentence": "Our neighbor is very friendly",
+    "exampleSentence": "Our neighbour is very friendly",
     "category": "family",
     "difficulty": 2
   },
@@ -1592,12 +1592,12 @@
     "difficulty": 2
   },
   {
-    "id": "vocab_200",
-    "english": "offspring",
-    "german": "Nachkommen",
-    "exampleSentence": "Parents and their offspring",
+    "id": "vocab_453",
+    "english": "siblings",
+    "german": "Geschwister",
+    "exampleSentence": "I have two siblings",
     "category": "family",
-    "difficulty": 3
+    "difficulty": 2
   },
   {
     "id": "vocab_201",
@@ -1993,9 +1993,9 @@
   },
   {
     "id": "vocab_250",
-    "english": "movie",
+    "english": "film",
     "german": "Film",
-    "exampleSentence": "We watch a movie tonight",
+    "exampleSentence": "We watch a film tonight",
     "category": "everyday",
     "difficulty": 1
   },
@@ -2619,7 +2619,7 @@
     "id": "vocab_328",
     "english": "summer",
     "german": "Sommer",
-    "exampleSentence": "We have vacation in summer",
+    "exampleSentence": "We are on holiday in summer",
     "category": "nature",
     "difficulty": 1
   },
@@ -2755,7 +2755,7 @@
     "id": "vocab_345",
     "english": "butterfly",
     "german": "Schmetterling",
-    "exampleSentence": "Butterflies are colorful",
+    "exampleSentence": "Butterflies are colourful",
     "category": "nature",
     "difficulty": 2
   },
@@ -3608,10 +3608,10 @@
     "difficulty": 2
   },
   {
-    "id": "vocab_452",
-    "english": "headphones (wireless)",
-    "german": "kabellose Kopfhörer",
-    "exampleSentence": "He listens with wireless headphones",
+    "id": "vocab_454",
+    "english": "loudspeaker",
+    "german": "Lautsprecher",
+    "exampleSentence": "The stadium loudspeaker announces the teams",
     "category": "media",
     "difficulty": 3
   }
