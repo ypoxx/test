@@ -16,13 +16,30 @@ const splitAlternatives = (value) =>
     .filter(Boolean)
 
 /**
+ * Reduce an alternative to its core word, so that different spellings of
+ * the same word count as equal: "tragen (Kleidung)" → "tragen",
+ * "wear – wore – worn" → "wear", "to save" → "save".
+ */
+const toLemma = (alternative) =>
+  alternative
+    .replace(/\s*\([^)]*\)/g, '')
+    .split('–')[0]
+    .trim()
+    .replace(/^to\s+/, '')
+
+/**
  * Two answers collide if they share at least one alternative
- * (e.g. "schießen" collides with "treten, schießen"). Colliding
- * distractors would be a second "correct" option in disguise.
+ * (e.g. "schießen" collides with "treten, schießen"). Comparison happens
+ * on lemma level, so "to wear", "wear – wore – worn" and
+ * "tragen (Kleidung)" vs. "tragen" collide too. Colliding distractors
+ * would be a second "correct" option in disguise.
  */
 const collides = (a, b) => {
-  const alternativesA = splitAlternatives(a)
-  return splitAlternatives(b).some(alt => alternativesA.includes(alt))
+  const lemmasA = splitAlternatives(a).map(toLemma).filter(Boolean)
+  return splitAlternatives(b)
+    .map(toLemma)
+    .filter(Boolean)
+    .some(lemma => lemmasA.includes(lemma))
 }
 
 /**

@@ -137,6 +137,31 @@ export const filterByDifficulty = (allVocabs, difficulties) => {
 }
 
 /**
+ * Pad a filtered pool up to a minimum size with words from a fallback pool
+ * (same category, other difficulties), closest difficulty first. Some
+ * category/difficulty combinations are sparse (e.g. only one hard nature
+ * word) — without padding they would produce one-question matches or an
+ * empty pool.
+ * @param {Array} pool - Words matching all filters
+ * @param {Array} fallbackPool - Words matching the category filter only
+ * @param {number} targetDifficulty - The selected difficulty level
+ * @param {number} minSize - Minimum pool size to pad up to
+ * @returns {Array} - The padded pool
+ */
+export const padPoolToMinimum = (pool, fallbackPool, targetDifficulty, minSize = 10) => {
+  if (pool.length >= minSize) {
+    return pool
+  }
+  const poolIds = new Set(pool.map(vocab => vocab.id))
+  const fillers = fallbackPool
+    .filter(vocab => !poolIds.has(vocab.id))
+    .sort((a, b) =>
+      Math.abs(a.difficulty - targetDifficulty) - Math.abs(b.difficulty - targetDifficulty)
+    )
+  return [...pool, ...fillers.slice(0, minSize - pool.length)]
+}
+
+/**
  * Get statistics about vocabulary progress
  */
 export const getVocabStats = (allVocabs, progress) => {

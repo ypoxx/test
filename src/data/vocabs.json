@@ -74,7 +74,7 @@
   {
     "id": "vocab_010",
     "english": "to tackle",
-    "german": "angreifen, grätschen",
+    "german": "angehen, grätschen",
     "exampleSentence": "The defender tackles the opponent",
     "category": "sport",
     "difficulty": 2
@@ -554,7 +554,7 @@
   {
     "id": "vocab_070",
     "english": "to score a hat-trick",
-    "german": "drei Tore schießen",
+    "german": "einen Hattrick erzielen",
     "exampleSentence": "The striker scores a hat-trick",
     "category": "sport",
     "difficulty": 3
@@ -977,9 +977,9 @@
   },
   {
     "id": "vocab_123",
-    "english": "principal",
+    "english": "headteacher",
     "german": "Schulleiter",
-    "exampleSentence": "The principal talks to all students",
+    "exampleSentence": "The headteacher talks to all students",
     "category": "school",
     "difficulty": 3
   },
@@ -1145,9 +1145,9 @@
   },
   {
     "id": "vocab_144",
-    "english": "report card",
+    "english": "school report",
     "german": "Zeugnis",
-    "exampleSentence": "I get my report card in summer",
+    "exampleSentence": "I get my school report in summer",
     "category": "school",
     "difficulty": 2
   },
@@ -1457,9 +1457,9 @@
   },
   {
     "id": "vocab_183",
-    "english": "vacation",
-    "german": "Urlaub",
-    "exampleSentence": "We go on vacation in summer",
+    "english": "holiday",
+    "german": "Urlaub, Ferien",
+    "exampleSentence": "We go on holiday in summer",
     "category": "family",
     "difficulty": 2
   },
@@ -1539,7 +1539,7 @@
     "id": "vocab_193",
     "english": "to marry",
     "german": "heiraten",
-    "exampleSentence": "My parents married 15 years ago",
+    "exampleSentence": "My parents got married 15 years ago",
     "category": "family",
     "difficulty": 2
   },
@@ -1561,7 +1561,7 @@
   },
   {
     "id": "vocab_196",
-    "english": "neighbor",
+    "english": "neighbour",
     "german": "Nachbar",
     "exampleSentence": "Our neighbor is very friendly",
     "category": "family",
@@ -1593,11 +1593,11 @@
   },
   {
     "id": "vocab_200",
-    "english": "offspring",
-    "german": "Nachkommen",
-    "exampleSentence": "Parents and their offspring",
+    "english": "siblings",
+    "german": "Geschwister",
+    "exampleSentence": "I have two siblings",
     "category": "family",
-    "difficulty": 3
+    "difficulty": 2
   },
   {
     "id": "vocab_201",
@@ -3609,9 +3609,9 @@
   },
   {
     "id": "vocab_452",
-    "english": "headphones (wireless)",
-    "german": "kabellose Kopfhörer",
-    "exampleSentence": "He listens with wireless headphones",
+    "english": "loudspeaker",
+    "german": "Lautsprecher",
+    "exampleSentence": "The stadium loudspeaker announces the teams",
     "category": "media",
     "difficulty": 3
   }
