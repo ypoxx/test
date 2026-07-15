@@ -106,8 +106,11 @@ function FutCard({ card, variant = 'reveal', serial }) {
   }
 
   /* ---------- Bühnen-Karte (Reveal) ---------- */
+  // Lange Namen (z.B. "Publikumsliebling") bekommen kleinere Typo + Umbruch,
+  // damit auf der Karte grundsätzlich nichts abgeschnitten wird
+  const longName = (card.name || '').length > 13
   return (
-    <div className={`fut-card fut-card--reveal fc-${tier}`}>
+    <div className={`fut-card fut-card--reveal fc-${tier}${longName ? ' fut-card--longname' : ''}`}>
       <div className="fc-shell">
         <div className="fc-inner">
           <div className="fc-rating">

@@ -163,12 +163,18 @@
   border-radius: 3cqw;
 }
 
+.fut-card--reveal .fc-rating {
+  /* über dem Artwork-Panel — Positions-Kürzel darf nie verdeckt werden */
+  z-index: 3;
+}
+
 .fut-card--reveal .fc-art {
-  top: 29cqw;
+  /* 32cqw statt 29cqw: unter der vollen Höhe des Rating-Blocks (Zahl+Kürzel) */
+  top: 32cqw;
   left: 50%;
   transform: translateX(-50%);
   width: 70cqw;
-  height: 56cqw;
+  height: 53cqw;
   border-radius: 5.5cqw;
 }
 
@@ -193,7 +199,21 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   line-height: 1.05;
+  overflow-wrap: break-word;
+  -webkit-hyphens: auto;
+  hyphens: auto;
 }
+
+/* Lange Namen: kleinere Typo, bis zu zwei Zeilen, kompakterer unterer Block —
+   Schrift darf grundsätzlich nie abgeschnitten werden */
+.fut-card--longname.fut-card--reveal .fc-name {
+  font-size: max(12px, 6.6cqw);
+  line-height: 1.12;
+  letter-spacing: 0.04em;
+}
+
+.fut-card--longname.fut-card--reveal .fc-lower { top: 86.5cqw; }
+.fut-card--longname.fut-card--reveal .fc-badge { margin-top: 1.8cqw; }
 
 .fc-badge {
   display: inline-flex;

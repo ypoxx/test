@@ -240,8 +240,17 @@ export const getTimeBasedGreeting = () => {
   }
 }
 
+/**
+ * Immer tageszeitpassend, ohne Satzzeichen — die Anrede („…, Maurice!")
+ * hängt der aufrufende Screen an. Vormittags/nachmittags freundlich-locker,
+ * morgens/abends klassisch.
+ */
 export const getPersonalGreeting = () => {
-  const timeGreeting = getTimeBasedGreeting()
-  const randomGreeting = getRandomGreeting()
-  return Math.random() < 0.5 ? `${randomGreeting}!` : `${timeGreeting}!`
+  const hour = new Date().getHours()
+
+  if (hour < 6) return 'Gute Nacht'
+  if (hour < 11) return 'Guten Morgen'
+  if (hour < 18) return 'Hallöchen'
+  if (hour < 22) return 'Guten Abend'
+  return 'Gute Nacht'
 }

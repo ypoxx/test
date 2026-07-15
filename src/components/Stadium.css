@@ -1,0 +1,1067 @@
+/* ============================================================
+   Stadium — Stadion-Hub als Spielmenü "Zebra Ultimate Team"
+   (Richtung A "Flutlicht-Gold", scratchpad/design/direction-a.html)
+
+   Alle Klassen mit st-Präfix, nur von Stadium.jsx verwendet.
+   A11y: Schrift >= 13px (Nebenlabels >= 12px), Tap-Targets >= 44px,
+   :focus-visible-Ring in Gold, Animationen mit reduced-motion-Guard.
+   ============================================================ */
+
+.st-scroll {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-bottom: calc(34px + env(safe-area-inset-bottom, 0px));
+}
+
+.st-wrap {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  position: relative;
+  animation: stRise var(--zut-dur-slow, 600ms) ease both;
+}
+
+@keyframes stRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- Tribünen-Backdrop hinter dem Kopfbereich ---------- */
+.st-backdrop {
+  position: absolute;
+  top: calc(-1 * (env(safe-area-inset-top, 0px) + 1rem));
+  left: -16px;
+  right: -16px;
+  height: 280px;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.st-backdrop img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 22%;
+  opacity: 0.45;
+  filter: saturate(0.9);
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.5) 55%, rgba(0, 0, 0, 0) 100%);
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.5) 55%, rgba(0, 0, 0, 0) 100%);
+}
+
+/* ---------- Kopf: Kicker + Titel + Settings ---------- */
+.st-head {
+  position: relative;
+  text-align: center;
+  padding: 6px 52px 0;
+}
+
+.st-head-kicker {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #FFDD66;
+}
+
+.st-title {
+  margin: 4px 0 0;
+  font-size: clamp(24px, 7.8vw, 30px);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  line-height: 1.05;
+  background: linear-gradient(180deg, #FFFFFF 0%, #C9D8F4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+}
+
+.st-settings {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(150, 180, 230, 0.3);
+  background: linear-gradient(180deg, rgba(24, 44, 90, 0.9), rgba(10, 22, 48, 0.95));
+  color: #E7EEFB;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  transition: transform var(--zut-dur-fast, 200ms) ease;
+}
+
+.st-settings:active {
+  transform: scale(0.94);
+}
+
+.st-settings svg {
+  width: 21px;
+  height: 21px;
+  display: block;
+}
+
+/* Tages-Serie als Gold-Flammen-Chip */
+.st-streak {
+  margin-top: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 30px;
+  padding: 3px 13px;
+  border-radius: 15px;
+  font-size: 13px;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.05em;
+  color: #FFDD66;
+  background: linear-gradient(180deg, rgba(255, 203, 45, 0.18), rgba(255, 203, 45, 0.05));
+  border: 1px solid rgba(255, 203, 45, 0.55);
+  box-shadow: 0 0 12px rgba(255, 203, 45, 0.25);
+}
+
+.st-streak svg {
+  width: 12px;
+  height: 14px;
+  display: block;
+}
+
+/* ---------- Level/XP-Zeile mit Wappen + Gold-Progressbar ---------- */
+.st-level {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: linear-gradient(175deg, rgba(20, 40, 86, 0.92), rgba(9, 20, 46, 0.94));
+  border: 1px solid rgba(150, 180, 230, 0.28);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 10px 22px rgba(0, 0, 0, 0.45);
+}
+
+.st-level-badge {
+  flex: none;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.55));
+}
+
+.st-level-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.st-level-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+.st-level-num {
+  font-size: 19px;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  background: linear-gradient(180deg, #FFF6D8 0%, var(--zut-gold-1, #FFCB2D) 60%, #D89A12 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.6));
+}
+
+.st-level-title {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #AFC4E8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.st-level-next {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: #AFC4E8;
+}
+
+/* ---------- Gold-Progressbar (Level, Liga, Album) ---------- */
+.st-goldbar {
+  display: block;
+  height: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #0B1834, #10224A);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.st-goldbar i {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #C8940E, var(--zut-gold-1, #FFCB2D) 55%, var(--zut-gold-2, #FFE27A));
+  box-shadow: 0 0 10px rgba(255, 203, 45, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  transition: width var(--zut-dur-slow, 600ms) ease;
+}
+
+.st-goldbar--mini {
+  height: 7px;
+  border-radius: 4px;
+}
+
+/* ---------- ZUT-Panel mit Gold-Hairline ---------- */
+.st-panel {
+  position: relative;
+  margin-top: 14px;
+  border-radius: 20px;
+  padding: 16px 14px;
+  background: linear-gradient(175deg, rgba(20, 40, 86, 0.92) 0%, rgba(9, 20, 46, 0.94) 100%);
+  border: 1px solid rgba(150, 180, 230, 0.3);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 14px 28px rgba(0, 0, 0, 0.5);
+}
+
+.st-panel::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 18%;
+  right: 18%;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255, 203, 45, 0), var(--zut-gold-2, #FFE27A) 50%, rgba(255, 203, 45, 0));
+}
+
+.st-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.st-panel-icon {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2A1D04;
+  background: linear-gradient(160deg, var(--zut-gold-2, #FFE27A) 0%, var(--zut-gold-1, #FFCB2D) 55%, #C8940E 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 0 12px rgba(255, 203, 45, 0.3), 0 3px 6px rgba(0, 0, 0, 0.5);
+}
+
+.st-panel-icon svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.st-kicker {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #AFC4E8;
+}
+
+.st-panel-title {
+  margin: 2px 0 0;
+  font-size: 18px;
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  color: #F2F6FF;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* ---------- ANPFIFF-Hero (Saison) ---------- */
+.st-hero {
+  border-color: rgba(255, 203, 45, 0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 0 24px rgba(255, 203, 45, 0.16),
+    0 16px 32px rgba(0, 0, 0, 0.55);
+}
+
+.st-hero-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.st-hero-top > div {
+  flex: 1;
+  min-width: 0;
+}
+
+/* kompaktere Laufweite, damit "Saison n · Spieltag m/34" eine Zeile bleibt */
+.st-hero-top .st-kicker {
+  letter-spacing: 0.1em;
+}
+
+.st-hero-rank {
+  margin: 3px 0 0;
+  font-size: 15px;
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Zonen-Label bricht als Ganzes um, nicht mitten im Wort(paar) */
+.st-hero-zone {
+  white-space: nowrap;
+}
+
+.st-tablebtn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #E7EEFB;
+  background: linear-gradient(180deg, rgba(24, 44, 90, 0.85), rgba(10, 22, 48, 0.9));
+  border: 1px solid rgba(150, 180, 230, 0.28);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: transform var(--zut-dur-fast, 200ms) ease;
+}
+
+.st-tablebtn:active {
+  transform: scale(0.96);
+}
+
+.st-tablebtn svg {
+  width: 15px;
+  height: 15px;
+  display: block;
+}
+
+/* Aufstellung: MSV vs Gegner */
+.st-vs {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.st-vs-team {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.st-vs-team > svg,
+.st-vs-team .st-vs-crest {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.55));
+}
+
+.st-vs-code {
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: #F2F6FF;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.st-vs-mid {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.st-vs-x {
+  font-size: 26px;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  background: linear-gradient(180deg, #FFF6D8 0%, var(--zut-gold-1, #FFCB2D) 60%, #C8940E 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.6));
+}
+
+.st-vs-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 21px;
+  padding: 1px 9px;
+  border-radius: 11px;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: #0A1730;
+  background: linear-gradient(180deg, var(--zut-gold-2, #FFE27A), #E3AC1B);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.st-vs-note {
+  margin: 12px 0 0;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #C9D8F4;
+}
+
+.st-vs-note b {
+  color: #F2F6FF;
+}
+
+.st-vs-sub {
+  margin: 4px 0 0;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #AFC4E8;
+}
+
+.st-derby {
+  margin: 10px auto 0;
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  padding: 2px 12px;
+  border-radius: 13px;
+  font-size: 13px;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.08em;
+  color: #FFDD66;
+  background: linear-gradient(180deg, rgba(255, 203, 45, 0.18), rgba(255, 203, 45, 0.05));
+  border: 1px solid rgba(255, 203, 45, 0.55);
+  box-shadow: 0 0 12px rgba(255, 203, 45, 0.25);
+}
+
+.st-derby svg {
+  width: 11px;
+  height: 13px;
+  display: block;
+}
+
+/* ---------- Gold-CTA (ANPFIFF) + Navy-CTA (Training) ---------- */
+.st-cta {
+  margin-top: 14px;
+  width: 100%;
+  min-height: 56px;
+  border-radius: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #2A1D04;
+  background: linear-gradient(180deg, #FFE9A0 0%, var(--zut-gold-1, #FFCB2D) 55%, #DA9C13 100%);
+  border: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -3px 6px rgba(150, 100, 0, 0.45),
+    0 0 22px rgba(255, 203, 45, 0.5),
+    0 10px 20px rgba(0, 0, 0, 0.6);
+  transition: transform var(--zut-dur-fast, 200ms) ease;
+  animation: stCtaGlow 2.4s ease-in-out infinite;
+}
+
+.st-cta:active {
+  transform: scale(0.97);
+}
+
+.st-cta svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  display: block;
+}
+
+@keyframes stCtaGlow {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.8),
+      inset 0 -3px 6px rgba(150, 100, 0, 0.45),
+      0 0 16px rgba(255, 203, 45, 0.4),
+      0 10px 20px rgba(0, 0, 0, 0.6);
+  }
+  50% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.8),
+      inset 0 -3px 6px rgba(150, 100, 0, 0.45),
+      0 0 30px rgba(255, 203, 45, 0.65),
+      0 10px 20px rgba(0, 0, 0, 0.6);
+  }
+}
+
+.st-training-note {
+  margin: 9px 0 0;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #AFC4E8;
+}
+
+.st-cta--navy {
+  color: #FFE9A0;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  background: linear-gradient(180deg, #1E3866 0%, #10224A 55%, #0B1936 100%);
+  border: 1px solid rgba(255, 203, 45, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.5),
+    0 6px 14px rgba(0, 0, 0, 0.45);
+  animation: none;
+}
+
+/* ---------- Filter-Pills (Album-Stil) ---------- */
+.st-filter-label {
+  margin: 14px 0 8px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #AFC4E8;
+}
+
+.st-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.st-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 0 15px;
+  border-radius: 22px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #E7EEFB;
+  background: linear-gradient(180deg, rgba(24, 44, 90, 0.85), rgba(10, 22, 48, 0.9));
+  border: 1px solid rgba(150, 180, 230, 0.28);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 4px 10px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: transform var(--zut-dur-fast, 200ms) ease;
+}
+
+.st-pill:active {
+  transform: scale(0.96);
+}
+
+/* Aktiv: Punkt-Glyphe + dickere Gold-Border — nicht nur Farbe */
+.st-pill[aria-pressed='true'] {
+  border: 2px solid var(--zut-gold-1, #FFCB2D);
+  padding: 0 14px;
+  color: #FFE9A0;
+  background: linear-gradient(180deg, rgba(48, 66, 110, 0.92), rgba(16, 30, 60, 0.95));
+  box-shadow: 0 0 12px rgba(255, 203, 45, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.st-pill-dot {
+  flex: none;
+  color: var(--zut-gold-1, #FFCB2D);
+  filter: drop-shadow(0 0 3px rgba(255, 203, 45, 0.7));
+}
+
+/* ---------- Kachel-Duo: Album + Trophäen ---------- */
+.st-tiles {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.st-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-height: 44px;
+  padding: 14px;
+  border-radius: 18px;
+  text-align: left;
+  background: linear-gradient(175deg, rgba(20, 40, 86, 0.92), rgba(9, 20, 46, 0.94));
+  border: 1px solid rgba(150, 180, 230, 0.3);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 12px 24px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+  transition: transform var(--zut-dur-fast, 200ms) ease;
+}
+
+.st-tile:active {
+  transform: scale(0.97);
+}
+
+.st-tile::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 22%;
+  right: 22%;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255, 203, 45, 0), var(--zut-gold-2, #FFE27A) 50%, rgba(255, 203, 45, 0));
+}
+
+.st-tile-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.st-tile-icon {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2A1D04;
+  background: linear-gradient(160deg, var(--zut-gold-2, #FFE27A) 0%, var(--zut-gold-1, #FFCB2D) 55%, #C8940E 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.st-tile-icon svg {
+  width: 15px;
+  height: 15px;
+  display: block;
+}
+
+.st-tile-kicker {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #AFC4E8;
+}
+
+.st-tile-value {
+  font-size: 30px;
+  font-weight: 900;
+  font-style: italic;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  background: linear-gradient(180deg, #FFF6D8 0%, var(--zut-gold-1, #FFCB2D) 60%, #D89A12 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.6));
+}
+
+.st-tile-value small {
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.st-tile-sub {
+  font-size: 12px;
+  font-weight: 700;
+  color: #AFC4E8;
+}
+
+.st-tile .st-goldbar {
+  width: 100%;
+}
+
+/* ---------- Liga-Panel ---------- */
+.st-league-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.st-league-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.st-league-goals {
+  flex: none;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.st-league-goals b {
+  font-size: 26px;
+  font-weight: 900;
+  font-style: italic;
+  line-height: 1;
+  background: linear-gradient(180deg, #FFF6D8 0%, var(--zut-gold-1, #FFCB2D) 60%, #D89A12 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.6));
+}
+
+.st-league-goals small {
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: #AFC4E8;
+}
+
+.st-league-bar {
+  margin-top: 12px;
+}
+
+.st-league-note {
+  margin: 8px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #C9D8F4;
+}
+
+.st-league-note b {
+  color: #FFDD66;
+}
+
+.st-league-note--max {
+  color: #FFDD66;
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ---------- Statistik-Kacheln (2x2) ---------- */
+.st-stats {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.st-stat {
+  position: relative;
+  padding: 13px 14px;
+  border-radius: 18px;
+  background: linear-gradient(175deg, rgba(20, 40, 86, 0.92), rgba(9, 20, 46, 0.94));
+  border: 1px solid rgba(150, 180, 230, 0.3);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 12px 24px rgba(0, 0, 0, 0.45);
+}
+
+.st-stat::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 22%;
+  right: 22%;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255, 203, 45, 0), var(--zut-gold-2, #FFE27A) 50%, rgba(255, 203, 45, 0));
+}
+
+.st-stat-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.st-stat-value {
+  font-size: 28px;
+  font-weight: 900;
+  font-style: italic;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  background: linear-gradient(180deg, #FFF6D8 0%, var(--zut-gold-1, #FFCB2D) 60%, #D89A12 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.6));
+}
+
+.st-stat-icon {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFDD66;
+  background: rgba(255, 203, 45, 0.12);
+  border: 1px solid rgba(255, 203, 45, 0.4);
+}
+
+.st-stat-icon svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+
+.st-stat-label {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #AFC4E8;
+}
+
+/* ---------- Backup-Panel ---------- */
+.st-backup-text {
+  margin: 10px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: #C9D8F4;
+}
+
+.st-backup-row {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.st-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 12px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #E7EEFB;
+  background: linear-gradient(180deg, #1E3866 0%, #10224A 55%, #0B1936 100%);
+  border: 1px solid rgba(150, 180, 230, 0.34);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 5px 12px rgba(0, 0, 0, 0.4);
+  transition: transform var(--zut-dur-fast, 200ms) ease;
+}
+
+.st-btn:active {
+  transform: scale(0.96);
+}
+
+.st-btn svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  display: block;
+  color: #FFDD66;
+}
+
+.st-backup-status {
+  margin: 10px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #FFDD66;
+}
+
+/* ---------- Letzte Spiele ---------- */
+.st-matches {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.st-match {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 8px 12px;
+  border-radius: 13px;
+  background: linear-gradient(180deg, rgba(24, 44, 90, 0.7), rgba(10, 22, 48, 0.8));
+  border: 1px solid rgba(150, 180, 230, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+.st-res {
+  flex: none;
+  width: 32px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transform: skewX(-7deg);
+  font-size: 14px;
+  font-weight: 900;
+  font-style: italic;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 2px 5px rgba(0, 0, 0, 0.45);
+}
+
+.st-res > span {
+  transform: skewX(7deg);
+}
+
+.st-res--win {
+  color: #2A1D04;
+  background: linear-gradient(180deg, var(--zut-gold-2, #FFE27A), #D89A12);
+}
+
+.st-res--loss {
+  color: #FFE5E5;
+  background: linear-gradient(180deg, #E05252, #98262B);
+}
+
+.st-res--draw {
+  color: #F2F6FF;
+  background: linear-gradient(180deg, #5E9BFF, #1D4FA8);
+}
+
+.st-match-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.st-match-opp {
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+  color: #F2F6FF;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.st-match-date {
+  display: block;
+  margin-top: 1px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #AFC4E8;
+}
+
+.st-match-score {
+  flex: none;
+  font-size: 19px;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  background: linear-gradient(180deg, #FFF6D8 0%, var(--zut-gold-1, #FFCB2D) 60%, #D89A12 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.6));
+}
+
+/* ---------- Footer: Zebra Ultimate Team + Version ---------- */
+.st-footer {
+  margin-top: 26px;
+  text-align: center;
+}
+
+.st-footer-brand {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  background: linear-gradient(180deg, #FFF6D8 0%, var(--zut-gold-1, #FFCB2D) 60%, #C8940E 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.6));
+}
+
+.st-footer-brand svg {
+  width: 15px;
+  height: 15px;
+  display: block;
+  color: var(--zut-gold-1, #FFCB2D);
+  filter: drop-shadow(0 0 4px rgba(255, 203, 45, 0.5));
+}
+
+.st-footer-version {
+  margin: 6px 0 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8FA3C8;
+}
+
+/* ---------- Fokus-Ring (Gold) ---------- */
+.st-settings:focus-visible,
+.st-tablebtn:focus-visible,
+.st-cta:focus-visible,
+.st-pill:focus-visible,
+.st-tile:focus-visible,
+.st-btn:focus-visible {
+  outline: 3px solid var(--zut-gold-1, #FFCB2D);
+  outline-offset: 2px;
+}
+
+/* ---------- Reduced Motion: statische Endzustände, keine Loops ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .st-wrap {
+    animation: none;
+  }
+
+  .st-cta {
+    animation: none;
+  }
+
+  .st-goldbar i,
+  .st-settings,
+  .st-tablebtn,
+  .st-cta,
+  .st-pill,
+  .st-tile,
+  .st-btn {
+    transition: none;
+  }
+
+  .st-settings:active,
+  .st-tablebtn:active,
+  .st-cta:active,
+  .st-pill:active,
+  .st-tile:active,
+  .st-btn:active {
+    transform: none;
+  }
+}
