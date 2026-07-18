@@ -600,6 +600,16 @@ class SoundManager {
   }
 
   /**
+   * Low-level AudioContext state, for diagnosing "app thinks sound is ready
+   * but nothing plays" — the 'initialized' flag alone can't tell this apart,
+   * since iOS Safari may silently leave the context 'suspended' if resume()
+   * wasn't called inside a genuine user gesture.
+   */
+  getContextState() {
+    return this.audioContext ? this.audioContext.state : 'unavailable'
+  }
+
+  /**
    * Enable or disable sound explicitly
    */
   setEnabled(enabled) {

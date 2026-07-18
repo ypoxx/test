@@ -8,6 +8,7 @@ import { saveSoundPreference, resetProgress } from '../utils/localStorage'
 function Settings({ onClose, onProgressReset }) {
   const [soundOn, setSoundOn] = useState(soundManager.enabled)
   const [confirmReset, setConfirmReset] = useState(false)
+  const [soundTestHint, setSoundTestHint] = useState(null)
 
   const handleSoundToggle = () => {
     const next = !soundOn
@@ -16,6 +17,27 @@ function Settings({ onClose, onProgressReset }) {
     saveSoundPreference(next)
     if (next) {
       soundManager.init().then(() => soundManager.playGoal())
+    }
+  }
+
+  const handleSoundTest = async () => {
+    setSoundTestHint(null)
+    if (!soundOn) {
+      setSoundOn(true)
+      soundManager.setEnabled(true)
+      saveSoundPreference(true)
+    }
+    await soundManager.init()
+    soundManager.playGoal()
+    // iOS can leave the AudioContext silently suspended even after a
+    // successful-looking init() — that's the hardware mute switch, which no
+    // website can override, so point directly at it instead of staying quiet.
+    if (soundManager.getContextState() !== 'running') {
+      setSoundTestHint(
+        'Kein Ton zu hören? Prüf den Stumm-Schalter an der Seite deines iPhones (er darf nicht orange sein) und die Lautstärke.'
+      )
+    } else {
+      setSoundTestHint('Ton läuft! Falls trotzdem nichts zu hören ist, prüf die Lautstärke.')
     }
   }
 
@@ -59,6 +81,19 @@ function Settings({ onClose, onProgressReset }) {
           >
             {soundOn ? '🔊 An' : '🔇 Aus'}
           </button>
+        </div>
+
+        {/* Sound-Diagnose (v.a. für iPhone: Stumm-Schalter etc.) */}
+        <div className="bg-white/5 rounded-lg p-4 mb-4">
+          <button
+            onClick={handleSoundTest}
+            className="w-full px-4 py-2 rounded-lg font-bold text-sm bg-white/10 text-white transition-all hover:bg-white/20"
+          >
+            🔈 Sound testen
+          </button>
+          {soundTestHint && (
+            <p className="text-xs text-white/70 mt-2">{soundTestHint}</p>
+          )}
         </div>
 
         {/* Reset */}

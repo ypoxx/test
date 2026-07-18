@@ -3,6 +3,7 @@ import { getPersonalGreeting, getRandomFunFact, getRandomPrompt } from '../utils
 import StadiumScene from './StadiumScene'
 import FutCard from './FutCard'
 import cardsData from '../data/cards.json'
+import soundManager from '../utils/sounds'
 import './Welcome.css'
 
 /**
@@ -130,6 +131,10 @@ function Welcome({ onStart }) {
   const [selectedAnswer, setSelectedAnswer] = useState(null)
 
   const handleAnswer = (answer) => {
+    // Earliest real tap in a returning session (sound preference already
+    // stored, so the "Sound aktivieren" prompt no longer shows) — attempt
+    // the iOS audio unlock here so it happens inside a genuine gesture.
+    soundManager.init()
     setSelectedAnswer(answer)
     setAnswered(true)
   }
@@ -214,7 +219,7 @@ function Welcome({ onStart }) {
 
           {/* Direkt ins Stadion */}
           {!answered && (
-            <button onClick={onStart} className="wl-skip">
+            <button onClick={() => { soundManager.init(); onStart() }} className="wl-skip">
               Überspringen und direkt loslegen
               <ArrowIcon />
             </button>

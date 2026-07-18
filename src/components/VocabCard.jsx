@@ -69,10 +69,13 @@ function VocabCard({ vocab, options, direction = 'en-de', onAnswer, currentIndex
   const handleSelectAnswer = (answer) => {
     if (showFeedback) return // Prevent multiple selections
 
-    // Initialize sound on first user click (browsers require a gesture)
-    if (!soundManager.initialized) {
-      soundManager.init()
-    }
+    // Re-attempt the audio unlock on every real tap. iOS Safari requires the
+    // AudioContext resume() call to happen synchronously inside a genuine
+    // user gesture — Match.jsx's mount-time init() runs in a useEffect and
+    // does NOT count, so on iOS it can silently leave the context suspended
+    // (initialized stays true, but no sound plays). init() itself is cheap
+    // to call repeatedly: it just re-resumes if still suspended.
+    soundManager.init()
 
     setSelectedAnswer(answer)
     const correct = answer === correctOption
