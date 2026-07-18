@@ -16,6 +16,7 @@ import { loadSeason, getNextFixture, getRank, getRankZone, getSeasonReward, star
 import { getZoneStyle } from './zoneStyles'
 import { OPPONENTS } from '../utils/matchLogic'
 import { CATEGORIES } from '../utils/categories'
+import soundManager from '../utils/sounds'
 import './Stadium.css'
 
 /**
@@ -320,6 +321,10 @@ function Stadium({ progress, onStartMatch, onProgressReset, onProgressRefresh })
 
   const startSeasonMatch = () => {
     if (!nextFixture || !fixtureOpponent) return
+    // Attempt the iOS audio unlock synchronously inside this real tap —
+    // Match.jsx's own init() runs later in a useEffect, which iOS Safari
+    // does not treat as a user gesture and can leave audio silently muted.
+    soundManager.init()
     onStartMatch({
       mode: 'season',
       category,
@@ -330,6 +335,7 @@ function Stadium({ progress, onStartMatch, onProgressReset, onProgressRefresh })
   }
 
   const startTrainingMatch = () => {
+    soundManager.init()
     onStartMatch({ mode: 'training', category, difficulty })
   }
 
